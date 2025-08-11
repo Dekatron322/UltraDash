@@ -27,19 +27,19 @@ const AddNewTicket: React.FC = () => {
   const [description, setDescription] = useState("")
 
   const router = useRouter()
-  const searchParams = useSearchParams()
+  // const searchParams = useSearchParams()
 
-  useEffect(() => {
-    const eventParam = searchParams.get("event")
-    if (eventParam) {
-      try {
-        const parsedEvent = JSON.parse(decodeURIComponent(eventParam)) as Event
-        setSelectedEvent(parsedEvent)
-      } catch (e) {
-        console.error("Failed to parse event from URL", e)
-      }
-    }
-  }, [searchParams])
+  // useEffect(() => {
+  //   const eventParam = searchParams.get("event")
+  //   if (eventParam) {
+  //     try {
+  //       const parsedEvent = JSON.parse(decodeURIComponent(eventParam)) as Event
+  //       setSelectedEvent(parsedEvent)
+  //     } catch (e) {
+  //       console.error("Failed to parse event from URL", e)
+  //     }
+  //   }
+  // }, [searchParams])
 
   const handleGoBack = () => {
     router.back()

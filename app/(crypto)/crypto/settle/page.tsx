@@ -29,22 +29,22 @@ const TransferToUser: React.FC = () => {
   const [activeField, setActiveField] = useState<"amount" | "recipient" | null>(null)
 
   const router = useRouter()
-  const searchParams = useSearchParams()
+  // const searchParams = useSearchParams()
 
-  useEffect(() => {
-    const tokenParam = searchParams.get("token")
-    if (tokenParam) {
-      try {
-        const token = JSON.parse(decodeURIComponent(tokenParam))
-        // setSelectedToken({
-        //   ...token,
-        //   color: token.color || getTokenColor(token.symbol),
-        // })
-      } catch (e) {
-        console.error("Failed to parse token from URL", e)
-      }
-    }
-  }, [searchParams])
+  // useEffect(() => {
+  //   const tokenParam = searchParams.get("token")
+  //   if (tokenParam) {
+  //     try {
+  //       const token = JSON.parse(decodeURIComponent(tokenParam))
+  //       // setSelectedToken({
+  //       //   ...token,
+  //       //   color: token.color || getTokenColor(token.symbol),
+  //       // })
+  //     } catch (e) {
+  //       console.error("Failed to parse token from URL", e)
+  //     }
+  //   }
+  // }, [searchParams])
 
   const getTokenColor = (symbol: string) => {
     const colors: Record<string, string> = {
