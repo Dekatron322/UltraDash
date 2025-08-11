@@ -9,28 +9,26 @@ import SettingIcon from "public/setting-icon"
 
 const links = [
   { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
-  { name: "Transactions", href: "/transactions", icon: Pricing },
   {
     name: "Customers",
     href: "/customers",
     icon: ServiceIcon,
   },
-  { name: "Virtual Cards", href: "/virtual-accounts", icon: NoteIcon },
-  { name: "Crypto", href: "/crypto", icon: BusinessLogo },
-  { name: "Employees", href: "/employee", icon: EmployeeLogo },
   {
-    name: "Settings",
+    name: "All Transactions",
     href: "",
     icon: SettingIcon,
     sublinks: [
-      { name: "Banks", href: "/settings/banks" },
-      { name: "Debit Fee", href: "/settings/debit-fee" },
-      { name: "Customer Type", href: "/settings/customer-type" },
-      { name: "Identity Type", href: "/settings/identity-type" },
-      { name: "Product Type", href: "/settings/product-type" },
-      { name: "Sector", href: "/settings/sector" },
+      { name: "Fiat Transactions", href: "/transactions" },
+      { name: "Crypto Transactions", href: "/transactions/crypto" },
     ],
   },
+  { name: "Crypto", href: "/crypto", icon: BusinessLogo },
+  { name: "Virtual Cards", href: "/virtual-accounts", icon: NoteIcon },
+
+  { name: "Tickets & Events", href: "/tickets-and-events", icon: BusinessLogo },
+  { name: "Role Management", href: "/role-management", icon: BusinessLogo },
+  { name: "Fees", href: "/fees", icon: BusinessLogo },
 ]
 
 interface LinksProps {

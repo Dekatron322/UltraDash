@@ -171,7 +171,7 @@ const DashboardNav = () => {
       <nav className="block border-b bg-[#E9F0FF] px-16 py-4 max-md:px-3 md:hidden">
         <div className="flex items-center justify-between">
           <Link href="/" className="content-center">
-            <Image src="/otech logo.svg" width={40} height={40} alt="dekalo" />
+            <UltraIcon />
           </Link>
           <FormatAlignLeftIcon onClick={toggleNav} style={{ cursor: "pointer" }} />
         </div>

@@ -95,7 +95,7 @@ const SignIn: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full max-w-md rounded-2xl p-8 "
+            className="w-full max-w-md rounded-2xl md:p-8 "
           >
             <div className="mb-8 text-center">
               <h1 className="text-3xl font-bold text-gray-700">Welcome back</h1>
