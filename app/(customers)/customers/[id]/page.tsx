@@ -6,7 +6,7 @@ import CustomerInfo from "components/CustomerInfo/CustomerInfo"
 import DashboardNav from "components/Navbar/DashboardNav"
 import { ButtonModule } from "components/ui/Button/Button"
 import ActivateCustomerModal from "components/ui/Modal/activate-customer-modal"
-import DeactivateCustomerModal from "components/ui/Modal/freeze-account-modal"
+// import DeactivateCustomerModal from "components/ui/Modal/freeze-account-modal"
 import DeleteCustomerModal from "components/ui/Modal/delete-customer-modal"
 
 interface Account {
@@ -159,13 +159,13 @@ const CustomerDetailPage: React.FC = () => {
         customerId={0}
       />
 
-      <DeactivateCustomerModal
+      {/* <DeactivateCustomerModal
         isOpen={isDeactivateModalOpen}
         onRequestClose={() => setIsDeactivateModalOpen(false)}
         onSuccess={handleDeactivateSuccess}
         customerId={customer.id}
         customerName={`${customer.firstName} ${customer.lastName}`}
-      />
+      /> */}
 
       <DeleteCustomerModal
         isOpen={isDeleteModalOpen}

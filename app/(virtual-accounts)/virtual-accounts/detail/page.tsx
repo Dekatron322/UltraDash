@@ -1,4 +1,5 @@
 "use client"
+
 import React, { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from "framer-motion"
@@ -7,11 +8,20 @@ import { TbWaveSawTool } from "react-icons/tb"
 import { RiVisaLine } from "react-icons/ri"
 import { SiMastercard } from "react-icons/si"
 import DashboardNav from "components/Navbar/DashboardNav"
-import { notify } from "components/ui/Notification/Notification"
+
+type GradientKey = "gradient-1" | "gradient-2" | "gradient-3" | "gradient-4"
+
+const cardGradients: Record<GradientKey, string> = {
+  "gradient-1": "from-purple-500 via-pink-500 to-rose-500",
+  "gradient-2": "from-emerald-500 via-teal-500 to-cyan-500",
+  "gradient-3": "from-amber-500 via-orange-500 to-red-500",
+  "gradient-4": "from-indigo-500 via-blue-500 to-violet-500",
+}
 
 const VirtualCardPage = () => {
   const router = useRouter()
   const cardRef = useRef<HTMLDivElement>(null)
+
   const [cardDetails, setCardDetails] = useState({
     number: "•••• •••• •••• 4242",
     fullNumber: "4242424242424242",
@@ -24,11 +34,11 @@ const VirtualCardPage = () => {
     balance: 12500.42,
     currency: "USD",
     frozen: false,
-    color: "gradient-1",
+    color: "gradient-1" as GradientKey,
   })
 
   const [showDetails, setShowDetails] = useState(false)
-  const [transactions, setTransactions] = useState([
+  const [transactions] = useState([
     { id: 1, merchant: "Amazon", amount: -42.99, date: "2023-06-15", category: "shopping", icon: "🛍️" },
     { id: 2, merchant: "Starbucks", amount: -5.75, date: "2023-06-14", category: "food", icon: "☕" },
     { id: 3, merchant: "Spotify", amount: -9.99, date: "2023-06-10", category: "entertainment", icon: "🎵" },
@@ -43,14 +53,6 @@ const VirtualCardPage = () => {
   const rotateY = useTransform(x, [-100, 100], [-10, 10])
   const gradientPosition = useTransform(x, [-200, 200], ["0% 100%", "100% 0%"])
   const background = useMotionTemplate`radial-gradient(circle at ${gradientPosition}, var(--tw-gradient-stops))`
-
-  // Card color gradients
-  const cardGradients = {
-    "gradient-1": "from-purple-500 via-pink-500 to-rose-500",
-    "gradient-2": "from-emerald-500 via-teal-500 to-cyan-500",
-    "gradient-3": "from-amber-500 via-orange-500 to-red-500",
-    "gradient-4": "from-indigo-500 via-blue-500 to-violet-500",
-  }
 
   // Animated balance counter
   useEffect(() => {
@@ -68,7 +70,6 @@ const VirtualCardPage = () => {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return
-
     const rect = cardRef.current.getBoundingClientRect()
     x.set(e.clientX - rect.left - rect.width / 2)
     y.set(e.clientY - rect.top - rect.height / 2)
@@ -85,45 +86,28 @@ const VirtualCardPage = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    // notify({
-    //   type: "success",
-    //   message: "Copied to clipboard!",
-    // })
   }
 
   const regenerateCard = () => {
-    // notify({
-    //   type: "info",
-    //   message: "Generating new card details...",
-    // })
-    // Simulate API call
     setTimeout(() => {
-      setCardDetails({
-        ...cardDetails,
+      setCardDetails((prev) => ({
+        ...prev,
         fullNumber: "5555666677778888",
         number: "•••• •••• •••• 8888",
         fullCvv: "456",
         cvv: "•••",
         fullExpiry: "09/25",
         expiry: "••/••",
-      })
-      // notify({
-      //   type: "success",
-      //   message: "New virtual card generated!",
-      // })
+      }))
     }, 1500)
   }
 
-  const changeCardColor = (color: string) => {
+  const changeCardColor = (color: GradientKey) => {
     setCardDetails({ ...cardDetails, color })
   }
 
   const freezeCard = () => {
     setCardDetails({ ...cardDetails, frozen: !cardDetails.frozen })
-    // notify({
-    //   type: cardDetails.frozen ? "success" : "warning",
-    //   message: cardDetails.frozen ? "Card unfrozen" : "Card frozen",
-    // })
   }
 
   return (
@@ -148,12 +132,7 @@ const VirtualCardPage = () => {
             ref={cardRef}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            style={{
-              rotateX,
-              rotateY,
-              background,
-              transformPerspective: 1000,
-            }}
+            style={{ rotateX, rotateY, background, transformPerspective: 1000 }}
             className={`h-56 w-full max-w-md rounded-2xl bg-gradient-to-br p-6 shadow-2xl ${
               cardGradients[cardDetails.color]
             } relative overflow-hidden`}
@@ -272,10 +251,10 @@ const VirtualCardPage = () => {
                 key={gradient}
                 whileHover={{ y: -5 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => changeCardColor(gradient)}
-                className={`h-24 cursor-pointer rounded-xl bg-gradient-to-br ${cardGradients[gradient]} ${
-                  cardDetails.color === gradient ? "ring-4 ring-white/50" : ""
-                }`}
+                onClick={() => changeCardColor(gradient as GradientKey)}
+                className={`h-24 cursor-pointer rounded-xl bg-gradient-to-br ${
+                  cardGradients[gradient as GradientKey]
+                } ${cardDetails.color === gradient ? "ring-4 ring-white/50" : ""}`}
               />
             ))}
           </div>
@@ -290,7 +269,6 @@ const VirtualCardPage = () => {
               {cardDetails.currency} {cardDetails.balance.toLocaleString()}
             </div>
             <div className="text-sm text-green-400">+2.5% from last month</div>
-
             <div className="mt-6 space-y-4">
               <button className="w-full rounded-lg bg-indigo-600 py-2 transition-colors hover:bg-indigo-700">
                 Add Funds
@@ -309,7 +287,6 @@ const VirtualCardPage = () => {
                 <FiShare2 size={16} /> Export
               </button>
             </div>
-
             <div className="space-y-4">
               {transactions.map((txn) => (
                 <motion.div
@@ -331,7 +308,6 @@ const VirtualCardPage = () => {
                 </motion.div>
               ))}
             </div>
-
             <button className="mt-6 w-full rounded-lg border border-dashed border-gray-600 py-2 text-indigo-400 transition-colors hover:border-indigo-500 hover:text-indigo-300">
               View All Transactions
             </button>
