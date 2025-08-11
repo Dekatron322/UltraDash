@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { FiArrowLeft, FiRefreshCw } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
-import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
 import TokenDropdown from "components/ui/Modal/token-dropdown"
 
@@ -22,12 +21,14 @@ const tokens: Token[] = [
   { symbol: "ETH", icon: "Ξ", name: "Ethereum", color: "bg-purple-500" },
 ]
 
+const defaultToken: Token = { symbol: "", icon: null, name: "", color: "" }
+
 const SwapScreen: React.FC = () => {
   const [amount, setAmount] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [buyCurrency, setBuyCurrency] = useState<Token>(tokens[0])
-  const [receiveCurrency, setReceiveCurrency] = useState<Token>(tokens[1])
+  const [buyCurrency, setBuyCurrency] = useState<Token>(tokens[0] ?? defaultToken)
+  const [receiveCurrency, setReceiveCurrency] = useState<Token>(tokens[1] ?? defaultToken)
   const [showFees, setShowFees] = useState(false)
   const [calculatingFees, setCalculatingFees] = useState(false)
   const [exchangeRate, setExchangeRate] = useState(1500)
@@ -64,24 +65,10 @@ const SwapScreen: React.FC = () => {
     setLoading(true)
 
     try {
-      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // notify({
-      //   type: "success",
-      //   title: "Swap Initiated!",
-      //   message: `Swapping ${amount} ${buyCurrency.symbol} to ${receiveCurrency.symbol}`,
-      //   duration: 2000,
-      // })
-
       setTimeout(() => router.push("/swap/confirmation"), 1000)
     } catch (error: any) {
       setError(error.message || "Swap failed. Please try again.")
-      // notify({
-      //   type: "error",
-      //   title: "Swap Failed",
-      //   message: error.message || "Please try again",
-      // })
     } finally {
       setLoading(false)
     }
@@ -89,16 +76,9 @@ const SwapScreen: React.FC = () => {
 
   const refreshExchangeRate = () => {
     setIsRateRefreshing(true)
-    // Simulate API call
     setTimeout(() => {
       setExchangeRate((prev) => prev + (Math.random() > 0.5 ? 10 : -10))
       setIsRateRefreshing(false)
-      // notify({
-      //   type: "info",
-      //   title: "Rate Updated",
-      //   message: "Exchange rate refreshed",
-      //   duration: 1000,
-      // })
     }, 1000)
   }
 
@@ -112,7 +92,7 @@ const SwapScreen: React.FC = () => {
     } else if (buyCurrency.symbol === "USDT" && receiveCurrency.symbol === "NGN") {
       return (numAmount * exchangeRate).toFixed(2)
     }
-    return "0" // For other currency pairs
+    return "0"
   }
 
   const calculateFees = () => {
@@ -120,8 +100,8 @@ const SwapScreen: React.FC = () => {
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount)) return { swapFee: 0, networkFee: 0, total: 0 }
 
-    const swapFee = numAmount * 0.005 // 0.5% swap fee
-    const networkFee = 360 // Fixed network fee in NGN
+    const swapFee = numAmount * 0.005
+    const networkFee = 360
     return {
       swapFee,
       networkFee,
@@ -134,7 +114,6 @@ const SwapScreen: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <DashboardNav />
-
       <div className="container mx-auto max-w-md px-4 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           {/* Header */}
@@ -159,7 +138,6 @@ const SwapScreen: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700">You Pay</label>
                 <div className="text-sm text-gray-500">Balance: {buyCurrency.symbol === "NGN" ? "∞" : "1,234.56"}</div>
               </div>
-
               <div className="flex items-center">
                 <input
                   type="text"
@@ -196,7 +174,6 @@ const SwapScreen: React.FC = () => {
                   Balance: {receiveCurrency.symbol === "NGN" ? "∞" : "789.01"}
                 </div>
               </div>
-
               <div className="flex items-center">
                 <input
                   type="text"
@@ -240,7 +217,6 @@ const SwapScreen: React.FC = () => {
                   transition={{ duration: 0.3 }}
                 >
                   <h3 className="mb-3 font-medium text-gray-900">Transaction Details</h3>
-
                   {calculatingFees ? (
                     <div className="space-y-3">
                       {[...Array(3)].map((_, i) => (
