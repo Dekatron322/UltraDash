@@ -74,8 +74,10 @@ export const FormInputModule: React.FC<FormInputProps> = ({
               symbol: currency,
               icon: currencyIcon,
               name: currency === "NGN" ? "Naira" : "Tether",
+              color: "#003F9F", // Added the required color property
             }}
             onSelect={onCurrencyChange}
+            tokens={[]}
           />
         ) : (
           <div className="flex items-center justify-center gap-2 rounded-full bg-[#003F9F] p-2">
