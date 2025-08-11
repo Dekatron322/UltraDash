@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { PasswordInputModule } from "components/ui/Input/PasswordInput"
@@ -9,7 +9,7 @@ import { notify } from "components/ui/Notification/Notification"
 import UltraIcon from "public/ultra-icon"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "lib/redux/store"
-import { loginUser, initializeAuth } from "lib/redux/authSlice"
+import { initializeAuth, loginUser } from "lib/redux/authSlice"
 import { motion } from "framer-motion"
 
 const SignIn: React.FC = () => {
@@ -136,7 +136,7 @@ const SignIn: React.FC = () => {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-[#003F9F] focus:ring-[#003F9F]"
+                    className="size-4 rounded border-gray-300 text-[#003F9F] focus:ring-[#003F9F]"
                   />
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                     Remember me
@@ -171,7 +171,7 @@ const SignIn: React.FC = () => {
                   {loading ? (
                     <div className="flex items-center justify-center">
                       <svg
-                        className="mr-2 h-5 w-5 animate-spin"
+                        className="mr-2 size-5 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -206,7 +206,7 @@ const SignIn: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.8 }}
             className="mt-8 text-center text-sm text-gray-500"
           >
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="#" className="font-medium text-[#003F9F] hover:text-[#2F88FC]">
               Get started
             </Link>

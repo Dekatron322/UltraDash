@@ -93,7 +93,7 @@ const MakeAdminModal: React.FC<MakeAdminModalProps> = ({ isOpen, onRequestClose,
                   id={`permission-${option.id}`}
                   checked={permissions.includes(option.id)}
                   onChange={() => handlePermissionChange(option.id)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <label htmlFor={`permission-${option.id}`} className="ml-2 text-sm text-gray-700">
                   {option.label}

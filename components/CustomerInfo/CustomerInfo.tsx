@@ -1,15 +1,15 @@
 "use client"
 
-import React, { useState, useRef } from "react"
+import React, { useState } from "react"
 import { RxCaretSort } from "react-icons/rx"
-import { MdOutlineCheckBoxOutlineBlank, MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos } from "react-icons/md"
+import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
 import TransactionDetailModal from "components/ui/Modal/transaction-detail-modal"
 import { ButtonModule } from "components/ui/Button/Button"
 import ExportIcon from "public/export-icon"
 import AssetDetailModal from "components/ui/Modal/asset-detail-modal"
 import NotificationModal from "components/ui/Modal/notification-modal"
 import { motion } from "framer-motion"
-import { useGetUserByIdQuery, useGetUserTransactionsQuery, useGetUserCryptoQuery } from "lib/redux/customerSlice"
+import { useGetUserByIdQuery, useGetUserCryptoQuery, useGetUserTransactionsQuery } from "lib/redux/customerSlice"
 import { useParams } from "next/navigation"
 import LoadingSkeleton from "components/ui/Loader/LoadingSkeleton"
 import { format, subDays } from "date-fns"
@@ -144,7 +144,7 @@ const CryptoAssetsSkeleton = () => {
             <tr key={index} className="hover:bg-gray-50">
               <td className="whitespace-nowrap border-b px-4 py-2">
                 <div className="flex items-center">
-                  <div className="h-8 w-8 animate-pulse rounded-md bg-gray-200"></div>
+                  <div className="size-8 animate-pulse rounded-md bg-gray-200"></div>
                   <div className="ml-4">
                     <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
                     <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
@@ -391,7 +391,7 @@ const CustomerInfo = () => {
       >
         <div className="mb-6 flex items-center justify-between gap-2 border-b pb-3">
           <div className="flex h-auto items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#003F9F] text-xl font-semibold text-white">
+            <div className="flex size-10 items-center justify-center rounded-md bg-[#003F9F] text-xl font-semibold text-white">
               {customer.firstName?.charAt(0) || ""}
               {customer.lastName?.charAt(0) || ""}
             </div>
@@ -608,7 +608,7 @@ const CustomerInfo = () => {
                             <button
                               key={index}
                               onClick={() => paginate(pageNum)}
-                              className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                              className={`flex size-8 items-center justify-center rounded-md text-sm ${
                                 currentPage === pageNum
                                   ? "bg-[#003F9F] text-white"
                                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -624,7 +624,7 @@ const CustomerInfo = () => {
                         {totalPages > 5 && currentPage < totalPages - 1 && (
                           <button
                             onClick={() => paginate(totalPages)}
-                            className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                            className={`flex size-8 items-center justify-center rounded-md text-sm ${
                               currentPage === totalPages
                                 ? "bg-[#003F9F] text-white"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -710,7 +710,7 @@ const CustomerInfo = () => {
                                 <img
                                   src={asset.logo}
                                   alt={asset.name}
-                                  className="h-8 w-8 rounded-md object-contain"
+                                  className="size-8 rounded-md object-contain"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement
                                     target.src = "https://via.placeholder.com/32"

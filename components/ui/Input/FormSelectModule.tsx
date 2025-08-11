@@ -79,7 +79,7 @@ export const FormSelectModule: React.FC<FormSelectModuleProps> = ({
       >
         <span className="text-base">{selectedOption?.label || "Select an option"}</span>
         <ChevronDown
-          className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`size-5 text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         />
       </div>
 

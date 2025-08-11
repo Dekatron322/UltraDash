@@ -1,11 +1,10 @@
 "use client"
 import React, { useRef, useState } from "react"
 import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
-import { RxCaretSort, RxDotsVertical } from "react-icons/rx"
+import { RxCaretSort } from "react-icons/rx"
 import OutgoingIcon from "public/outgoing-icon"
 import IncomingIcon from "public/incoming-icon"
 import { ButtonModule } from "components/ui/Button/Button"
-import ExportIcon from "public/export-icon"
 import { SearchModule } from "components/ui/Search/search-module"
 import EmptyState from "public/empty-state"
 import PdfFile from "public/pdf-file"
@@ -18,7 +17,7 @@ import Filtericon from "public/filter-icon"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
-import { Transaction, useGetTransactionsQuery, useGetTransactionByIdQuery } from "lib/redux/transactionSlice"
+import { Transaction, useGetTransactionByIdQuery, useGetTransactionsQuery } from "lib/redux/transactionSlice"
 
 type SortOrder = "asc" | "desc" | null
 
@@ -62,10 +61,10 @@ const DetailSkeleton = () => {
     <div className="w-full animate-pulse">
       <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
         <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-md bg-gray-300"></div>
+          <div className="size-7 rounded-md bg-gray-300"></div>
           <div className="h-6 w-40 rounded bg-gray-300"></div>
         </div>
-        <div className="h-6 w-6 rounded bg-gray-300"></div>
+        <div className="size-6 rounded bg-gray-300"></div>
       </div>
 
       <div className="flex flex-col items-center justify-center bg-gray-50 p-4">
@@ -235,7 +234,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
         <div ref={modalRef} className="w-full">
           <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
             <div className="flex items-center justify-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#003F9F] font-semibold text-white">
+              <div className="flex size-7 items-center justify-center rounded-md bg-[#003F9F] font-semibold text-white">
                 {transaction.user.firstName.charAt(0).toUpperCase()}
               </div>
               <p className="text-xl font-semibold text-[#2a2f4b]">Transaction Details</p>
@@ -412,11 +411,11 @@ const FilterDropdown = ({
           >
             <span className="mr-2">
               {activeFilters.includes(option.value) ? (
-                <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="size-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
-                <svg className="h-4 w-4 opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="size-4 opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               )}
@@ -782,7 +781,7 @@ const AllTransactionTable: React.FC = () => {
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#EDF0F4]">
+                        <div className="flex size-8 items-center justify-center rounded-md bg-[#EDF0F4]">
                           <p>{getInitial(transaction.user.firstName)}</p>
                         </div>
                         {transaction.user.firstName} {transaction.user.lastName}
@@ -869,7 +868,7 @@ const AllTransactionTable: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => paginate(pageNum)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                    className={`flex size-8 items-center justify-center rounded-md text-sm ${
                       currentPage === pageNum
                         ? "bg-[#003F9F] text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -887,7 +886,7 @@ const AllTransactionTable: React.FC = () => {
               {data?.totalPages && data.totalPages > 5 && currentPage < data.totalPages - 1 && (
                 <button
                   onClick={() => paginate(data.totalPages)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                  className={`flex size-8 items-center justify-center rounded-md text-sm ${
                     currentPage === data.totalPages
                       ? "bg-[#003F9F] text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"

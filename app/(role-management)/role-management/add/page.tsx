@@ -1,8 +1,8 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { FiArrowLeft, FiUser, FiMail, FiBriefcase, FiCheck, FiX, FiPhone, FiHome } from "react-icons/fi"
+import { motion } from "framer-motion"
+import { FiArrowLeft, FiBriefcase, FiCheck, FiHome, FiMail, FiPhone, FiUser } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -46,38 +46,38 @@ const AddNewEmployee: React.FC = () => {
     event.preventDefault()
 
     if (!firstName || !lastName) {
-      notify({
-        type: "error",
-        title: "Name Required",
-        message: "Please enter both first and last name",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Name Required",
+      //   message: "Please enter both first and last name",
+      // })
       return
     }
 
     if (!email) {
-      notify({
-        type: "error",
-        title: "Email Required",
-        message: "Please enter an email address",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Email Required",
+      //   message: "Please enter an email address",
+      // })
       return
     }
 
     if (!isValidEmail) {
-      notify({
-        type: "error",
-        title: "Invalid Email",
-        message: "Please enter a valid email address",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Invalid Email",
+      //   message: "Please enter a valid email address",
+      // })
       return
     }
 
     if (!department) {
-      notify({
-        type: "error",
-        title: "Department Required",
-        message: "Please select a department",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Department Required",
+      //   message: "Please select a department",
+      // })
       return
     }
 
@@ -100,21 +100,21 @@ const AddNewEmployee: React.FC = () => {
         joinDate: new Date().toISOString(),
       }
 
-      notify({
-        type: "success",
-        title: "Employee Added!",
-        message: `${firstName} ${lastName} has been added to ${department}`,
-        duration: 2000,
-      })
+      // notify({
+      //   type: "success",
+      //   title: "Employee Added!",
+      //   message: `${firstName} ${lastName} has been added to ${department}`,
+      //   duration: 2000,
+      // })
 
       setTimeout(() => router.push("/employees"), 1000)
     } catch (error: any) {
       setError(error.message || "Employee creation failed. Please try again.")
-      notify({
-        type: "error",
-        title: "Creation Failed",
-        message: error.message || "Please try again",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Creation Failed",
+      //   message: error.message || "Please try again",
+      // })
     } finally {
       setLoading(false)
     }
@@ -155,7 +155,7 @@ const AddNewEmployee: React.FC = () => {
           {/* Header */}
           <div className="mb-8 flex items-center">
             <button onClick={handleGoBack} className="mr-4 rounded-full p-2 hover:bg-gray-100">
-              <FiArrowLeft className="h-5 w-5 text-gray-700" />
+              <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Add New Employee</h1>
@@ -182,7 +182,7 @@ const AddNewEmployee: React.FC = () => {
                     <input
                       type="text"
                       placeholder="John"
-                      className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                      className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       onFocus={() => setActiveField("firstName")}
@@ -207,7 +207,7 @@ const AddNewEmployee: React.FC = () => {
                     <input
                       type="text"
                       placeholder="Doe"
-                      className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                      className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       onFocus={() => setActiveField("lastName")}
@@ -235,7 +235,7 @@ const AddNewEmployee: React.FC = () => {
                   <input
                     type="email"
                     placeholder="john.doe@company.com"
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={email}
                     onChange={handleEmailChange}
                     onFocus={() => setActiveField("email")}
@@ -271,7 +271,7 @@ const AddNewEmployee: React.FC = () => {
                   <input
                     type="tel"
                     placeholder="(123) 456-7890"
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     onFocus={() => setActiveField("phone")}
@@ -297,7 +297,7 @@ const AddNewEmployee: React.FC = () => {
                   <input
                     type="text"
                     placeholder="123 Main St, City, State"
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     onFocus={() => setActiveField("address")}
@@ -372,7 +372,7 @@ const AddNewEmployee: React.FC = () => {
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <div className="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Adding...
                   </div>
                 ) : (

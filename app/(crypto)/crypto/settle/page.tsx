@@ -1,8 +1,8 @@
 "use client"
 import React, { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { FiArrowLeft, FiUser, FiDollarSign, FiCheck, FiX } from "react-icons/fi"
+import { motion } from "framer-motion"
+import { FiArrowLeft, FiDollarSign, FiUser } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -36,10 +36,10 @@ const TransferToUser: React.FC = () => {
     if (tokenParam) {
       try {
         const token = JSON.parse(decodeURIComponent(tokenParam))
-        setSelectedToken({
-          ...token,
-          color: token.color || getTokenColor(token.symbol),
-        })
+        // setSelectedToken({
+        //   ...token,
+        //   color: token.color || getTokenColor(token.symbol),
+        // })
       } catch (e) {
         console.error("Failed to parse token from URL", e)
       }
@@ -66,47 +66,47 @@ const TransferToUser: React.FC = () => {
     event.preventDefault()
 
     if (!selectedToken) {
-      notify({
-        type: "error",
-        title: "No Token Selected",
-        message: "Please select a token to transfer",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "No Token Selected",
+      //   message: "Please select a token to transfer",
+      // })
       return
     }
 
     if (!recipientName) {
-      notify({
-        type: "error",
-        title: "Recipient Required",
-        message: "Please enter a recipient name",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Recipient Required",
+      //   message: "Please enter a recipient name",
+      // })
       return
     }
 
     if (!amount) {
-      notify({
-        type: "error",
-        title: "Amount Required",
-        message: "Please enter an amount to transfer",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Amount Required",
+      //   message: "Please enter an amount to transfer",
+      // })
       return
     }
 
     if (!isValidAmount) {
-      notify({
-        type: "error",
-        title: "Invalid Amount",
-        message: "Please enter a valid amount",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Invalid Amount",
+      //   message: "Please enter a valid amount",
+      // })
       return
     }
 
     if (parseFloat(amount) > (selectedToken?.amount || 0)) {
-      notify({
-        type: "error",
-        title: "Insufficient Balance",
-        message: `You don't have enough ${selectedToken.symbol} to complete this transfer`,
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Insufficient Balance",
+      //   message: `You don't have enough ${selectedToken.symbol} to complete this transfer`,
+      // })
       return
     }
 
@@ -117,21 +117,21 @@ const TransferToUser: React.FC = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      notify({
-        type: "success",
-        title: "Transfer Initiated!",
-        message: `${amount} ${selectedToken.symbol} to ${recipientName}`,
-        duration: 2000,
-      })
+      // notify({
+      //   type: "success",
+      //   title: "Transfer Initiated!",
+      //   message: `${amount} ${selectedToken.symbol} to ${recipientName}`,
+      //   duration: 2000,
+      // })
 
       setTimeout(() => router.push("/crypto/verification-code"), 1000)
     } catch (error: any) {
       setError(error.message || "Transfer failed. Please try again.")
-      notify({
-        type: "error",
-        title: "Transfer Failed",
-        message: error.message || "Please try again",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Transfer Failed",
+      //   message: error.message || "Please try again",
+      // })
     } finally {
       setLoading(false)
     }
@@ -194,7 +194,7 @@ const TransferToUser: React.FC = () => {
           {/* Header */}
           <div className="mb-8 flex items-center">
             <button onClick={handleGoBack} className="mr-4 rounded-full p-2 hover:bg-gray-100">
-              <FiArrowLeft className="h-5 w-5 text-gray-700" />
+              <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Transfer {selectedToken?.symbol || "Crypto"}</h1>
@@ -249,7 +249,7 @@ const TransferToUser: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Enter recipient name or ID"
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={recipientName}
                     onChange={handleRecipientChange}
                     onFocus={() => setActiveField("recipient")}
@@ -257,8 +257,8 @@ const TransferToUser: React.FC = () => {
                     required
                   />
                   {verifyingRecipient && (
-                    <div className="ml-2 h-5 w-5 animate-spin">
-                      <div className="h-4 w-4 rounded-full border-2 border-blue-500 border-t-transparent" />
+                    <div className="ml-2 size-5 animate-spin">
+                      <div className="size-4 rounded-full border-2 border-blue-500 border-t-transparent" />
                     </div>
                   )}
                 </div>
@@ -289,7 +289,7 @@ const TransferToUser: React.FC = () => {
                     type="text"
                     inputMode="decimal"
                     placeholder="0.00"
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={amount}
                     onChange={handleAmountChange}
                     onFocus={() => setActiveField("amount")}
@@ -336,7 +336,7 @@ const TransferToUser: React.FC = () => {
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <div className="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Processing...
                   </div>
                 ) : (

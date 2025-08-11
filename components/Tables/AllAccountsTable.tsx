@@ -82,7 +82,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ customer, onViewDetails
   return (
     <div className="relative" ref={dropdownRef}>
       <div
-        className="focus::bg-gray-100 flex h-7 w-7 cursor-pointer items-center justify-center gap-2 rounded-full transition-all duration-200 ease-in-out hover:bg-gray-200"
+        className="focus::bg-gray-100 flex size-7 cursor-pointer items-center justify-center gap-2 rounded-full transition-all duration-200 ease-in-out hover:bg-gray-200"
         onClick={() => setIsOpen(!isOpen)}
       >
         <RxDotsVertical />
@@ -159,10 +159,10 @@ const LoadingSkeleton = () => {
       </div>
 
       <div className="flex items-center justify-between border-t px-4 py-3">
-        <div className="h-4 w-48 animate-pulse rounded bg-gray-200"></div>
+        <div className="size-48 animate-pulse rounded bg-gray-200"></div>
         <div className="flex gap-2">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-7 w-7 animate-pulse rounded-full bg-gray-200"></div>
+            <div key={i} className="size-7 animate-pulse rounded-full bg-gray-200"></div>
           ))}
         </div>
       </div>
@@ -326,7 +326,7 @@ const CustomersTable: React.FC = () => {
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#EDF0F4]">
+                        <div className="flex size-8 items-center justify-center rounded-md bg-[#EDF0F4]">
                           {customer.firstName?.charAt(0)}
                           {customer.lastName?.charAt(0)}
                         </div>
@@ -404,7 +404,7 @@ const CustomersTable: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => paginate(pageNum)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                    className={`flex size-8 items-center justify-center rounded-md text-sm ${
                       currentPage === pageNum
                         ? "bg-[#003F9F] text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -422,7 +422,7 @@ const CustomersTable: React.FC = () => {
               {data?.totalPages && data.totalPages > 5 && currentPage < data.totalPages - 1 && (
                 <button
                   onClick={() => paginate(data.totalPages)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                  className={`flex size-8 items-center justify-center rounded-md text-sm ${
                     currentPage === data.totalPages
                       ? "bg-[#003F9F] text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"

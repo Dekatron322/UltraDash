@@ -154,7 +154,7 @@ const AllBusinessTable = () => {
     return (
       <div className="relative" ref={dropdownRef}>
         <div
-          className="focus::bg-gray-100 flex h-7 w-7 cursor-pointer items-center justify-center gap-2 rounded-full transition-all duration-200 ease-in-out hover:bg-gray-200"
+          className="focus::bg-gray-100 flex size-7 cursor-pointer items-center justify-center gap-2 rounded-full transition-all duration-200 ease-in-out hover:bg-gray-200"
           onClick={() => setIsOpen(!isOpen)}
         >
           <RxDotsVertical />
@@ -242,10 +242,10 @@ const AllBusinessTable = () => {
 
         {/* Pagination Skeleton */}
         <div className="flex items-center justify-between border-t px-4 py-3">
-          <div className="h-4 w-40 animate-pulse rounded bg-gray-200"></div>
+          <div className="size-40 animate-pulse rounded bg-gray-200"></div>
           <div className="flex gap-2">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-7 w-7 animate-pulse rounded-full bg-gray-200"></div>
+              <div key={i} className="size-7 animate-pulse rounded-full bg-gray-200"></div>
             ))}
           </div>
         </div>
@@ -367,9 +367,9 @@ const AllBusinessTable = () => {
                     <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
                       <div className="flex items-center gap-2">
                         {business.logo ? (
-                          <img src={business.logo} alt={business.name} className="h-8 w-8 rounded-md object-cover" />
+                          <img src={business.logo} alt={business.name} className="size-8 rounded-md object-cover" />
                         ) : (
-                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#EDF0F4]">
+                          <div className="flex size-8 items-center justify-center rounded-md bg-[#EDF0F4]">
                             {business.name.charAt(0)}
                           </div>
                         )}
@@ -426,7 +426,7 @@ const AllBusinessTable = () => {
               <button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                className={`flex size-7 items-center justify-center rounded-full ${
                   currentPage === 1 ? "cursor-not-allowed bg-gray-200 text-gray-500" : "bg-gray-200 hover:bg-gray-300"
                 }`}
               >
@@ -436,7 +436,7 @@ const AllBusinessTable = () => {
                 <button
                   key={index}
                   onClick={() => paginate(index + 1)}
-                  className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                  className={`flex size-7 items-center justify-center rounded-full ${
                     currentPage === index + 1 ? "bg-primary text-black" : "bg-gray-200 hover:bg-gray-300"
                   }`}
                 >
@@ -446,7 +446,7 @@ const AllBusinessTable = () => {
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === Math.ceil((data?.totalRecords || 0) / pageSize)}
-                className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                className={`flex size-7 items-center justify-center rounded-full ${
                   currentPage === Math.ceil((data?.totalRecords || 0) / pageSize)
                     ? "cursor-not-allowed bg-gray-200 text-gray-500"
                     : "bg-gray-200 hover:bg-gray-300"

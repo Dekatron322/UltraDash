@@ -9,7 +9,7 @@ const LoadingSkeleton = () => {
       <div className="w-1/3 rounded-lg bg-[#E9F0FF] p-6">
         <div className="mb-6 flex items-center justify-between gap-2 border-b pb-3">
           <div className="flex items-center gap-2">
-            <div className="h-10 w-10 animate-pulse rounded-md bg-gray-200"></div>
+            <div className="size-10 animate-pulse rounded-md bg-gray-200"></div>
             <div className="space-y-2">
               <div className="h-4 w-32 animate-pulse rounded bg-gray-200"></div>
               <div className="h-3 w-20 animate-pulse rounded bg-gray-200"></div>

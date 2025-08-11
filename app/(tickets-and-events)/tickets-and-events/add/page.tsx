@@ -1,8 +1,8 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { FiArrowLeft, FiTag, FiDollarSign, FiCalendar, FiUsers, FiCheck, FiX } from "react-icons/fi"
+import { motion } from "framer-motion"
+import { FiArrowLeft, FiCalendar, FiDollarSign, FiTag, FiUsers } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -33,8 +33,8 @@ const AddNewTicket: React.FC = () => {
     const eventParam = searchParams.get("event")
     if (eventParam) {
       try {
-        const event = JSON.parse(decodeURIComponent(eventParam))
-        setSelectedEvent(event)
+        const parsedEvent = JSON.parse(decodeURIComponent(eventParam)) as Event
+        setSelectedEvent(parsedEvent)
       } catch (e) {
         console.error("Failed to parse event from URL", e)
       }
@@ -49,56 +49,56 @@ const AddNewTicket: React.FC = () => {
     event.preventDefault()
 
     if (!selectedEvent) {
-      notify({
-        type: "error",
-        title: "No Event Selected",
-        message: "Please select an event for this ticket",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "No Event Selected",
+      //   message: "Please select an event for this ticket",
+      // })
       return
     }
 
     if (!ticketName) {
-      notify({
-        type: "error",
-        title: "Ticket Name Required",
-        message: "Please enter a name for the ticket",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Ticket Name Required",
+      //   message: "Please enter a name for the ticket",
+      // })
       return
     }
 
     if (!price) {
-      notify({
-        type: "error",
-        title: "Price Required",
-        message: "Please enter a price for the ticket",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Price Required",
+      //   message: "Please enter a price for the ticket",
+      // })
       return
     }
 
     if (!isValidPrice) {
-      notify({
-        type: "error",
-        title: "Invalid Price",
-        message: "Please enter a valid price amount",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Invalid Price",
+      //   message: "Please enter a valid price amount",
+      // })
       return
     }
 
     if (!quantity) {
-      notify({
-        type: "error",
-        title: "Quantity Required",
-        message: "Please enter the quantity available",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Quantity Required",
+      //   message: "Please enter the quantity available",
+      // })
       return
     }
 
     if (!isValidQuantity) {
-      notify({
-        type: "error",
-        title: "Invalid Quantity",
-        message: "Please enter a valid quantity",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Invalid Quantity",
+      //   message: "Please enter a valid quantity",
+      // })
       return
     }
 
@@ -117,21 +117,21 @@ const AddNewTicket: React.FC = () => {
         description,
       }
 
-      notify({
-        type: "success",
-        title: "Ticket Created!",
-        message: `${ticketName} ticket for ${selectedEvent.title}`,
-        duration: 2000,
-      })
+      // notify({
+      //   type: "success",
+      //   title: "Ticket Created!",
+      //   message: `${ticketName} ticket for ${selectedEvent.title}`,
+      //   duration: 2000,
+      // })
 
       setTimeout(() => router.push(`/events/${selectedEvent.id}`), 1000)
     } catch (error: any) {
       setError(error.message || "Ticket creation failed. Please try again.")
-      notify({
-        type: "error",
-        title: "Creation Failed",
-        message: error.message || "Please try again",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Creation Failed",
+      //   message: error.message || "Please try again",
+      // })
     } finally {
       setLoading(false)
     }
@@ -170,7 +170,7 @@ const AddNewTicket: React.FC = () => {
           {/* Header */}
           <div className="mb-8 flex items-center">
             <button onClick={handleGoBack} className="mr-4 rounded-full p-2 hover:bg-gray-100">
-              <FiArrowLeft className="h-5 w-5 text-gray-700" />
+              <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Create New Ticket</h1>
@@ -220,7 +220,7 @@ const AddNewTicket: React.FC = () => {
                   <input
                     type="text"
                     placeholder="General Admission, VIP, etc."
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={ticketName}
                     onChange={(e) => setTicketName(e.target.value)}
                     onFocus={() => setActiveField("name")}
@@ -248,7 +248,7 @@ const AddNewTicket: React.FC = () => {
                     type="text"
                     inputMode="decimal"
                     placeholder="0.00"
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={price}
                     onChange={handlePriceChange}
                     onFocus={() => setActiveField("price")}
@@ -286,7 +286,7 @@ const AddNewTicket: React.FC = () => {
                     type="text"
                     inputMode="numeric"
                     placeholder="100"
-                    className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none"
+                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
                     value={quantity}
                     onChange={handleQuantityChange}
                     onFocus={() => setActiveField("quantity")}
@@ -310,7 +310,7 @@ const AddNewTicket: React.FC = () => {
             <div className="mb-6">
               <label className="mb-2 block text-sm font-medium text-gray-700">Description (Optional)</label>
               <textarea
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-gray-800 placeholder-gray-400 outline-none transition-all focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-gray-800 outline-none transition-all placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200"
                 placeholder="What's included with this ticket?"
                 rows={3}
                 value={description}
@@ -331,7 +331,7 @@ const AddNewTicket: React.FC = () => {
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <div className="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Creating...
                   </div>
                 ) : (

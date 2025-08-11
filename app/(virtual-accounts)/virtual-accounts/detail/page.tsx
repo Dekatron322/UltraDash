@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useRef, useEffect } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion, useMotionTemplate, useMotionValue, useTransform, animate } from "framer-motion"
 import { FiCopy, FiEye, FiEyeOff, FiRefreshCw, FiSettings, FiPlus, FiShare2, FiX } from "react-icons/fi"
@@ -85,17 +85,17 @@ const VirtualCardPage = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    notify({
-      type: "success",
-      message: "Copied to clipboard!",
-    })
+    // notify({
+    //   type: "success",
+    //   message: "Copied to clipboard!",
+    // })
   }
 
   const regenerateCard = () => {
-    notify({
-      type: "info",
-      message: "Generating new card details...",
-    })
+    // notify({
+    //   type: "info",
+    //   message: "Generating new card details...",
+    // })
     // Simulate API call
     setTimeout(() => {
       setCardDetails({
@@ -107,10 +107,10 @@ const VirtualCardPage = () => {
         fullExpiry: "09/25",
         expiry: "••/••",
       })
-      notify({
-        type: "success",
-        message: "New virtual card generated!",
-      })
+      // notify({
+      //   type: "success",
+      //   message: "New virtual card generated!",
+      // })
     }, 1500)
   }
 
@@ -120,10 +120,10 @@ const VirtualCardPage = () => {
 
   const freezeCard = () => {
     setCardDetails({ ...cardDetails, frozen: !cardDetails.frozen })
-    notify({
-      type: cardDetails.frozen ? "success" : "warning",
-      message: cardDetails.frozen ? "Card unfrozen" : "Card frozen",
-    })
+    // notify({
+    //   type: cardDetails.frozen ? "success" : "warning",
+    //   message: cardDetails.frozen ? "Card unfrozen" : "Card frozen",
+    // })
   }
 
   return (
@@ -317,7 +317,7 @@ const VirtualCardPage = () => {
                   whileHover={{ x: 5 }}
                   className="flex items-center rounded-lg p-3 transition-colors hover:bg-[#E9F0FF]"
                 >
-                  <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-gray-700 text-xl">
+                  <div className="mr-4 flex size-10 items-center justify-center rounded-full bg-gray-700 text-xl">
                     {txn.icon}
                   </div>
                   <div className="flex-1">

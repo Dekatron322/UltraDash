@@ -1,8 +1,8 @@
 "use client"
-import React, { useState, useRef, useEffect } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { FiArrowLeft, FiClock, FiMail, FiShield, FiCheckCircle, FiAlertCircle } from "react-icons/fi"
+import { AnimatePresence, motion } from "framer-motion"
+import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock, FiMail, FiShield } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -105,7 +105,9 @@ const OtpInputModule: React.FC<OtpInputProps> = ({ value = "", onChange, onVerif
         {Array.from({ length }).map((_, index) => (
           <motion.input
             key={index}
-            ref={(el) => (inputRefs.current[index] = el)}
+            ref={(el) => {
+              inputRefs.current[index] = el
+            }}
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
@@ -137,7 +139,7 @@ const OtpInputModule: React.FC<OtpInputProps> = ({ value = "", onChange, onVerif
           >
             {isVerifying ? (
               <>
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                <div className="size-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
                 <span className="text-sm text-gray-600">Verifying...</span>
               </>
             ) : error ? (
@@ -183,11 +185,11 @@ const VerificationCode: React.FC = () => {
     event.preventDefault()
 
     if (!isOtpVerified) {
-      notify({
-        type: "error",
-        title: "Verification Required",
-        message: "Please enter and verify the code",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Verification Required",
+      //   message: "Please enter and verify the code",
+      // })
       return
     }
 
@@ -197,21 +199,21 @@ const VerificationCode: React.FC = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      notify({
-        type: "success",
-        title: "BVN Verified!",
-        message: "Your identity has been confirmed",
-        duration: 2000,
-      })
+      // notify({
+      //   type: "success",
+      //   title: "BVN Verified!",
+      //   message: "Your identity has been confirmed",
+      //   duration: 2000,
+      // })
 
       setTimeout(() => router.push("/crypto/review"), 1000)
     } catch (error: any) {
       setError(error.message || "Verification failed. Please try again.")
-      notify({
-        type: "error",
-        title: "Verification Failed",
-        message: error.message || "Please try again",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Verification Failed",
+      //   message: error.message || "Please try again",
+      // })
     } finally {
       setLoading(false)
     }
@@ -232,11 +234,11 @@ const VerificationCode: React.FC = () => {
 
   const handleResendCode = () => {
     if (resendAttempts >= 3) {
-      notify({
-        type: "error",
-        title: "Limit Exceeded",
-        message: "You've reached the maximum resend attempts",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Limit Exceeded",
+      //   message: "You've reached the maximum resend attempts",
+      // })
       return
     }
 
@@ -245,11 +247,11 @@ const VerificationCode: React.FC = () => {
     setOtp("")
     setIsOtpVerified(false)
 
-    notify({
-      type: "info",
-      title: "New Code Sent",
-      message: "Check your email for the new verification code",
-    })
+    // notify({
+    //   type: "info",
+    //   title: "New Code Sent",
+    //   message: "Check your email for the new verification code",
+    // })
   }
 
   return (
@@ -261,7 +263,7 @@ const VerificationCode: React.FC = () => {
           {/* Header */}
           <div className="mb-8 flex items-center">
             <button onClick={handleGoBack} className="mr-4 rounded-full p-2 hover:bg-gray-100">
-              <FiArrowLeft className="h-5 w-5 text-gray-700" />
+              <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Otp Verification</h1>
@@ -311,7 +313,7 @@ const VerificationCode: React.FC = () => {
                     onClick={handleResendCode}
                     className="text-sm font-medium text-blue-600 hover:text-blue-800"
                   >
-                    Didn't receive code? Resend
+                    Didn&apos;t receive code? Resend
                   </button>
                 )}
               </div>
@@ -327,7 +329,7 @@ const VerificationCode: React.FC = () => {
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
-                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <div className="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Verifying...
                   </div>
                 ) : (

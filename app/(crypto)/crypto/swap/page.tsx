@@ -1,8 +1,8 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { FiArrowLeft, FiInfo, FiRefreshCw, FiChevronDown, FiCopy } from "react-icons/fi"
+import { FiArrowLeft, FiRefreshCw } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -67,21 +67,21 @@ const SwapScreen: React.FC = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      notify({
-        type: "success",
-        title: "Swap Initiated!",
-        message: `Swapping ${amount} ${buyCurrency.symbol} to ${receiveCurrency.symbol}`,
-        duration: 2000,
-      })
+      // notify({
+      //   type: "success",
+      //   title: "Swap Initiated!",
+      //   message: `Swapping ${amount} ${buyCurrency.symbol} to ${receiveCurrency.symbol}`,
+      //   duration: 2000,
+      // })
 
       setTimeout(() => router.push("/swap/confirmation"), 1000)
     } catch (error: any) {
       setError(error.message || "Swap failed. Please try again.")
-      notify({
-        type: "error",
-        title: "Swap Failed",
-        message: error.message || "Please try again",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Swap Failed",
+      //   message: error.message || "Please try again",
+      // })
     } finally {
       setLoading(false)
     }
@@ -93,12 +93,12 @@ const SwapScreen: React.FC = () => {
     setTimeout(() => {
       setExchangeRate((prev) => prev + (Math.random() > 0.5 ? 10 : -10))
       setIsRateRefreshing(false)
-      notify({
-        type: "info",
-        title: "Rate Updated",
-        message: "Exchange rate refreshed",
-        duration: 1000,
-      })
+      // notify({
+      //   type: "info",
+      //   title: "Rate Updated",
+      //   message: "Exchange rate refreshed",
+      //   duration: 1000,
+      // })
     }, 1000)
   }
 
@@ -140,7 +140,7 @@ const SwapScreen: React.FC = () => {
           {/* Header */}
           <div className="mb-8 flex items-center">
             <button onClick={() => router.back()} className="mr-4 rounded-full p-2 hover:bg-gray-100">
-              <FiArrowLeft className="h-5 w-5 text-gray-700" />
+              <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Swap Tokens</h1>
@@ -181,7 +181,7 @@ const SwapScreen: React.FC = () => {
                 className="rounded-full border border-gray-200 bg-white p-2 shadow-md hover:bg-gray-50"
                 whileTap={{ scale: 0.9 }}
               >
-                <FiRefreshCw className="h-5 w-5 text-gray-700" />
+                <FiRefreshCw className="size-5 text-gray-700" />
               </motion.button>
             </div>
 
@@ -224,7 +224,7 @@ const SwapScreen: React.FC = () => {
                   className="text-gray-400 hover:text-gray-600"
                   disabled={isRateRefreshing}
                 >
-                  <FiRefreshCw className={`h-4 w-4 ${isRateRefreshing ? "animate-spin" : ""}`} />
+                  <FiRefreshCw className={`size-4 ${isRateRefreshing ? "animate-spin" : ""}`} />
                 </button>
               </div>
             </div>
@@ -284,7 +284,7 @@ const SwapScreen: React.FC = () => {
             >
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <div className="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   Processing...
                 </div>
               ) : (

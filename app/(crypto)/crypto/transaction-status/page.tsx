@@ -1,8 +1,8 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { FiArrowLeft, FiCopy, FiCheck, FiX, FiClock, FiExternalLink } from "react-icons/fi"
+import { motion } from "framer-motion"
+import { FiArrowLeft, FiCheck, FiClock, FiCopy, FiExternalLink, FiX } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -82,19 +82,19 @@ const TransactionStatus: React.FC = () => {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        notify({
-          type: "success",
-          title: "Copied!",
-          message: `${label} copied to clipboard`,
-          duration: 1500,
-        })
+        // notify({
+        //   type: "success",
+        //   title: "Copied!",
+        //   message: `${label} copied to clipboard`,
+        //   duration: 1500,
+        // })
       })
       .catch(() => {
-        notify({
-          type: "error",
-          title: "Failed to copy",
-          message: "Please try again",
-        })
+        // notify({
+        //   type: "error",
+        //   title: "Failed to copy",
+        //   message: "Please try again",
+        // })
       })
   }
 
@@ -121,7 +121,7 @@ const TransactionStatus: React.FC = () => {
           {/* Header */}
           <div className="mb-8 flex items-center">
             <button onClick={() => router.back()} className="mr-4 rounded-full p-2 hover:bg-gray-100">
-              <FiArrowLeft className="h-5 w-5 text-gray-700" />
+              <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Transaction Status</h1>
@@ -133,7 +133,7 @@ const TransactionStatus: React.FC = () => {
           <div className="mb-8">
             {loading ? (
               <div className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>
+                <div className="mb-4 size-8 animate-pulse rounded-full bg-gray-200"></div>
                 <div className="mb-2 h-4 w-32 animate-pulse rounded bg-gray-200"></div>
                 <div className="h-3 w-48 animate-pulse rounded bg-gray-200"></div>
               </div>
@@ -153,7 +153,7 @@ const TransactionStatus: React.FC = () => {
                   {status === "completed" ? (
                     <>
                       <div className="mb-4 rounded-full bg-green-100 p-3">
-                        <FiCheck className="h-8 w-8 text-green-600" />
+                        <FiCheck className="size-8 text-green-600" />
                       </div>
                       <h3 className="mb-1 text-xl font-bold text-green-800">Transaction Completed</h3>
                       <p className="text-green-600">Your funds have been transferred successfully</p>
@@ -161,7 +161,7 @@ const TransactionStatus: React.FC = () => {
                   ) : status === "failed" ? (
                     <>
                       <div className="mb-4 rounded-full bg-red-100 p-3">
-                        <FiX className="h-8 w-8 text-red-600" />
+                        <FiX className="size-8 text-red-600" />
                       </div>
                       <h3 className="mb-1 text-xl font-bold text-red-800">Transaction Failed</h3>
                       <p className="text-red-600">Please try again or contact support</p>
@@ -169,7 +169,7 @@ const TransactionStatus: React.FC = () => {
                   ) : (
                     <>
                       <div className="mb-4 rounded-full bg-blue-100 p-3">
-                        <FiClock className="h-8 w-8 animate-pulse text-blue-600" />
+                        <FiClock className="size-8 animate-pulse text-blue-600" />
                       </div>
                       <h3 className="mb-1 text-xl font-bold text-gray-800">
                         {status === "processing" ? "Processing Transaction" : "Transaction Pending"}
@@ -220,7 +220,7 @@ const TransactionStatus: React.FC = () => {
                       onClick={() => handleCopy(details.id, "Transaction ID")}
                       className="text-gray-400 hover:text-gray-600"
                     >
-                      <FiCopy className="h-4 w-4" />
+                      <FiCopy className="size-4" />
                     </button>
                   </div>
                 </div>
@@ -269,7 +269,7 @@ const TransactionStatus: React.FC = () => {
                         onClick={() => handleCopy(details.hash, "Transaction hash")}
                         className="text-gray-400 hover:text-gray-600"
                       >
-                        <FiCopy className="h-4 w-4" />
+                        <FiCopy className="size-4" />
                       </button>
                     </div>
                     <div className="break-all font-mono text-sm text-gray-900">{displayHash}</div>
@@ -290,7 +290,7 @@ const TransactionStatus: React.FC = () => {
                         onClick={() => handleCopy(details.walletAddress, "Wallet address")}
                         className="text-gray-400 hover:text-gray-600"
                       >
-                        <FiCopy className="h-4 w-4" />
+                        <FiCopy className="size-4" />
                       </button>
                     </div>
                     <div className="break-all font-mono text-sm text-gray-900">{displayAddress}</div>

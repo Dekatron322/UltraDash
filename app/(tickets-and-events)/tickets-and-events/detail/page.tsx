@@ -1,13 +1,13 @@
 "use client"
-import React, { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useEffect, useRef, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 import {
+  MdClose,
   MdOutlineArrowBackIosNew,
   MdOutlineArrowForwardIos,
   MdOutlineCheckBoxOutlineBlank,
-  MdClose,
 } from "react-icons/md"
-import { RxCaretSort, RxDotsVertical } from "react-icons/rx"
+import { RxCaretSort } from "react-icons/rx"
 import { FiArrowLeft } from "react-icons/fi"
 import { MapIcon } from "lucide-react"
 import Modal from "react-modal"
@@ -226,7 +226,7 @@ const AttendeeDetailModal: React.FC<{
         {/* Header */}
         <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-100 p-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 font-semibold text-white">
+            <div className="flex size-7 items-center justify-center rounded-md bg-blue-600 font-semibold text-white">
               {attendee?.name.charAt(0).toUpperCase()}
             </div>
             <p className="text-xl font-semibold text-gray-800">Attendee Details</p>
@@ -356,11 +356,11 @@ const FilterDropdown = ({
               >
                 <span className="mr-2">
                   {activeFilters.includes(option.value) ? (
-                    <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="size-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <svg className="h-4 w-4 opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="size-4 opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   )}
@@ -507,12 +507,10 @@ const AttendeesTable: React.FC<{ attendees: Attendee[] }> = ({ attendees }) => {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeIn} className="mt-8">
-      <motion.h2 variants={slideUp} className="mb-4 text-xl font-semibold text-gray-800">
-        Attendees
-      </motion.h2>
+      <motion.h2 className="mb-4 text-xl font-semibold text-gray-800">Attendees</motion.h2>
 
       {/* Header */}
-      <motion.div variants={slideUp} className="items-center justify-between border-b py-2 md:flex md:py-4">
+      <motion.div className="items-center justify-between border-b py-2 md:flex md:py-4">
         <p className="text-lg font-medium text-gray-800 max-sm:pb-3 md:text-xl">Attendee List</p>
         <div className="flex gap-4">
           <SearchModule
@@ -562,7 +560,7 @@ const AttendeesTable: React.FC<{ attendees: Attendee[] }> = ({ attendees }) => {
         </motion.div>
       ) : (
         <>
-          <motion.div variants={slideUp} className="w-full overflow-x-auto rounded-lg  bg-white shadow-sm">
+          <motion.div className="w-full overflow-x-auto rounded-lg  bg-white shadow-sm">
             <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
               <thead>
                 <tr className="bg-gray-50">
@@ -627,7 +625,7 @@ const AttendeesTable: React.FC<{ attendees: Attendee[] }> = ({ attendees }) => {
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm text-gray-700">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100">
+                        <div className="flex size-8 items-center justify-center rounded-md bg-gray-100">
                           <p className="text-sm font-medium text-gray-600">{getInitial(attendee.name)}</p>
                         </div>
                         {attendee.name}
@@ -682,7 +680,7 @@ const AttendeesTable: React.FC<{ attendees: Attendee[] }> = ({ attendees }) => {
           </motion.div>
 
           {/* Pagination */}
-          <motion.div variants={slideUp} className="flex items-center justify-between border-t py-4">
+          <motion.div className="flex items-center justify-between border-t py-4">
             <div className="text-sm text-gray-600">
               Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredAttendees.length)} to{" "}
               {Math.min(currentPage * itemsPerPage, filteredAttendees.length)} of {filteredAttendees.length} entries
@@ -702,7 +700,7 @@ const AttendeesTable: React.FC<{ attendees: Attendee[] }> = ({ attendees }) => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                className={`flex size-8 items-center justify-center rounded-md text-sm ${
                   currentPage === 1 ? "bg-blue-600 text-white" : "bg-gray-100 hover:bg-gray-200"
                 }`}
                 onClick={() => paginate(1)}
@@ -1002,11 +1000,7 @@ const TicketDetailsPage: React.FC = () => {
               { label: "Sold", value: `${ticketType.sold} / ${ticketType.quantity}` },
               { label: "Revenue", value: `$${ticketType.revenue}` },
             ].map((stat, index) => (
-              <motion.div
-                key={index}
-                variants={slideUp}
-                className="rounded-lg border border-gray-200 p-4 hover:shadow-md"
-              >
+              <motion.div key={index} className="rounded-lg border border-gray-200 p-4 hover:shadow-md">
                 <h3 className="text-sm font-medium text-gray-500">{stat.label}</h3>
                 <p className="mt-1 text-xl font-semibold text-gray-800">{stat.value}</p>
               </motion.div>
@@ -1020,14 +1014,10 @@ const TicketDetailsPage: React.FC = () => {
               {
                 label: "Location",
                 value: mockEvent.location,
-                icon: <MapIcon className="mr-2 h-4 w-4" />,
+                icon: <MapIcon className="mr-2 size-4" />,
               },
             ].map((stat, index) => (
-              <motion.div
-                key={index}
-                variants={slideUp}
-                className="rounded-lg border border-gray-200 p-4 hover:shadow-md"
-              >
+              <motion.div key={index} className="rounded-lg border border-gray-200 p-4 hover:shadow-md">
                 <h3 className="text-sm font-medium text-gray-500">{stat.label}</h3>
                 <p className="mt-1 flex items-center text-gray-800">
                   {stat.icon}

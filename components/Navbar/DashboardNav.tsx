@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -13,7 +13,6 @@ import UltraIcon from "public/ultra-icon"
 import { useSelector } from "react-redux"
 import { RootState } from "lib/redux/store"
 import { ArrowDown, ArrowDown01Icon, ChevronDown } from "lucide-react"
-
 
 const DashboardNav = () => {
   const [isNavOpen, setIsNavOpen] = useState(false)
@@ -87,7 +86,6 @@ const DashboardNav = () => {
   ]
 
   const transactionTypes = [
-    
     { name: "Fiat Transactions", path: "/transactions" },
     { name: "Crypto Transactions", path: "/transactions/crypto" },
   ]
@@ -116,7 +114,7 @@ const DashboardNav = () => {
                           }`}
                         >
                           {selectedTransactionType}
-                          <ChevronDown className="ml-1 h-4 w-4" />
+                          <ChevronDown className="ml-1 size-4" />
                         </button>
 
                         {isDropdownOpen && (

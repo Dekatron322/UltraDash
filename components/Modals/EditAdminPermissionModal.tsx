@@ -104,7 +104,7 @@ export default function EditAdminPermissionsModal({
                 id={`perm-${option.id}`}
                 checked={permissions.includes(option.id)}
                 onChange={() => handlePermissionChange(option.id)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                className="size-4 rounded border-gray-300 text-indigo-600"
               />
               <label htmlFor={`perm-${option.id}`} className="ml-2">
                 {option.label}

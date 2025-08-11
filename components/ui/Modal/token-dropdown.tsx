@@ -1,7 +1,7 @@
 "use client"
-import React, { useState, useRef, useEffect } from "react"
-import { FiChevronDown, FiCheck } from "react-icons/fi"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useEffect, useRef, useState } from "react"
+import { FiCheck, FiChevronDown } from "react-icons/fi"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface Token {
   symbol: string
@@ -42,7 +42,7 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
       >
-        <div className={`h-6 w-6 rounded-full ${selectedToken.color} flex items-center justify-center text-white`}>
+        <div className={`size-6 rounded-full ${selectedToken.color} flex items-center justify-center text-white`}>
           {selectedToken.icon}
         </div>
         <span className="font-medium">{selectedToken.symbol}</span>
@@ -71,7 +71,7 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`h-6 w-6 rounded-full ${token.color} flex items-center justify-center text-white`}>
+                    <div className={`size-6 rounded-full ${token.color} flex items-center justify-center text-white`}>
                       {token.icon}
                     </div>
                     <div>

@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
-import { FiCopy, FiEye, FiEyeOff, FiRefreshCw, FiMoreVertical, FiFreeze } from "react-icons/fi"
-import { RiVisaLine, RiMastercardFill } from "react-icons/ri"
+import { FiCopy, FiEye, FiEyeOff, FiRefreshCw } from "react-icons/fi"
+import { RiMastercardFill, RiVisaLine } from "react-icons/ri"
 import { SiApplepay } from "react-icons/si"
 
 import DashboardNav from "components/Navbar/DashboardNav"

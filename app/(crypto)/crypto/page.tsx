@@ -155,7 +155,7 @@ export default function Dashboard() {
                   disabled={isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching)}
                 >
                   <FiRefreshCw
-                    className={`h-5 w-5 ${
+                    className={`size-5 ${
                       isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching)
                         ? "animate-spin"
                         : ""
@@ -329,7 +329,7 @@ export default function Dashboard() {
                                       <img
                                         src={asset.logo}
                                         alt={asset.symbol}
-                                        className="h-8 w-8 rounded-md"
+                                        className="size-8 rounded-md"
                                         onError={(e) => {
                                           const target = e.target as HTMLImageElement
                                           target.onerror = null
@@ -448,7 +448,7 @@ export default function Dashboard() {
                                       <img
                                         src={asset.logo}
                                         alt={asset.symbol}
-                                        className="h-8 w-8 rounded-md"
+                                        className="size-8 rounded-md"
                                         onError={(e) => {
                                           const target = e.target as HTMLImageElement
                                           target.onerror = null

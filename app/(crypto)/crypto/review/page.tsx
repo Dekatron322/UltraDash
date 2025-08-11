@@ -1,10 +1,9 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { FiArrowLeft, FiCopy, FiInfo, FiShield, FiCheck, FiExternalLink } from "react-icons/fi"
+import { motion } from "framer-motion"
+import { FiArrowLeft, FiCopy, FiExternalLink, FiInfo, FiShield } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
-import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
 
 interface TransferDetails {
@@ -52,21 +51,21 @@ const ReviewTransfer: React.FC = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      notify({
-        type: "success",
-        title: "Transfer Initiated!",
-        message: "Your transaction is being processed",
-        duration: 2000,
-      })
+      // notify({
+      //   type: "success",
+      //   title: "Transfer Initiated!",
+      //   message: "Your transaction is being processed",
+      //   duration: 2000,
+      // })
 
       setTimeout(() => router.push("/crypto/transaction-status"), 1000)
     } catch (error: any) {
       setError(error.message || "Transfer failed. Please try again.")
-      notify({
-        type: "error",
-        title: "Transfer Failed",
-        message: error.message || "Please try again",
-      })
+      // notify({
+      //   type: "error",
+      //   title: "Transfer Failed",
+      //   message: error.message || "Please try again",
+      // })
     } finally {
       setSubmitting(false)
     }
@@ -78,19 +77,19 @@ const ReviewTransfer: React.FC = () => {
     navigator.clipboard
       .writeText(transferDetails.walletAddress)
       .then(() => {
-        notify({
-          type: "success",
-          title: "Copied!",
-          message: "Wallet address copied to clipboard",
-          duration: 1500,
-        })
+        // notify({
+        //   type: "success",
+        //   title: "Copied!",
+        //   message: "Wallet address copied to clipboard",
+        //   duration: 1500,
+        // })
       })
       .catch(() => {
-        notify({
-          type: "error",
-          title: "Failed to copy",
-          message: "Please try again",
-        })
+        // notify({
+        //   type: "error",
+        //   title: "Failed to copy",
+        //   message: "Please try again",
+        // })
       })
   }
 
@@ -115,7 +114,7 @@ const ReviewTransfer: React.FC = () => {
           {/* Header */}
           <div className="mb-8 flex items-center">
             <button onClick={() => router.back()} className="mr-4 rounded-full p-2 hover:bg-gray-100">
-              <FiArrowLeft className="h-5 w-5 text-gray-700" />
+              <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Review Transfer</h1>
@@ -205,7 +204,7 @@ const ReviewTransfer: React.FC = () => {
                           className="text-gray-500 hover:text-gray-700"
                           title="Copy address"
                         >
-                          <FiCopy className="h-4 w-4" />
+                          <FiCopy className="size-4" />
                         </button>
                       </div>
                       <div className="mt-1 break-all font-mono text-sm text-gray-900">{displayWalletAddress}</div>
@@ -244,7 +243,7 @@ const ReviewTransfer: React.FC = () => {
               >
                 {submitting ? (
                   <div className="flex items-center justify-center">
-                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <div className="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Processing...
                   </div>
                 ) : (

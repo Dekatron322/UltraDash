@@ -166,7 +166,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
         {/* Header */}
         <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
           <div className="flex items-center justify-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#003F9F] font-semibold text-white">
+            <div className="flex size-7 items-center justify-center rounded-md bg-[#003F9F] font-semibold text-white">
               T
             </div>
             <p className="text-xl font-semibold text-[#2a2f4b]">Transaction Details</p>

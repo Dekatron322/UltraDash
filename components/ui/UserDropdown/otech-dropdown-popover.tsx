@@ -141,9 +141,9 @@ const UserDropdown = () => {
           tabIndex={0}
         >
           {userData?.photo ? (
-            <img src={userData.photo} alt="User profile" className="h-8 w-8 rounded-full object-cover" />
+            <img src={userData.photo} alt="User profile" className="size-8 rounded-full object-cover" />
           ) : (
-            <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-white">
+            <div className="bg-primary flex size-8 items-center justify-center rounded-full text-white">
               {getInitials(userData?.firstName || null, userData?.lastName || null)}
             </div>
           )}
@@ -152,7 +152,7 @@ const UserDropdown = () => {
           <div className="absolute right-0 z-50 mt-2 min-w-56 rounded-md bg-white shadow-lg">
             <div className="flex items-center gap-2 border-b px-4 py-2">
               {userData?.photo ? (
-                <img src={userData.photo} alt="User profile" className="h-10 w-10 rounded-full object-cover" />
+                <img src={userData.photo} alt="User profile" className="size-10 rounded-full object-cover" />
               ) : (
                 <div className="bg-primary flex min-h-10 min-w-10 items-center justify-center rounded-full text-white">
                   {getInitials(userData?.firstName || null, userData?.lastName || null)}

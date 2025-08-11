@@ -1,24 +1,23 @@
 "use client"
-import React, { useState, useRef, useEffect } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { RxCross2, RxCaretDown } from "react-icons/rx"
+import { RxCaretDown, RxCross2 } from "react-icons/rx"
 
 interface SearchModuleProps {
-  /** The current search text */
   value: string
-  /** Handler for when the search text changes */
+
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  /** Optional callback when the cancel (clear) icon is clicked */
+
   onCancel?: () => void
-  /** Placeholder text for the input */
+
   placeholder?: string
-  /** Additional Tailwind or custom classes to apply */
+
   className?: string
-  /** Current search type */
+
   searchType?: string
-  /** Handler for search type change */
+
   onSearchTypeChange?: (type: string) => void
-  /** Available search type options */
+
   searchTypeOptions?: {
     value: string
     label: string
@@ -41,9 +40,9 @@ export const SearchModule: React.FC<SearchModuleProps> = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  
+
   // Get the current label for the selected search type
-  const currentLabel = searchTypeOptions.find(opt => opt.value === searchType)?.label || "Tag"
+  const currentLabel = searchTypeOptions.find((opt) => opt.value === searchType)?.label || "Tag"
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -81,7 +80,7 @@ export const SearchModule: React.FC<SearchModuleProps> = ({
             <span>{currentLabel}</span>
             <RxCaretDown className={`ml-2 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
           </button>
-          
+
           {/* Dropdown popover */}
           {isDropdownOpen && (
             <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-white shadow-lg">
@@ -100,7 +99,7 @@ export const SearchModule: React.FC<SearchModuleProps> = ({
           )}
         </div>
       )}
-      
+
       {/* Search input */}
       <div className="flex flex-1 items-center gap-2 px-3">
         <Image src="/DashboardImages/Search.svg" width={16} height={16} alt="Search Icon" />

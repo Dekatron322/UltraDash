@@ -61,7 +61,7 @@ const ForgotPassword: React.FC = () => {
     <section className="flex h-screen flex-grow bg-[#F8F9FA]">
       <div className="flex w-full flex-col items-center max-sm:mt-10 md:mt-20">
         <div className="mb-4 flex items-center justify-center gap-2">
-          <img src="/otech logo.svg" alt="profile" className="h-10 w-10" />
+          <img src="/otech logo.svg" alt="profile" className="size-10" />
           <p className="text-xl font-semibold text-[#2a2f4b]">Otech MFB</p>
         </div>
 
@@ -88,7 +88,7 @@ const ForgotPassword: React.FC = () => {
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <svg
-                      className="mr-2 h-5 w-5 animate-spin"
+                      className="mr-2 size-5 animate-spin"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

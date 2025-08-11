@@ -59,10 +59,10 @@ const DetailSkeleton = () => {
     <div className="w-full animate-pulse">
       <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
         <div className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-md bg-gray-300"></div>
+          <div className="size-7 rounded-md bg-gray-300"></div>
           <div className="h-6 w-40 rounded bg-gray-300"></div>
         </div>
-        <div className="h-6 w-6 rounded bg-gray-300"></div>
+        <div className="size-6 rounded bg-gray-300"></div>
       </div>
 
       <div className="flex flex-col items-center justify-center bg-gray-50 p-4">
@@ -214,7 +214,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
         <div ref={modalRef} className="w-full">
           <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
             <div className="flex items-center justify-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#003F9F] font-semibold text-white">
+              <div className="flex size-7 items-center justify-center rounded-md bg-[#003F9F] font-semibold text-white">
                 {transaction.quidaxUser.firstName.charAt(0).toUpperCase()}
               </div>
               <p className="text-xl font-semibold text-[#2a2f4b]">Crypto Transaction Details</p>
@@ -564,7 +564,7 @@ const CryptoTransactionTable: React.FC = () => {
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#EDF0F4]">
+                        <div className="flex size-8 items-center justify-center rounded-md bg-[#EDF0F4]">
                           <p>{getInitial(transaction.quidaxUser.firstName)}</p>
                         </div>
                         {transaction.quidaxUser.firstName} {transaction.quidaxUser.lastName}
@@ -649,7 +649,7 @@ const CryptoTransactionTable: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => paginate(pageNum)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                    className={`flex size-8 items-center justify-center rounded-md text-sm ${
                       currentPage === pageNum
                         ? "bg-[#003F9F] text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -667,7 +667,7 @@ const CryptoTransactionTable: React.FC = () => {
               {data?.totalPages && data.totalPages > 5 && currentPage < data.totalPages - 1 && (
                 <button
                   onClick={() => paginate(data.totalPages)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-md text-sm ${
+                  className={`flex size-8 items-center justify-center rounded-md text-sm ${
                     currentPage === data.totalPages
                       ? "bg-[#003F9F] text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"

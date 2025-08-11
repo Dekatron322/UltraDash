@@ -1,7 +1,7 @@
 "use client"
-import React, { useState, useRef, useEffect } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
-import { RxCaretSort, RxDotsVertical } from "react-icons/rx"
+import { RxCaretSort } from "react-icons/rx"
 import { ButtonModule } from "components/ui/Button/Button"
 import { SearchModule } from "components/ui/Search/search-module"
 import EmptyState from "public/empty-state"
@@ -77,11 +77,11 @@ const FilterDropdown = ({
           >
             <span className="mr-2">
               {activeFilters.includes(option.value) ? (
-                <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="size-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
-                <svg className="h-4 w-4 opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="size-4 opacity-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               )}
@@ -357,7 +357,7 @@ const EmployeesTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#EDF0F4]">
+                        <div className="flex size-8 items-center justify-center rounded-md bg-[#EDF0F4]">
                           <p>{getInitial(employee.name)}</p>
                         </div>
                         {employee.name}
@@ -419,7 +419,7 @@ const EmployeesTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
                 <MdOutlineArrowBackIosNew />
               </button>
               <button
-                className={`flex h-7 w-7 items-center justify-center rounded-md shadow-sm ${
+                className={`flex size-7 items-center justify-center rounded-md shadow-sm ${
                   currentPage === 1 ? "bg-white text-[#003F9F]" : "bg-gray-200 hover:bg-gray-300"
                 }`}
                 onClick={() => paginate(1)}
@@ -429,7 +429,7 @@ const EmployeesTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
               <button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === Math.ceil(filteredEmployees.length / itemsPerPage)}
-                className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                className={`flex size-7 items-center justify-center rounded-full ${
                   currentPage === Math.ceil(filteredEmployees.length / itemsPerPage)
                     ? "cursor-not-allowed text-gray-500"
                     : "text-[#003F9F]"

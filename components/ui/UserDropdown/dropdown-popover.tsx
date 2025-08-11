@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState } from "react"
 import Modal from "react-modal"
 import { useRouter } from "next/navigation"
-import { useSelector, useDispatch } from "react-redux"
-import { RootState, AppDispatch } from "lib/redux/store"
+import { useDispatch, useSelector } from "react-redux"
+import { AppDispatch, RootState } from "lib/redux/store"
 import { logout } from "lib/redux/authSlice"
 
 import UserIcon from "public/user-icon"

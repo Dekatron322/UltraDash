@@ -1,10 +1,10 @@
 "use client"
-import React, { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import React, { useState } from "react"
+import { useRouter } from "next/navigation"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
 import ArrowLeftIcon from "public/arrow-left"
-import { FiEdit2, FiCheck, FiX, FiInfo } from "react-icons/fi"
+import { FiCheck, FiEdit2, FiInfo, FiX } from "react-icons/fi"
 import { motion } from "framer-motion"
 import { useSelector } from "react-redux"
 import { RootState } from "lib/redux/store"
@@ -171,7 +171,7 @@ const FeesPage: React.FC = () => {
         >
           <div className="mb-6 flex items-center">
             <button onClick={() => router.back()} className="mr-4 rounded-full p-2 transition-colors hover:bg-gray-100">
-              <ArrowLeftIcon className="h-5 w-5" />
+              <ArrowLeftIcon className="size-5" />
             </button>
             <h1 className="text-2xl font-bold text-gray-800">Transaction Fees</h1>
           </div>

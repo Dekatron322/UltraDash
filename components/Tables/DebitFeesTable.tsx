@@ -164,7 +164,7 @@ const DebitFeesTable = ({ refreshKey }: { refreshKey?: number }) => {
           <div className="h-6 w-48 animate-pulse rounded bg-gray-200"></div>
           <div className="flex gap-2">
             {[...Array(5)].map((_, index) => (
-              <div key={index} className="h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>
+              <div key={index} className="size-8 animate-pulse rounded-full bg-gray-200"></div>
             ))}
           </div>
         </div>
