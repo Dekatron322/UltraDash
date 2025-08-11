@@ -8,7 +8,7 @@ import { RootState } from "lib/redux/store"
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { isAuthenticated, loading, token } = useSelector((state: RootState) => state.auth)
+  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
     // Check authentication status when component mounts
@@ -21,7 +21,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     //   // Handle token expiration (dispatch logout action if using Redux)
     //   router.push("/otech/signin")
     // }
-  }, [isAuthenticated, loading, router, token])
+  }, [isAuthenticated, loading, router])
 
   if (loading || !isAuthenticated) {
     return (
