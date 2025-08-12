@@ -1,6 +1,6 @@
 "use client"
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts"
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts"
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28"]
 

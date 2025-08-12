@@ -121,7 +121,7 @@ export default function Dashboard() {
             {/* Header */}
             <div className="mb-3">
               <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Dashboard Overview</h1>
-              <p className="text-gray-500">Welcome back! Here's what's happening with your platform.</p>
+              <p className="text-gray-500">Welcome back! Here&apos;s what&apos;s happening with your platform.</p>
             </div>
 
             {/* Exchange Rates Marquee - Would go here */}
