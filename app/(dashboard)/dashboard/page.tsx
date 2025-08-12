@@ -117,7 +117,7 @@ export default function Dashboard() {
         <div className="flex w-full flex-col">
           <DashboardNav />
 
-          <div className="  px-16 py-8">
+          <div className="px-16  py-8 max-sm:px-3">
             {/* Header */}
             <div className="mb-3">
               <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Dashboard Overview</h1>
