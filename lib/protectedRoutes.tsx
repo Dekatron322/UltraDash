@@ -2,9 +2,9 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useSelector, useDispatch } from "react-redux"
-import { RootState, AppDispatch } from "lib/redux/store"
-import { logout, initializeAuth } from "lib/redux/authSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { AppDispatch, RootState } from "lib/redux/store"
+import { initializeAuth, logout } from "lib/redux/authSlice"
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter()
