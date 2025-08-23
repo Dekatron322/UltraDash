@@ -92,9 +92,9 @@ const DashboardNav = () => {
 
   return (
     <>
-      <nav className="containerbg hidden border-b px-16 py-2 max-sm:px-3 md:block">
-        <div className="flexBetween">
-          <div className="flex items-center gap-10">
+      <nav className="containerbg hidden border-b  md:block">
+        <div className="flexBetween container mx-auto px-16 py-2 max-sm:px-3">
+          <div className=" flex items-center gap-10">
             <div className="flex border-r-2 pr-10">
               <UltraIcon />
             </div>

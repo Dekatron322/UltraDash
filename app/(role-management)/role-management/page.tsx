@@ -508,7 +508,7 @@ const RoleManagementPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       <DashboardNav />
-      <div className="px-16 py-8">
+      <div className="container mx-auto px-16 py-8">
         <h1 className="mb-6 text-2xl font-bold">Employee Role Management</h1>
         <div>
           <EmployeesTable employees={mockEmployees} />

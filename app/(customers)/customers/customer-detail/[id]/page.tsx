@@ -115,7 +115,7 @@ const CustomerDetailPage: React.FC = () => {
           <DashboardNav />
 
           {/* Header Bar */}
-          <div className="flex justify-between border-b px-16 py-4 max-sm:flex-col max-sm:px-3">
+          <div className="container mx-auto flex justify-between border-b px-16 py-4 max-sm:flex-col max-sm:px-3">
             <div className="flex cursor-pointer items-center gap-2 whitespace-nowrap" onClick={() => router.back()}>
               <BackArrowIcon />
               <p className="font-medium md:text-lg">
@@ -142,7 +142,7 @@ const CustomerDetailPage: React.FC = () => {
           </div>
 
           {/* Main Content */}
-          <div className="mt-8 flex w-full gap-6 px-16 max-md:flex-col max-md:px-0 max-sm:my-4 max-sm:px-3">
+          <div className="container mx-auto mt-8 flex w-full gap-6 px-16 max-md:flex-col max-md:px-0 max-sm:my-4 max-sm:px-3">
             <div className="w-full">
               <CustomerInfo />
             </div>

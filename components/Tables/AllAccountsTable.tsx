@@ -55,6 +55,7 @@ interface ActionDropdownProps {
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({ customer, onViewDetails }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [dropdownDirection, setDropdownDirection] = useState<"bottom" | "top">("bottom")
   const dropdownRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
@@ -71,6 +72,28 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ customer, onViewDetails
     }
   }, [])
 
+  // Calculate dropdown position before opening
+  const calculateDropdownPosition = () => {
+    if (!dropdownRef.current) return
+
+    const buttonRect = dropdownRef.current.getBoundingClientRect()
+    const spaceBelow = window.innerHeight - buttonRect.bottom
+    const spaceAbove = buttonRect.top
+    const dropdownHeight = 120 // Approximate height of the dropdown
+
+    // Open upwards if there's not enough space below but enough above
+    if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+      setDropdownDirection("top")
+    } else {
+      setDropdownDirection("bottom")
+    }
+  }
+
+  const handleButtonClick = () => {
+    calculateDropdownPosition()
+    setIsOpen(!isOpen)
+  }
+
   const handleViewDetails = (e: React.MouseEvent) => {
     e.preventDefault()
     localStorage.setItem("selectedCustomer", JSON.stringify(customer))
@@ -83,12 +106,33 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ customer, onViewDetails
     <div className="relative" ref={dropdownRef}>
       <div
         className="focus::bg-gray-100 flex size-7 cursor-pointer items-center justify-center gap-2 rounded-full transition-all duration-200 ease-in-out hover:bg-gray-200"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleButtonClick}
       >
         <RxDotsVertical />
       </div>
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div
+          className="fixed z-50 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          style={
+            dropdownDirection === "bottom"
+              ? {
+                  top: dropdownRef.current
+                    ? dropdownRef.current.getBoundingClientRect().bottom + window.scrollY + 2
+                    : 0,
+                  right: dropdownRef.current
+                    ? window.innerWidth - dropdownRef.current.getBoundingClientRect().right
+                    : 0,
+                }
+              : {
+                  bottom: dropdownRef.current
+                    ? window.innerHeight - dropdownRef.current.getBoundingClientRect().top + window.scrollY + 2
+                    : 0,
+                  right: dropdownRef.current
+                    ? window.innerWidth - dropdownRef.current.getBoundingClientRect().right
+                    : 0,
+                }
+          }
+        >
           <div className="py-1">
             <a
               href={`/customers/customer-detail/${customer.id}`}
@@ -158,12 +202,14 @@ const LoadingSkeleton = () => {
         </table>
       </div>
 
-      <div className="flex items-center justify-between border-t px-4 py-3">
-        <div className="size-48 animate-pulse rounded bg-gray-200"></div>
-        <div className="flex gap-2">
+      <div className="flex items-center justify-between border-t py-3">
+        <div className="h-4 w-48 animate-pulse rounded bg-gray-200"></div>
+        <div className="flex items-center gap-2">
+          <div className="size-8 animate-pulse rounded bg-gray-200"></div>
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="size-7 animate-pulse rounded-full bg-gray-200"></div>
+            <div key={i} className="size-8 animate-pulse rounded bg-gray-200"></div>
           ))}
+          <div className="size-8 animate-pulse rounded bg-gray-200"></div>
         </div>
       </div>
     </div>

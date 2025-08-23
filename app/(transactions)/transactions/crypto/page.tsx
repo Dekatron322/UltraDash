@@ -36,7 +36,7 @@ export default function AllTransactions() {
       <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="flex w-full flex-col">
           <DashboardNav />
-          <div className="flex flex-col">
+          <div className="container mx-auto flex flex-col">
             <div className="flex w-full gap-6 px-16 max-md:flex-col max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8">
               <div className="w-full">
                 <div className="flex w-full gap-3 max-lg:grid max-lg:grid-cols-2 max-sm:grid-cols-1">
