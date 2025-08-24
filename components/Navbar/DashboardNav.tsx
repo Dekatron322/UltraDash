@@ -63,16 +63,16 @@ const DashboardNav = () => {
       path: "/crypto",
       show: user?.admin?.permission?.canViewTransactions,
     },
-    {
-      name: "Virtual Cards",
-      path: "/virtual-accounts",
-      show: user?.admin?.permission?.canViewTransactions,
-    },
-    {
-      name: "Tickets & Events",
-      path: "/tickets-and-events",
-      show: true,
-    },
+    // {
+    //   name: "Virtual Cards",
+    //   path: "/virtual-accounts",
+    //   show: user?.admin?.permission?.canViewTransactions,
+    // },
+    // {
+    //   name: "Tickets & Events",
+    //   path: "/tickets-and-events",
+    //   show: true,
+    // },
     {
       name: "Role Management",
       path: "/role-management",

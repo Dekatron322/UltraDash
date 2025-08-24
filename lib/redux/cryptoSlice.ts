@@ -1,6 +1,7 @@
 // src/lib/redux/cryptoSlice.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { RootState } from "./store"
+import { API_CONFIG, API_ENDPOINTS } from "lib/config/api"
 
 export interface Network {
   id: string
@@ -31,7 +32,7 @@ export interface CryptoAccountResponse {
 export const cryptoApi = createApi({
   reducerPath: "cryptoApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://ultra-service-79baffa4bc31.herokuapp.com/",
+    baseUrl: API_CONFIG.BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState
       const accessToken = state.auth.tokens?.accessToken
@@ -57,13 +58,13 @@ export const cryptoApi = createApi({
   endpoints: (builder) => ({
     getMasterAccount: builder.query<CryptoAccountResponse, void>({
       query: () => ({
-        url: `Admin/Crypto/Master`,
+        url: API_ENDPOINTS.CRYPTO.LIST + "/Master",
         method: "GET",
       }),
     }),
     getProfitAccount: builder.query<CryptoAccountResponse, void>({
       query: () => ({
-        url: `Admin/Crypto/Profit`,
+        url: API_ENDPOINTS.CRYPTO.LIST + "/Profit",
         method: "GET",
       }),
     }),

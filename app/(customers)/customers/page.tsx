@@ -1,6 +1,5 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
-
 import InsightIcon from "public/insight-icon"
 import IncomingIcon from "public/incoming-icon"
 import OutgoingIcon from "public/outgoing-icon"
@@ -9,15 +8,19 @@ import ArrowIcon from "public/arrow-icon"
 import AllAccountsTable from "components/Tables/AllAccountsTable"
 import { useState } from "react"
 import AddCustomerModal from "components/ui/Modal/add-customer-modal"
+import { useGetOverviewQuery } from "lib/redux/overviewSlice"
 
 export default function AllTransactions() {
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false)
 
-  // Mock data instead of API calls
-  const totalCustomers = 0
-  const activeCustomers = 0
-  const frozenCustomers = 0
-  const inactiveCustomers = 0
+  // Use the overview API hook
+  const { data: overviewData, error, isLoading } = useGetOverviewQuery()
+
+  // Use actual data from API instead of mock data
+  const totalCustomers = overviewData?.data?.totalUsers || 0
+  const activeCustomers = overviewData?.data?.verifiedUsers || 0
+  const frozenCustomers = overviewData?.data?.banned_Suspended_Users || 0
+  const inactiveCustomers = overviewData?.data?.unverifiedUsers || 0
 
   // Format numbers with commas
   const formatNumber = (num: number) => {
@@ -26,6 +29,40 @@ export default function AllTransactions() {
 
   const handleAddCustomerSuccess = async () => {
     setIsAddCustomerModalOpen(false)
+  }
+
+  if (isLoading) {
+    return (
+      <section className="h-full w-full ">
+        <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
+          <div className="flex w-full flex-col">
+            <DashboardNav />
+            <div className="container mx-auto flex flex-col">
+              <div className="flex w-full items-center justify-center px-16 max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8">
+                <div className="text-lg">Loading overview data...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section className="h-full w-full ">
+        <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
+          <div className="flex w-full flex-col">
+            <DashboardNav />
+            <div className="container mx-auto flex flex-col">
+              <div className="flex w-full items-center justify-center px-16 max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8">
+                <div className="text-lg text-red-500">Error loading overview data</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (

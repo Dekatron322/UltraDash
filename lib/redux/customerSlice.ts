@@ -1,6 +1,7 @@
 // src/lib/redux/customerSlice.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { RootState } from "./store"
+import { API_CONFIG, API_ENDPOINTS } from "lib/config/api"
 
 export interface Status {
   value: number
@@ -180,7 +181,7 @@ export interface UserCryptoResponse {
 export const customerApi = createApi({
   reducerPath: "customerApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://ultra-service-79baffa4bc31.herokuapp.com/",
+    baseUrl: API_CONFIG.BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState
       const accessToken = state.auth.tokens?.accessToken
@@ -215,7 +216,7 @@ export const customerApi = createApi({
       }
     >({
       query: ({ pageNumber, pageSize, tag, email, phoneNumber }) => ({
-        url: `Admin/Users`,
+        url: API_ENDPOINTS.USERS.LIST,
         params: {
           pageNumber,
           pageSize,
@@ -228,7 +229,7 @@ export const customerApi = createApi({
     }),
     getUserById: builder.query<UserResponse, number>({
       query: (id) => ({
-        url: `Admin/Users/${id}`,
+        url: API_ENDPOINTS.USERS.DETAILS(id),
         method: "GET",
       }),
     }),
@@ -244,7 +245,7 @@ export const customerApi = createApi({
       }
     >({
       query: ({ id, pageNumber, pageSize, type, startDate, endDate }) => ({
-        url: `Admin/Users/${id}/Transactions`,
+        url: `${API_ENDPOINTS.USERS.DETAILS(id)}/Transactions`,
         params: {
           pageNumber,
           pageSize,
@@ -257,7 +258,7 @@ export const customerApi = createApi({
     }),
     getUserCrypto: builder.query<UserCryptoResponse, number>({
       query: (id) => ({
-        url: `Admin/Users/Crypto/${id}`,
+        url: `/Admin/Users/Crypto/${id}`,
         method: "GET",
       }),
     }),
