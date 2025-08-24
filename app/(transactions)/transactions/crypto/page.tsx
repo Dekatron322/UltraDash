@@ -9,7 +9,7 @@ import ArrowIcon from "public/arrow-icon"
 import { useState } from "react"
 import CryptoTransactionTable from "components/Tables/CryptoTransactionTable"
 
-import { ChevronDownIcon, CalendarIcon, ChartBarIcon } from "@heroicons/react/24/outline"
+import { CalendarIcon, ChevronDownIcon } from "@heroicons/react/24/outline"
 import { useGetTransactionOverviewQuery } from "lib/redux/overviewSlice"
 
 interface PaymentAccount {
