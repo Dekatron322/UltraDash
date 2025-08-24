@@ -1,18 +1,17 @@
 "use client"
-import React, { useState, useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
   FiArrowLeft,
   FiBriefcase,
   FiCheck,
-  FiHome,
+  FiChevronDown,
   FiMail,
   FiPhone,
-  FiUser,
   FiSearch,
+  FiUser,
   FiX,
-  FiChevronDown,
 } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
