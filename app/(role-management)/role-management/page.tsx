@@ -1,5 +1,6 @@
 "use client"
 import React, { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
 import { RxCaretSort } from "react-icons/rx"
 import { ButtonModule } from "components/ui/Button/Button"
@@ -12,10 +13,11 @@ import { FiEdit2, FiTrash2, FiUserPlus } from "react-icons/fi"
 import { Badge } from "components/ui/Badge/badge"
 import { useSelector } from "react-redux"
 import { RootState } from "lib/redux/store"
+import { useGetAdminsQuery } from "lib/redux/adminSlice"
 
 type SortOrder = "asc" | "desc" | null
 
-export type Employee = {
+export interface Employee {
   id: string
   name: string
   email: string
@@ -23,7 +25,89 @@ export type Employee = {
   status: "active" | "inactive" | "pending"
   lastActive: string
   department: string
+  phoneNumber?: string
+  isActive?: boolean
+  firstName?: string
+  lastName?: string
+  tag?: string
+  photo?: string
 }
+
+// Skeleton Loading Components
+const SkeletonRow = () => (
+  <tr>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="flex items-center gap-2">
+        <div className="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
+        <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
+      </div>
+    </td>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="flex items-center gap-2">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>
+        <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+      </div>
+    </td>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="h-4 w-32 animate-pulse rounded bg-gray-200"></div>
+    </td>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
+    </td>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="h-6 w-16 animate-pulse rounded-full bg-gray-200"></div>
+    </td>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="h-6 w-16 animate-pulse rounded-full bg-gray-200"></div>
+    </td>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
+    </td>
+    <td className="whitespace-nowrap border-b px-4 py-3">
+      <div className="flex gap-2">
+        <div className="h-8 w-16 animate-pulse rounded border bg-gray-200"></div>
+        <div className="h-8 w-16 animate-pulse rounded border bg-gray-200"></div>
+      </div>
+    </td>
+  </tr>
+)
+
+const SkeletonTable = () => (
+  <>
+    <div className="w-full overflow-x-auto border-l border-r bg-[#ffffff]">
+      <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
+        <thead>
+          <tr>
+            {["Employee ID", "Name", "Email", "Department", "Role", "Status", "Last Active", "Actions"].map(
+              (header) => (
+                <th key={header} className="whitespace-nowrap border-b p-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
+                    {header}
+                    <div className="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                </th>
+              )
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <SkeletonRow key={index} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div className="flex items-center justify-between border-t py-3">
+      <div className="h-4 w-40 animate-pulse rounded bg-gray-200"></div>
+      <div className="flex gap-2">
+        <div className="h-7 w-7 animate-pulse rounded-md bg-gray-200"></div>
+        <div className="h-7 w-7 animate-pulse rounded-md bg-gray-200"></div>
+        <div className="h-7 w-7 animate-pulse rounded-md bg-gray-200"></div>
+      </div>
+    </div>
+  </>
+)
 
 const FilterDropdown = ({
   isOpen,
@@ -101,7 +185,8 @@ const FilterDropdown = ({
   )
 }
 
-const EmployeesTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
+const EmployeesTable: React.FC<{ employees: Employee[]; isLoading: boolean }> = ({ employees, isLoading }) => {
+  const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
   const canManageAdmin = user?.admin?.permission?.canManageAdmin
 
@@ -218,8 +303,7 @@ const EmployeesTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
   }
 
   const handleAddEmployee = () => {
-    setSelectedEmployee(null)
-    setIsRoleModalOpen(true)
+    router.push("/role-management/add")
   }
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
@@ -230,6 +314,24 @@ const EmployeesTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
       month: "short",
       day: "numeric",
     })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="">
+        <div className="items-center justify-between border-b py-2 md:flex md:py-4">
+          <div className="h-7 w-40 animate-pulse rounded bg-gray-200"></div>
+          <div className="flex gap-4">
+            <div className="h-10 w-64 animate-pulse rounded-md bg-gray-200"></div>
+            <div className="flex gap-2">
+              <div className="h-10 w-20 animate-pulse rounded-md bg-gray-200"></div>
+              {canManageAdmin && <div className="h-10 w-32 animate-pulse rounded-md bg-gray-200"></div>}
+            </div>
+          </div>
+        </div>
+        <SkeletonTable />
+      </div>
+    )
   }
 
   return (
@@ -457,53 +559,48 @@ const EmployeesTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
 }
 
 const RoleManagementPage: React.FC = () => {
-  const mockEmployees: Employee[] = [
-    {
-      id: "EMP-1001",
-      name: "John Smith",
-      email: "john.smith@example.com",
-      role: "admin",
-      status: "active",
-      lastActive: "2023-10-15T14:30:00",
-      department: "Management",
-    },
-    {
-      id: "EMP-1002",
-      name: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      role: "manager",
-      status: "active",
-      lastActive: "2023-10-14T09:15:00",
-      department: "Operations",
-    },
-    {
-      id: "EMP-2001",
-      name: "Michael Brown",
-      email: "michael.b@example.com",
-      role: "staff",
-      status: "active",
-      lastActive: "2023-10-13T16:45:00",
-      department: "Sales",
-    },
-    {
-      id: "EMP-2002",
-      name: "Emily Davis",
-      email: "emily.d@example.com",
-      role: "support",
-      status: "inactive",
-      lastActive: "2023-08-01T11:20:00",
-      department: "Customer Service",
-    },
-    {
-      id: "EMP-3001",
-      name: "Robert Wilson",
-      email: "robert.w@example.com",
-      role: "staff",
-      status: "pending",
-      lastActive: "2023-10-10T13:10:00",
-      department: "Marketing",
-    },
-  ]
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+
+  const { data, error, isLoading } = useGetAdminsQuery({
+    pageNumber: currentPage,
+    pageSize: pageSize,
+  })
+
+  // Transform API data to match Employee interface
+  const transformApiDataToEmployees = (apiData: any[]): Employee[] => {
+    return apiData.map((admin) => ({
+      id: `EMP-${admin.id}`,
+      name: `${admin.user?.firstName || ""} ${admin.user?.lastName || ""}`.trim() || "Unknown",
+      email: admin.user?.email || "No email",
+      role: "admin" as const,
+      status: admin.isActive ? ("active" as const) : ("inactive" as const),
+      lastActive: new Date().toISOString(),
+      department: "Administration",
+      phoneNumber: admin.user?.phoneNumber,
+      isActive: admin.isActive,
+      firstName: admin.user?.firstName,
+      lastName: admin.user?.lastName,
+      tag: admin.user?.tag,
+      photo: admin.user?.photo,
+    }))
+  }
+
+  const employees = data?.data ? transformApiDataToEmployees(data.data) : []
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+        <DashboardNav />
+        <div className="container mx-auto px-16 py-8">
+          <h1 className="mb-6 text-2xl font-bold">Employee Role Management</h1>
+          <div className="flex h-60 items-center justify-center">
+            <div className="text-lg text-red-600">Error loading employees. Please try again.</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -511,7 +608,7 @@ const RoleManagementPage: React.FC = () => {
       <div className="container mx-auto px-16 py-8">
         <h1 className="mb-6 text-2xl font-bold">Employee Role Management</h1>
         <div>
-          <EmployeesTable employees={mockEmployees} />
+          <EmployeesTable employees={employees} isLoading={isLoading} />
         </div>
       </div>
     </div>
