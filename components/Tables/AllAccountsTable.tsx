@@ -1,14 +1,15 @@
 "use client"
+
 import React, { useEffect, useRef, useState } from "react"
 import { RxCaretSort, RxDotsVertical } from "react-icons/rx"
 import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
 import { useRouter } from "next/navigation"
-import ExportIcon from "public/export-icon"
 import EmptyState from "public/empty-state"
 import { ButtonModule } from "components/ui/Button/Button"
 import { SearchModule } from "components/ui/Search/search-module"
 import Filtericon from "public/filter-icon"
 import { useGetUsersQuery } from "lib/redux/customerSlice"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface Status {
   value: number
@@ -104,76 +105,136 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ customer, onViewDetails
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div
+      <motion.div
         className="focus::bg-gray-100 flex size-7 cursor-pointer items-center justify-center gap-2 rounded-full transition-all duration-200 ease-in-out hover:bg-gray-200"
         onClick={handleButtonClick}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
       >
         <RxDotsVertical />
-      </div>
-      {isOpen && (
-        <div
-          className="fixed z-50 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-          style={
-            dropdownDirection === "bottom"
-              ? {
-                  top: dropdownRef.current
-                    ? dropdownRef.current.getBoundingClientRect().bottom + window.scrollY + 2
-                    : 0,
-                  right: dropdownRef.current
-                    ? window.innerWidth - dropdownRef.current.getBoundingClientRect().right
-                    : 0,
-                }
-              : {
-                  bottom: dropdownRef.current
-                    ? window.innerHeight - dropdownRef.current.getBoundingClientRect().top + window.scrollY + 2
-                    : 0,
-                  right: dropdownRef.current
-                    ? window.innerWidth - dropdownRef.current.getBoundingClientRect().right
-                    : 0,
-                }
-          }
-        >
-          <div className="py-1">
-            <a
-              href={`/customers/customer-detail/${customer.id}`}
-              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-              onClick={handleViewDetails}
-            >
-              View Details
-            </a>
-            <button
-              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                console.log("Freeze customer:", customer.id)
-                setIsOpen(false)
-              }}
-            >
-              Freeze Account
-            </button>
-            <button
-              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => {
-                console.log("Delete customer:", customer.id)
-                setIsOpen(false)
-              }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      )}
+      </motion.div>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed z-50 w-48 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            style={
+              dropdownDirection === "bottom"
+                ? {
+                    top: dropdownRef.current
+                      ? dropdownRef.current.getBoundingClientRect().bottom + window.scrollY + 2
+                      : 0,
+                    right: dropdownRef.current
+                      ? window.innerWidth - dropdownRef.current.getBoundingClientRect().right
+                      : 0,
+                  }
+                : {
+                    bottom: dropdownRef.current
+                      ? window.innerHeight - dropdownRef.current.getBoundingClientRect().top + window.scrollY + 2
+                      : 0,
+                    right: dropdownRef.current
+                      ? window.innerWidth - dropdownRef.current.getBoundingClientRect().right
+                      : 0,
+                  }
+            }
+            initial={{ opacity: 0, scale: 0.95, y: dropdownDirection === "bottom" ? -10 : 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: dropdownDirection === "bottom" ? -10 : 10 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+          >
+            <div className="py-1">
+              <motion.a
+                href={`/customers/customer-detail/${customer.id}`}
+                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                onClick={handleViewDetails}
+                whileHover={{ backgroundColor: "#f3f4f6" }}
+                transition={{ duration: 0.1 }}
+              >
+                View Details
+              </motion.a>
+              <motion.button
+                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  console.log("Freeze customer:", customer.id)
+                  setIsOpen(false)
+                }}
+                whileHover={{ backgroundColor: "#f3f4f6" }}
+                transition={{ duration: 0.1 }}
+              >
+                Freeze Account
+              </motion.button>
+              <motion.button
+                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  console.log("Delete customer:", customer.id)
+                  setIsOpen(false)
+                }}
+                whileHover={{ backgroundColor: "#f3f4f6" }}
+                transition={{ duration: 0.1 }}
+              >
+                Delete
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
 const LoadingSkeleton = () => {
   return (
-    <div className="flex-3 mt-5 flex flex-col rounded-md border bg-white p-5">
+    <motion.div
+      className="flex-3 mt-5 flex flex-col rounded-md border bg-white p-5"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="items-center justify-between border-b py-2 md:flex md:py-4">
-        <div className="h-8 w-40 animate-pulse rounded bg-gray-200"></div>
+        <div className="h-8 w-40 rounded bg-gray-200">
+          <motion.div
+            className="h-full w-full rounded bg-gray-300"
+            initial={{ opacity: 0.3 }}
+            animate={{
+              opacity: [0.3, 0.6, 0.3],
+              transition: {
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+            }}
+          />
+        </div>
         <div className="mt-3 flex gap-4 md:mt-0">
-          <div className="h-10 w-48 animate-pulse rounded bg-gray-200"></div>
-          <div className="h-10 w-24 animate-pulse rounded bg-gray-200"></div>
+          <div className="h-10 w-48 rounded bg-gray-200">
+            <motion.div
+              className="h-full w-full rounded bg-gray-300"
+              initial={{ opacity: 0.3 }}
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+                transition: {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.2,
+                },
+              }}
+            />
+          </div>
+          <div className="h-10 w-24 rounded bg-gray-200">
+            <motion.div
+              className="h-full w-full rounded bg-gray-300"
+              initial={{ opacity: 0.3 }}
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+                transition: {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.4,
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -183,7 +244,21 @@ const LoadingSkeleton = () => {
             <tr>
               {[...Array(8)].map((_, i) => (
                 <th key={i} className="whitespace-nowrap border-b p-4">
-                  <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                  <div className="h-4 w-24 rounded bg-gray-200">
+                    <motion.div
+                      className="h-full w-full rounded bg-gray-300"
+                      initial={{ opacity: 0.3 }}
+                      animate={{
+                        opacity: [0.3, 0.6, 0.3],
+                        transition: {
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.1,
+                        },
+                      }}
+                    />
+                  </div>
                 </th>
               ))}
             </tr>
@@ -193,7 +268,21 @@ const LoadingSkeleton = () => {
               <tr key={rowIndex}>
                 {[...Array(8)].map((_, cellIndex) => (
                   <td key={cellIndex} className="whitespace-nowrap border-b px-4 py-3">
-                    <div className="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+                    <div className="h-4 w-full rounded bg-gray-200">
+                      <motion.div
+                        className="h-full w-full rounded bg-gray-300"
+                        initial={{ opacity: 0.3 }}
+                        animate={{
+                          opacity: [0.3, 0.6, 0.3],
+                          transition: {
+                            duration: 1.5,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: (rowIndex * 8 + cellIndex) * 0.05,
+                          },
+                        }}
+                      />
+                    </div>
                   </td>
                 ))}
               </tr>
@@ -203,16 +292,72 @@ const LoadingSkeleton = () => {
       </div>
 
       <div className="flex items-center justify-between border-t py-3">
-        <div className="h-4 w-48 animate-pulse rounded bg-gray-200"></div>
+        <div className="h-4 w-48 rounded bg-gray-200">
+          <motion.div
+            className="h-full w-full rounded bg-gray-300"
+            initial={{ opacity: 0.3 }}
+            animate={{
+              opacity: [0.3, 0.6, 0.3],
+              transition: {
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.6,
+              },
+            }}
+          />
+        </div>
         <div className="flex items-center gap-2">
-          <div className="size-8 animate-pulse rounded bg-gray-200"></div>
+          <div className="size-8 rounded bg-gray-200">
+            <motion.div
+              className="h-full w-full rounded bg-gray-300"
+              initial={{ opacity: 0.3 }}
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+                transition: {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.8,
+                },
+              }}
+            />
+          </div>
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="size-8 animate-pulse rounded bg-gray-200"></div>
+            <div key={i} className="size-8 rounded bg-gray-200">
+              <motion.div
+                className="h-full w-full rounded bg-gray-300"
+                initial={{ opacity: 0.3 }}
+                animate={{
+                  opacity: [0.3, 0.6, 0.3],
+                  transition: {
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.8 + i * 0.1,
+                  },
+                }}
+              />
+            </div>
           ))}
-          <div className="size-8 animate-pulse rounded bg-gray-200"></div>
+          <div className="size-8 rounded bg-gray-200">
+            <motion.div
+              className="h-full w-full rounded bg-gray-300"
+              initial={{ opacity: 0.3 }}
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+                transition: {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1.3,
+                },
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -274,8 +419,13 @@ const CustomersTable: React.FC = () => {
   if (isError) return <div>Error loading customers</div>
 
   return (
-    <div className="relative">
-      <div className="items-center justify-between border-b py-2 md:flex md:py-4">
+    <motion.div className="relative" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+      <motion.div
+        className="items-center justify-between border-b py-2 md:flex md:py-4"
+        initial={{ y: -10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <p className="text-lg font-medium max-sm:pb-3 md:text-2xl">All Customers</p>
         <div className="flex gap-4">
           <SearchModule
@@ -286,28 +436,51 @@ const CustomersTable: React.FC = () => {
             onSearchTypeChange={handleSearchTypeChange}
             placeholder={`Search by ${searchType}...`}
           />
-          <ButtonModule
-            variant="black"
-            size="md"
-            icon={<Filtericon />}
-            iconPosition="end"
-            onClick={() => alert("Filter clicked!")}
-          >
-            <p className="max-sm:hidden">Filter</p>
-          </ButtonModule>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <ButtonModule
+              variant="black"
+              size="md"
+              icon={<Filtericon />}
+              iconPosition="end"
+              onClick={() => alert("Filter clicked!")}
+            >
+              <p className="max-sm:hidden">Filter</p>
+            </ButtonModule>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {customers.length === 0 ? (
-        <div className="flex h-60 flex-col items-center justify-center gap-2 bg-[#F6F6F9]">
-          <EmptyState />
-          <p className="text-base font-bold text-[#202B3C]">
+        <motion.div
+          className="flex h-60 flex-col items-center justify-center gap-2 bg-[#F6F6F9]"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          <motion.div
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <EmptyState />
+          </motion.div>
+          <motion.p
+            className="text-base font-bold text-[#202B3C]"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
             {searchText ? "No matching customers found" : "No customers available"}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       ) : (
         <>
-          <div className="w-full overflow-x-auto border-l border-r bg-[#FFFFFF]">
+          <motion.div
+            className="w-full overflow-x-auto border-l border-r bg-[#FFFFFF]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
               <thead>
                 <tr>
@@ -362,76 +535,94 @@ const CustomersTable: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {customers.map((customer) => (
-                  <tr key={customer.id}>
-                    <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <MdOutlineCheckBoxOutlineBlank className="text-lg" />
-                        {customer.id}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="flex size-8 items-center justify-center rounded-md bg-[#EDF0F4]">
-                          {customer.firstName?.charAt(0)}
-                          {customer.lastName?.charAt(0)}
+                <AnimatePresence>
+                  {customers.map((customer, index) => (
+                    <motion.tr
+                      key={customer.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      whileHover={{ backgroundColor: "#f9fafb" }}
+                    >
+                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <MdOutlineCheckBoxOutlineBlank className="text-lg" />
+                          {customer.id}
                         </div>
-                        <div className="flex flex-col gap-0">
-                          <p className="m-0 inline-block leading-none text-[#202B3C]">
-                            {customer.firstName || customer.lastName
-                              ? `${customer.firstName || ""} ${customer.lastName || ""}`.trim()
-                              : customer.tag || "N/A"}
-                          </p>
-                          <small className="text-grey-400 m-0 inline-block text-sm leading-none">
-                            {customer.tag || "No tag"}
-                          </small>
+                      </td>
+                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="flex size-8 items-center justify-center rounded-md bg-[#EDF0F4]">
+                            {customer.firstName?.charAt(0)}
+                            {customer.lastName?.charAt(0)}
+                          </div>
+                          <div className="flex flex-col gap-0">
+                            <p className="m-0 inline-block leading-none text-[#202B3C]">
+                              {customer.firstName || customer.lastName
+                                ? `${customer.firstName || ""} ${customer.lastName || ""}`.trim()
+                                : customer.tag || "N/A"}
+                            </p>
+                            <small className="text-grey-400 m-0 inline-block text-sm leading-none">
+                              {customer.tag || "No tag"}
+                            </small>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{customer.email || "N/A"}</td>
-                    <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{customer.phoneNumber || "N/A"}</td>
-                    <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                      {customer.kyc?.status?.label || "N/A"}
-                    </td>
-                    <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                      <div
-                        style={getStatusStyle(customer.status)}
-                        className="flex items-center justify-center gap-1 rounded-full px-2 py-1"
-                      >
-                        <span
-                          className="size-2 rounded-full"
-                          style={{ backgroundColor: customer.status.value === 1 ? "#589E67" : "#AF4B4B" }}
-                        ></span>
-                        {customer.status.label}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                      {customer.isVerified ? "Verified" : "Not Verified"}
-                    </td>
-                    <td className="whitespace-nowrap border-b px-4 py-1 text-sm">
-                      <ActionDropdown customer={customer} onViewDetails={setSelectedCustomer} />
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{customer.email || "N/A"}</td>
+                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{customer.phoneNumber || "N/A"}</td>
+                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                        {customer.kyc?.status?.label || "N/A"}
+                      </td>
+                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                        <motion.div
+                          style={getStatusStyle(customer.status)}
+                          className="flex items-center justify-center gap-1 rounded-full px-2 py-1"
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.1 }}
+                        >
+                          <span
+                            className="size-2 rounded-full"
+                            style={{ backgroundColor: customer.status.value === 1 ? "#589E67" : "#AF4B4B" }}
+                          ></span>
+                          {customer.status.label}
+                        </motion.div>
+                      </td>
+                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                        {customer.isVerified ? "Verified" : "Not Verified"}
+                      </td>
+                      <td className="whitespace-nowrap border-b px-4 py-1 text-sm">
+                        <ActionDropdown customer={customer} onViewDetails={setSelectedCustomer} />
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               </tbody>
             </table>
-          </div>
+          </motion.div>
 
-          <div className="flex items-center justify-between border-t py-3">
+          <motion.div
+            className="flex items-center justify-between border-t py-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
             <div className="text-sm text-gray-700">
               Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, data?.totalCount || 0)} of{" "}
               {data?.totalCount || 0} entries
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <motion.button
                 onClick={() => paginate(currentPage - 1)}
                 disabled={currentPage === 1}
                 className={`flex items-center justify-center rounded-md p-2 ${
                   currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-[#003F9F] hover:bg-gray-100"
                 }`}
+                whileHover={{ scale: currentPage === 1 ? 1 : 1.1 }}
+                whileTap={{ scale: currentPage === 1 ? 1 : 0.95 }}
               >
                 <MdOutlineArrowBackIosNew />
-              </button>
+              </motion.button>
 
               {Array.from({ length: Math.min(5, data?.totalPages || 1) }).map((_, index) => {
                 // Calculate page number based on current position
@@ -447,7 +638,7 @@ const CustomersTable: React.FC = () => {
                 }
 
                 return (
-                  <button
+                  <motion.button
                     key={index}
                     onClick={() => paginate(pageNum)}
                     className={`flex size-8 items-center justify-center rounded-md text-sm ${
@@ -455,9 +646,14 @@ const CustomersTable: React.FC = () => {
                         ? "bg-[#003F9F] text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
                   >
                     {pageNum}
-                  </button>
+                  </motion.button>
                 )
               })}
 
@@ -466,19 +662,21 @@ const CustomersTable: React.FC = () => {
               )}
 
               {data?.totalPages && data.totalPages > 5 && currentPage < data.totalPages - 1 && (
-                <button
+                <motion.button
                   onClick={() => paginate(data.totalPages)}
                   className={`flex size-8 items-center justify-center rounded-md text-sm ${
                     currentPage === data.totalPages
                       ? "bg-[#003F9F] text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   {data.totalPages}
-                </button>
+                </motion.button>
               )}
 
-              <button
+              <motion.button
                 onClick={() => paginate(currentPage + 1)}
                 disabled={currentPage === data?.totalPages}
                 className={`flex items-center justify-center rounded-md p-2 ${
@@ -486,14 +684,16 @@ const CustomersTable: React.FC = () => {
                     ? "cursor-not-allowed text-gray-400"
                     : "text-[#003F9F] hover:bg-gray-100"
                 }`}
+                whileHover={{ scale: currentPage === data?.totalPages ? 1 : 1.1 }}
+                whileTap={{ scale: currentPage === data?.totalPages ? 1 : 0.95 }}
               >
                 <MdOutlineArrowForwardIos />
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         </>
       )}
-    </div>
+    </motion.div>
   )
 }
 

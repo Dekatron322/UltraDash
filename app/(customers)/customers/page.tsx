@@ -1,4 +1,5 @@
 "use client"
+
 import DashboardNav from "components/Navbar/DashboardNav"
 import InsightIcon from "public/insight-icon"
 import IncomingIcon from "public/incoming-icon"
@@ -9,6 +10,94 @@ import AllAccountsTable from "components/Tables/AllAccountsTable"
 import { useState } from "react"
 import AddCustomerModal from "components/ui/Modal/add-customer-modal"
 import { useGetOverviewQuery } from "lib/redux/overviewSlice"
+import { motion } from "framer-motion"
+
+// Skeleton Loader Component
+const SkeletonLoader = () => {
+  return (
+    <div className="flex w-full gap-3 max-lg:grid max-lg:grid-cols-2 max-sm:grid-cols-1">
+      {[...Array(4)].map((_, index) => (
+        <motion.div
+          key={index}
+          className="small-card rounded-md bg-white p-2 transition duration-500 md:border"
+          initial={{ opacity: 0.6 }}
+          animate={{
+            opacity: [0.6, 1, 0.6],
+            transition: {
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            },
+          }}
+        >
+          <div className="flex items-center gap-2 border-b pb-4 max-sm:mb-2">
+            <div className="h-5 w-5 rounded-full bg-gray-200"></div>
+            <div className="h-4 w-24 rounded bg-gray-200"></div>
+          </div>
+          <div className="flex flex-col items-end justify-between gap-3 pt-4">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="flex w-full justify-between">
+                <div className="h-4 w-24 rounded bg-gray-200"></div>
+                <div className="h-4 w-10 rounded bg-gray-200"></div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+
+// Skeleton for the table
+const TableSkeleton = () => {
+  return (
+    <div className="flex-3 mt-5 flex flex-col rounded-md border bg-white p-5">
+      <div className="items-center justify-between border-b py-2 md:flex md:py-4">
+        <div className="h-8 w-40 animate-pulse rounded bg-gray-200"></div>
+        <div className="mt-3 flex gap-4 md:mt-0">
+          <div className="h-10 w-48 animate-pulse rounded bg-gray-200"></div>
+          <div className="h-10 w-24 animate-pulse rounded bg-gray-200"></div>
+        </div>
+      </div>
+
+      <div className="w-full overflow-x-auto border-l border-r bg-[#f9f9f9]">
+        <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
+          <thead>
+            <tr>
+              {[...Array(8)].map((_, i) => (
+                <th key={i} className="whitespace-nowrap border-b p-4">
+                  <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(5)].map((_, rowIndex) => (
+              <tr key={rowIndex}>
+                {[...Array(8)].map((_, cellIndex) => (
+                  <td key={cellIndex} className="whitespace-nowrap border-b px-4 py-3">
+                    <div className="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex items-center justify-between border-t py-3">
+        <div className="h-4 w-48 animate-pulse rounded bg-gray-200"></div>
+        <div className="flex items-center gap-2">
+          <div className="size-8 animate-pulse rounded bg-gray-200"></div>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="size-8 animate-pulse rounded bg-gray-200"></div>
+          ))}
+          <div className="size-8 animate-pulse rounded bg-gray-200"></div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function AllTransactions() {
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false)
@@ -38,8 +127,11 @@ export default function AllTransactions() {
           <div className="flex w-full flex-col">
             <DashboardNav />
             <div className="container mx-auto flex flex-col">
-              <div className="flex w-full items-center justify-center px-16 max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8">
-                <div className="text-lg">Loading overview data...</div>
+              <div className="flex w-full gap-6 px-16 max-md:flex-col max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8">
+                <div className="w-full">
+                  <SkeletonLoader />
+                  <TableSkeleton />
+                </div>
               </div>
             </div>
           </div>
@@ -55,9 +147,14 @@ export default function AllTransactions() {
           <div className="flex w-full flex-col">
             <DashboardNav />
             <div className="container mx-auto flex flex-col">
-              <div className="flex w-full items-center justify-center px-16 max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8">
+              <motion.div
+                className="flex w-full items-center justify-center px-16 max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 <div className="text-lg text-red-500">Error loading overview data</div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -73,11 +170,19 @@ export default function AllTransactions() {
           <div className="container mx-auto flex flex-col">
             <div className="flex w-full gap-6 px-16 max-md:flex-col max-md:px-0 max-sm:my-4 max-sm:px-3 md:my-8">
               <div className="w-full">
-                <div className="flex w-full gap-3 max-lg:grid max-lg:grid-cols-2 max-sm:grid-cols-1">
+                <motion.div
+                  className="flex w-full gap-3 max-lg:grid max-lg:grid-cols-2 max-sm:grid-cols-1"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
                   <div className="flex w-full max-sm:flex-col">
                     <div className="w-full">
                       <div className="mb-3 flex w-full cursor-pointer gap-3 max-sm:flex-col ">
-                        <div className="small-card rounded-md p-2 transition duration-500 md:border">
+                        <motion.div
+                          className="small-card rounded-md p-2 transition duration-500 md:border"
+                          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                        >
                           <div className="flex items-center gap-2 border-b pb-4 max-sm:mb-2">
                             <InsightIcon />
                             Overview
@@ -92,9 +197,12 @@ export default function AllTransactions() {
                               <p className="text-secondary font-medium">{formatNumber(activeCustomers)}</p>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="small-card rounded-md p-2 transition duration-500 md:border">
+                        <motion.div
+                          className="small-card rounded-md p-2 transition duration-500 md:border"
+                          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                        >
                           <div className="flex items-center gap-2 border-b pb-4 max-sm:mb-2">
                             <IncomingIcon />
                             Active Accounts
@@ -111,9 +219,12 @@ export default function AllTransactions() {
                               </p>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="small-card rounded-md p-2 transition duration-500 md:border">
+                        <motion.div
+                          className="small-card rounded-md p-2 transition duration-500 md:border"
+                          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                        >
                           <div className="flex items-center gap-2 border-b pb-4 max-sm:mb-2">
                             <OutgoingIcon />
                             Frozen Accounts
@@ -130,9 +241,12 @@ export default function AllTransactions() {
                               </p>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="small-card rounded-md p-2 transition duration-500 md:border">
+                        <motion.div
+                          className="small-card rounded-md p-2 transition duration-500 md:border"
+                          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                        >
                           <div className="flex items-center gap-2 border-b pb-4 max-sm:mb-2">
                             <UnresolvedTransactions />
                             Inactive Accounts
@@ -150,12 +264,18 @@ export default function AllTransactions() {
                               <p className="text-secondary font-medium">{inactiveCustomers}</p>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <AllAccountsTable />
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  <AllAccountsTable />
+                </motion.div>
               </div>
             </div>
           </div>

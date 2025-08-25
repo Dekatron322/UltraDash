@@ -141,7 +141,7 @@ export default function Dashboard() {
       <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="flex w-full flex-col">
           <DashboardNav />
-          <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-16 py-8 max-sm:my-4 max-sm:px-3 ">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
               {/* Header and Refresh */}
               <div className="mb-8 flex items-center justify-between">

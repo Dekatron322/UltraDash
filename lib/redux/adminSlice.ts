@@ -83,6 +83,16 @@ export interface DeleteAdminResponse {
   message: string
 }
 
+export interface UpdateAdminPermissionRequest {
+  id: number
+  permission: Permission
+}
+
+export interface UpdateAdminPermissionResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({
@@ -162,6 +172,15 @@ export const adminApi = createApi({
       }),
       providesTags: ["Admin"],
     }),
+
+    updateAdminPermission: builder.mutation<UpdateAdminPermissionResponse, UpdateAdminPermissionRequest>({
+      query: ({ id, permission }) => ({
+        url: `/Admin/Permission/${id}`,
+        method: "PATCH",
+        body: permission,
+      }),
+      invalidatesTags: ["Admin"],
+    }),
   }),
 })
 
@@ -171,4 +190,5 @@ export const {
   useUpdateAdminMutation,
   useDeleteAdminMutation,
   useGetAdminByIdQuery,
+  useUpdateAdminPermissionMutation,
 } = adminApi
