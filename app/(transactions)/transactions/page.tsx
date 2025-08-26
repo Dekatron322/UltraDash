@@ -300,7 +300,7 @@ export default function AllTransactions() {
       <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="flex w-full flex-col">
           <DashboardNav />
-          <div className="container mx-auto flex flex-col px-6 py-8">
+          <div className="container mx-auto flex flex-col px-16 py-8 max-sm:px-3">
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <div>

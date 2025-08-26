@@ -9,7 +9,7 @@ import { ButtonModule } from "components/ui/Button/Button"
 import { SearchModule } from "components/ui/Search/search-module"
 import Filtericon from "public/filter-icon"
 import { useGetUsersQuery } from "lib/redux/customerSlice"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface Status {
   value: number
