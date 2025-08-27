@@ -4,21 +4,15 @@ import DashboardNav from "components/Navbar/DashboardNav"
 import TotalAssets from "public/total-assets"
 import TransactionIcon from "public/transaction-icon"
 import AccountIcon from "public/accounts-icon"
-import WarningIcon from "public/warning-icon"
 import CustomerIcon from "public/customer-icon"
-import { ButtonModule } from "components/ui/Button/Button"
-import InsightIcon from "public/insight-icon"
-import { TransactionChart } from "components/Dashboard/TransactionChart"
 import { ProfitChart } from "components/Dashboard/ProfitChart"
-import { UserGrowthChart } from "components/Dashboard/UserGrowthChart"
-import { AssetDistributionChart } from "components/Dashboard/AssetDistributionChart"
-import { AccountDistributionChart } from "components/Dashboard/AccountDistributionChart"
+
 import {
+  useGetCryptoOverviewQuery,
   useGetCurrenciesQuery,
   useGetCustomerBalanceQuery,
   useGetOverviewQuery,
   useGetTransactionOverviewQuery,
-  useGetCryptoOverviewQuery,
 } from "lib/redux/overviewSlice"
 import { useEffect, useState } from "react"
 

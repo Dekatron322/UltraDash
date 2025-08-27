@@ -2,7 +2,7 @@
 
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { useGetTransactionSeriesQuery } from "lib/redux/overviewSlice"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 interface ProfitChartProps {
   timeFilter?: "day" | "week" | "month" | "all"

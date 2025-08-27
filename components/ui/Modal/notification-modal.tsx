@@ -5,10 +5,10 @@ import Modal from "react-modal"
 import { MdClose } from "react-icons/md"
 import { ButtonModule } from "components/ui/Button/Button"
 import dynamic from "next/dynamic"
+import "react-quill/dist/quill.snow.css"
 
 // Dynamically import react-quill (to avoid SSR issues in Next.js)
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false })
-import "react-quill/dist/quill.snow.css"
 
 interface NotificationModalProps {
   isOpen: boolean
