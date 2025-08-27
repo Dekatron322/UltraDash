@@ -32,8 +32,7 @@ export const API_ENDPOINTS = {
     OVERVIEW: "/Admin/Users/Overview",
     LIST: "/Admin/Users",
     DETAILS: (id: string | number) => `/Admin/Users/${id}`,
-    ADD_BONUS:  "/Admin/Wallet/Bonus",
-    
+    ADD_BONUS: "/Admin/Wallet/Bonus",
   },
 
   // Transaction endpoints
@@ -57,6 +56,11 @@ export const API_ENDPOINTS = {
   DASHBOARD: {
     STATS: "/Admin/Dashboard/Stats",
     ANALYTICS: "/Admin/Dashboard/Analytics",
+  },
+
+  //Series endpoints
+  SERIES: {
+    ANALYTICS: "/Admin/Transactions/Series",
   },
 }
 

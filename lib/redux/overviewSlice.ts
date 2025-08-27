@@ -20,6 +20,8 @@ export interface OverviewResponse {
 }
 
 export interface TransactionOverviewData {
+  withdraw_AllTime: number
+  withdraw_AllTime_Count: number
   today_Start: string
   week_Start_Monday: string
   month_Start: string
@@ -37,8 +39,6 @@ export interface TransactionOverviewData {
   withdraw_ThisWeek_Count: number
   withdraw_ThisMonth: number
   withdraw_ThisMonth_Count: number
-  withdraw_AllTime: number
-  withdraw_AllTime_Count: number
   airtime_Today: number
   airtime_Today_Count: number
   airtime_ThisWeek: number
@@ -138,6 +138,26 @@ export interface CustomerBalanceResponse {
   message: string
 }
 
+// Transaction Series Interfaces
+export interface TransactionSeriesItem {
+  day: string
+  type: string
+  amount: number
+  count: number
+}
+
+export interface TransactionSeriesResponse {
+  data: TransactionSeriesItem[]
+  isSuccess: boolean
+  message: string
+}
+
+export interface TransactionSeriesParams {
+  type?: string
+  from?: string
+  to?: string
+}
+
 export const overviewApi = createApi({
   reducerPath: "overviewApi",
   baseQuery: fetchBaseQuery({
@@ -195,13 +215,39 @@ export const overviewApi = createApi({
         method: "GET",
       }),
     }),
+    getTransactionSeries: builder.query<TransactionSeriesResponse, TransactionSeriesParams>({
+      query: (params) => {
+        const queryParams = new URLSearchParams()
+
+        if (params.type) {
+          queryParams.append("type", params.type)
+        }
+
+        if (params.from) {
+          queryParams.append("from", params.from)
+        }
+
+        if (params.to) {
+          queryParams.append("to", params.to)
+        }
+
+        const queryString = queryParams.toString()
+        const url = queryString ? `${API_ENDPOINTS.SERIES.ANALYTICS}?${queryString}` : API_ENDPOINTS.SERIES.ANALYTICS
+
+        return {
+          url,
+          method: "GET",
+        }
+      },
+    }),
   }),
 })
 
-export const { 
-  useGetOverviewQuery, 
-  useGetTransactionOverviewQuery, 
+export const {
+  useGetOverviewQuery,
+  useGetTransactionOverviewQuery,
   useGetCryptoOverviewQuery,
   useGetCurrenciesQuery,
-  useGetCustomerBalanceQuery 
+  useGetCustomerBalanceQuery,
+  useGetTransactionSeriesQuery,
 } = overviewApi

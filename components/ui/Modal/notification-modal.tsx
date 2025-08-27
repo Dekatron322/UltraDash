@@ -4,6 +4,11 @@ import React, { useState } from "react"
 import Modal from "react-modal"
 import { MdClose } from "react-icons/md"
 import { ButtonModule } from "components/ui/Button/Button"
+import dynamic from "next/dynamic"
+
+// Dynamically import react-quill (to avoid SSR issues in Next.js)
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false })
+import "react-quill/dist/quill.snow.css"
 
 interface NotificationModalProps {
   isOpen: boolean
@@ -12,7 +17,7 @@ interface NotificationModalProps {
     fullName: string
   }
   onRequestClose: () => void
-  onSendNotification: (message: string) => void
+  onSendNotification: (title: string, message: string) => void
 }
 
 const NotificationModal: React.FC<NotificationModalProps> = ({
@@ -21,6 +26,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   onRequestClose,
   onSendNotification,
 }) => {
+  const [title, setTitle] = useState("")
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [isSent, setIsSent] = useState(false)
@@ -28,11 +34,12 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   const handleSend = async () => {
     setIsSending(true)
     try {
-      await onSendNotification(message)
+      await onSendNotification(title, message)
       setIsSent(true)
       setTimeout(() => {
         onRequestClose()
         setIsSent(false)
+        setTitle("")
         setMessage("")
       }, 1500)
     } catch (error) {
@@ -75,17 +82,45 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
           ) : (
             <>
               <div className="mb-6">
-                <p className="mb-2 text-sm text-gray-600">
+                <p className="mb-4 text-sm text-gray-600">
                   Recipient: {customer.fullName} ({customer.email})
                 </p>
-                <textarea
-                  className="h-40 w-full rounded-md border border-gray-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-[#003F9F]"
-                  placeholder="Type your notification message here..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                />
+
+                {/* Title */}
+                <div className="mb-4">
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Title</label>
+                  <input
+                    type="text"
+                    className="w-full rounded-md border border-gray-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-[#003F9F]"
+                    placeholder="Enter notification title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+
+                {/* Rich Text Editor */}
+                <div className="mb-4">
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Message</label>
+                  <ReactQuill
+                    theme="snow"
+                    value={message}
+                    onChange={setMessage}
+                    className="rounded-md bg-white"
+                    placeholder="Type your notification message here..."
+                    modules={{
+                      toolbar: [
+                        [{ header: [1, 2, false] }],
+                        ["bold", "italic", "underline", "strike"],
+                        [{ list: "ordered" }, { list: "bullet" }],
+                        ["link", "image"],
+                        ["clean"],
+                      ],
+                    }}
+                  />
+                </div>
               </div>
 
+              {/* Footer */}
               <div className="flex justify-end gap-3">
                 <ButtonModule
                   variant="outline"
@@ -95,7 +130,12 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
                 >
                   Cancel
                 </ButtonModule>
-                <ButtonModule variant="primary" size="md" onClick={handleSend} disabled={!message.trim() || isSending}>
+                <ButtonModule
+                  variant="primary"
+                  size="md"
+                  onClick={handleSend}
+                  disabled={!title.trim() || !message.trim() || isSending}
+                >
                   {isSending ? "Sending..." : "Send Notification"}
                 </ButtonModule>
               </div>

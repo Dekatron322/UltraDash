@@ -495,7 +495,7 @@ const CustomerInfo = () => {
   }
 
   // Update the handleSendNotification function to use the API
-  const handleSendNotification = async (message: string) => {
+  const handleSendNotification = async (title: string, message: string) => {
     if (!userResponse?.data?.id) {
       notify("error", "User ID is required to send notification")
       return
@@ -504,7 +504,7 @@ const CustomerInfo = () => {
     try {
       const result = await notifyUser({
         userId: userResponse.data.id,
-        title: "Admin Notification",
+        title: title,
         message: message,
       }).unwrap()
 
@@ -611,14 +611,13 @@ const CustomerInfo = () => {
                 <p className="text-sm text-gray-500">Available Balance</p>
               </div>
             </div>
-            {wallet.bonus !== wallet.balance && (
-              <div className="mt-2 flex items-center justify-between border-t pt-2 text-sm">
-                <p className="text-gray-600">Bonus: {formatCurrency(wallet.bonus)}</p>
-                <ButtonModule onClick={() => handleOpenAddBonusModal(wallet)} variant="outline" size="sm" className="">
-                  Add Bonus
-                </ButtonModule>
-              </div>
-            )}
+
+            <div className="mt-2 flex items-center justify-between border-t pt-2 text-sm">
+              <p className="text-gray-600">Bonus: {formatCurrency(wallet.bonus)}</p>
+              <ButtonModule onClick={() => handleOpenAddBonusModal(wallet)} variant="outline" size="sm" className="">
+                Add Bonus
+              </ButtonModule>
+            </div>
           </motion.div>
         ))}
       </div>

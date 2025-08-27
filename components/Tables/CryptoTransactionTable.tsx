@@ -16,7 +16,6 @@ import { useGetCryptoTransactionsQuery, useSettleTransactionByReferenceMutation 
 import { API_CONFIG, API_ENDPOINTS } from "lib/config/api"
 import { notify } from "components/ui/Notification/Notification"
 
-
 type SortOrder = "asc" | "desc" | null
 
 const SkeletonRow = () => {
@@ -90,11 +89,11 @@ interface TransactionDetailModalProps {
   onSettleTransaction: (transactionReference: string) => Promise<void>
 }
 
-const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ 
-  isOpen, 
-  transactionId, 
+const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
+  isOpen,
+  transactionId,
   onRequestClose,
-  onSettleTransaction 
+  onSettleTransaction,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const { data, isLoading, isError } = useGetCryptoTransactionsQuery(
@@ -199,7 +198,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
 
   const handleSettleTransaction = async () => {
     if (!transaction?.reference) return
-    
+
     try {
       await onSettleTransaction(transaction.reference)
       onRequestClose()
@@ -339,12 +338,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
             {/* Settle Button - Only show if transaction is not settled */}
             {transaction.confirmed && !transaction.settled && (
               <div className="mt-4 flex justify-center">
-                <ButtonModule
-                  variant="primary"
-                  size="md"
-                  onClick={handleSettleTransaction}
-                  className="w-full"
-                >
+                <ButtonModule variant="primary" size="md" onClick={handleSettleTransaction} className="w-full">
                   Settle Transaction
                 </ButtonModule>
               </div>
@@ -382,7 +376,7 @@ const CryptoTransactionTable: React.FC = () => {
   const handleSettleTransaction = async (transactionReference: string) => {
     try {
       const result = await settleTransaction({ transactionReference }).unwrap()
-      
+
       if (result.isSuccess) {
         notify("success", "Transaction settled successfully!")
         // Refetch the transactions to update the UI
@@ -474,12 +468,12 @@ const CryptoTransactionTable: React.FC = () => {
   }
 
   if (isError) {
-    console.error('Crypto transactions error:', error)
+    console.error("Crypto transactions error:", error)
     return (
       <div className="flex h-60 flex-col items-center justify-center gap-2 bg-[#f9f9f9]">
         <p className="text-base font-bold text-[#202B3C]">Error loading crypto transactions. Please try again.</p>
         <p className="text-sm text-red-600">
-          {error && 'data' in error ? JSON.stringify(error.data) : 'Network error'}
+          {error && "data" in error ? JSON.stringify(error.data) : "Network error"}
         </p>
       </div>
     )
@@ -553,10 +547,10 @@ const CryptoTransactionTable: React.FC = () => {
           <EmptyState />
           <p className="text-base font-bold text-[#202B3C]">No crypto transactions found.</p>
           <p className="text-sm text-gray-600">
-            {!data ? 'No data received from API' : `API returned ${data.data.length} transactions`}
+            {!data ? "No data received from API" : `API returned ${data.data.length} transactions`}
           </p>
           <p className="text-xs text-gray-500">
-            Total count: {data?.totalCount || 'N/A'} | Current page: {currentPage}
+            Total count: {data?.totalCount || "N/A"} | Current page: {currentPage}
           </p>
         </div>
       ) : (
@@ -645,7 +639,7 @@ const CryptoTransactionTable: React.FC = () => {
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
                       <div className="flex items-center gap-2 rounded-full py-1">{transaction.type.label}</div>
                     </td>
-                    
+
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
                       <div className="flex">
                         <div className="flex items-center justify-center gap-1 rounded-full px-2 py-1">
@@ -655,8 +649,9 @@ const CryptoTransactionTable: React.FC = () => {
                       </div>
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
-                    
-                      <div className="flex items-center gap-2 rounded-full py-1">{transaction.profitCurrency}{transaction.profit}</div>
+                      <div className="flex items-center gap-1 rounded-full py-1">
+                        <p className="uppercase">{transaction.profitCurrency}</p> {transaction.profit}
+                      </div>
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
                       <div className="flex">
@@ -675,7 +670,7 @@ const CryptoTransactionTable: React.FC = () => {
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
                       {formatDate(transaction.createdAt)}
                     </td>
-                    <td className="whitespace-nowrap flex gap-2 border-b px-4 py-1 text-sm">
+                    <td className="flex gap-2 whitespace-nowrap border-b px-4 py-1 text-sm">
                       <ButtonModule
                         variant="outline"
                         size="sm"
