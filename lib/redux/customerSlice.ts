@@ -33,6 +33,8 @@ export interface Currency {
 }
 
 export interface Wallet {
+  disableWithdrawal: any
+  isDisabled: any
   id: number
   userId: number
   balance: number
@@ -193,6 +195,18 @@ export interface AddBonusResponse {
   message: string
 }
 
+// Disable Wallet Request Interface
+export interface DisableWalletRequest {
+  walletId: number
+  disable: boolean
+}
+
+// Disable Wallet Response Interface
+export interface DisableWalletResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const customerApi = createApi({
   reducerPath: "customerApi",
   baseQuery: fetchBaseQuery({
@@ -219,7 +233,7 @@ export const customerApi = createApi({
       return headers
     },
   }),
-  tagTypes: ['User'],
+  tagTypes: ["User"],
   endpoints: (builder) => ({
     getUsers: builder.query<
       UsersResponse,
@@ -242,14 +256,14 @@ export const customerApi = createApi({
         },
         method: "GET",
       }),
-      providesTags: ['User'],
+      providesTags: ["User"],
     }),
     getUserById: builder.query<UserResponse, number>({
       query: (id) => ({
         url: API_ENDPOINTS.USERS.DETAILS(id),
         method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'User', id }],
+      providesTags: (result, error, id) => [{ type: "User", id }],
     }),
     getUserTransactions: builder.query<
       TransactionsResponse,
@@ -287,15 +301,25 @@ export const customerApi = createApi({
         method: "POST",
         body: bonusData,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
+    }),
+    // Disable Wallet mutation endpoint
+    disableWallet: builder.mutation<DisableWalletResponse, DisableWalletRequest>({
+      query: (disableData) => ({
+        url: API_ENDPOINTS.USERS.DISABLE,
+        method: "POST",
+        body: disableData,
+      }),
+      invalidatesTags: ["User"],
     }),
   }),
 })
 
-export const { 
-  useGetUsersQuery, 
-  useGetUserByIdQuery, 
-  useGetUserTransactionsQuery, 
+export const {
+  useGetUsersQuery,
+  useGetUserByIdQuery,
+  useGetUserTransactionsQuery,
   useGetUserCryptoQuery,
-  useAddBonusMutation 
+  useAddBonusMutation,
+  useDisableWalletMutation,
 } = customerApi

@@ -11,6 +11,7 @@ import NotificationModal from "components/ui/Modal/notification-modal"
 import { motion } from "framer-motion"
 import {
   useAddBonusMutation,
+  useDisableWalletMutation,
   useGetUserByIdQuery,
   useGetUserCryptoQuery,
   useGetUserTransactionsQuery,
@@ -377,6 +378,147 @@ const AddBonusModal: React.FC<AddBonusModalProps> = ({ isOpen, wallet, customerN
   )
 }
 
+interface DisableWalletModalProps {
+  isOpen: boolean
+  wallet: any
+  customerName: string
+  onRequestClose: () => void
+  onDisableWallet: (data: { walletId: number; disable: boolean }) => Promise<any>
+}
+
+const DisableWalletModal: React.FC<DisableWalletModalProps> = ({
+  isOpen,
+  wallet,
+  customerName,
+  onRequestClose,
+  onDisableWallet,
+}) => {
+  const [isDisabling, setIsDisabling] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [actionType, setActionType] = useState<"disable" | "enable">("disable")
+
+  const handleDisableWallet = async () => {
+    if (!wallet) return
+
+    setIsDisabling(true)
+    try {
+      const disableData = {
+        walletId: wallet.id,
+        disable: actionType === "disable",
+      }
+
+      await onDisableWallet(disableData)
+      setIsSuccess(true)
+      setTimeout(() => {
+        onRequestClose()
+        setIsSuccess(false)
+      }, 1500)
+    } catch (error) {
+      console.error("Failed to disable wallet:", error)
+    } finally {
+      setIsDisabling(false)
+    }
+  }
+
+  // Determine if we're enabling or disabling based on current state
+  const isCurrentlyDisabled = wallet?.disableWithdrawal
+  const modalTitle = isCurrentlyDisabled ? "Enable Wallet" : "Disable Wallet"
+  const actionVerb = isCurrentlyDisabled ? "enable" : "disable"
+  const confirmText = isCurrentlyDisabled
+    ? "Are you sure you want to enable this wallet?"
+    : "Are you sure you want to disable this wallet?"
+
+  React.useEffect(() => {
+    if (wallet) {
+      setActionType(wallet.disableWithdrawal ? "enable" : "disable")
+    }
+  }, [wallet])
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      className="flex h-auto w-[500px] overflow-hidden rounded-md bg-white shadow-lg outline-none max-sm:w-full max-sm:max-w-[380px]"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      ariaHideApp={false}
+    >
+      <div className="w-full">
+        {/* Header */}
+        <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
+          <div className="flex items-center justify-center gap-2">
+            <div
+              className={`flex size-7 items-center justify-center rounded-md ${
+                actionType === "disable" ? "bg-red-500" : "bg-green-500"
+              } font-semibold text-white`}
+            >
+              {actionType === "disable" ? "!" : "✓"}
+            </div>
+            <p className="text-xl font-semibold text-[#2a2f4b]">{modalTitle}</p>
+          </div>
+          <button onClick={onRequestClose} className="cursor-pointer text-gray-600 hover:text-gray-800">
+            <MdClose size={24} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {isSuccess ? (
+            <div className="py-8 text-center">
+              <div className="mb-4 text-5xl text-green-500">✓</div>
+              <h3 className="mb-1 text-lg font-semibold">
+                Wallet {actionType === "disable" ? "Disabled" : "Enabled"}!
+              </h3>
+              <p className="text-gray-600">
+                The {wallet?.currency?.ticker || "Unknown"} wallet has been{" "}
+                {actionType === "disable" ? "disabled" : "enabled"} for {customerName}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6">
+                <p className="mb-2 text-sm text-gray-600">
+                  Customer: {customerName} ({wallet?.currency?.ticker || "Unknown"} Wallet)
+                </p>
+
+                <div className="mb-4 rounded-md bg-gray-100 p-4">
+                  <p className="text-center text-gray-700">{confirmText}</p>
+                </div>
+
+                {actionType === "disable" && (
+                  <div className="mb-4 rounded-md bg-yellow-50 p-3">
+                    <p className="text-sm text-yellow-700">
+                      Note: Disabling a wallet will prevent the user from making any transactions with this wallet.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <ButtonModule
+                  variant="outline"
+                  size="md"
+                  onClick={onRequestClose}
+                  className="border-gray-300 hover:bg-gray-50"
+                >
+                  Cancel
+                </ButtonModule>
+                <ButtonModule
+                  variant={actionType === "disable" ? "danger" : "primary"}
+                  size="md"
+                  onClick={handleDisableWallet}
+                  disabled={isDisabling}
+                >
+                  {isDisabling ? "Processing..." : modalTitle}
+                </ButtonModule>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 const CustomerInfo = () => {
   const { id } = useParams()
   const userId = Array.isArray(id) ? id[0] : id
@@ -421,6 +563,9 @@ const CustomerInfo = () => {
   // Add the bonus mutation hook
   const [addBonus, { isLoading: isAddingBonus }] = useAddBonusMutation()
 
+  // Add the disable wallet mutation hook
+  const [disableWallet, { isLoading: isDisablingWallet }] = useDisableWalletMutation()
+
   const [activeTab, setActiveTab] = useState("transactions")
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -428,6 +573,7 @@ const CustomerInfo = () => {
   const [selectedAsset, setSelectedAsset] = useState<any>(null)
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false)
   const [isAddBonusModalOpen, setIsAddBonusModalOpen] = useState(false)
+  const [isDisableWalletModalOpen, setIsDisableWalletModalOpen] = useState(false)
   const [selectedWallet, setSelectedWallet] = useState<any>(null)
 
   const formatDateTime = (dateString: string) => {
@@ -494,6 +640,16 @@ const CustomerInfo = () => {
     setSelectedWallet(null)
   }
 
+  const handleOpenDisableWalletModal = (wallet: any) => {
+    setSelectedWallet(wallet)
+    setIsDisableWalletModalOpen(true)
+  }
+
+  const handleCloseDisableWalletModal = () => {
+    setIsDisableWalletModalOpen(false)
+    setSelectedWallet(null)
+  }
+
   // Update the handleSendNotification function to use the API
   const handleSendNotification = async (title: string, message: string) => {
     if (!userResponse?.data?.id) {
@@ -539,6 +695,30 @@ const CustomerInfo = () => {
     } catch (error: any) {
       console.error("Failed to add bonus:", error)
       notify("error", error.data?.message || error.message || "Failed to add bonus")
+      throw error
+    }
+  }
+
+  // Handle disabling wallet
+  const handleDisableWallet = async (disableData: { walletId: number; disable: boolean }) => {
+    try {
+      const result = await disableWallet(disableData).unwrap()
+
+      if (result.isSuccess) {
+        notify("success", `Wallet ${disableData.disable ? "disabled" : "enabled"} successfully!`)
+        // Refetch user data to update the wallet status
+        refetchUser()
+        return result
+      } else {
+        notify("error", result.message || `Failed to ${disableData.disable ? "disable" : "enable"} wallet`)
+        throw new Error(result.message)
+      }
+    } catch (error: any) {
+      console.error("Failed to disable wallet:", error)
+      notify(
+        "error",
+        error.data?.message || error.message || `Failed to ${disableData.disable ? "disable" : "enable"} wallet`
+      )
       throw error
     }
   }
@@ -614,9 +794,14 @@ const CustomerInfo = () => {
 
             <div className="mt-2 flex items-center justify-between border-t pt-2 text-sm">
               <p className="text-gray-600">Bonus: {formatCurrency(wallet.bonus)}</p>
-              <ButtonModule onClick={() => handleOpenAddBonusModal(wallet)} variant="outline" size="sm" className="">
-                Add Bonus
-              </ButtonModule>
+              <div className="flex items-center gap-2">
+                <ButtonModule onClick={() => handleOpenAddBonusModal(wallet)} variant="outline" size="sm" className="">
+                  Add Bonus
+                </ButtonModule>
+                <ButtonModule onClick={() => handleOpenDisableWalletModal(wallet)} variant="outlineDanger" size="sm">
+                  {wallet.disableWithdrawal ? "Enable" : "Disable"}
+                </ButtonModule>
+              </div>
             </div>
           </motion.div>
         ))}
@@ -1025,6 +1210,13 @@ const CustomerInfo = () => {
           customerName={`${customer.firstName} ${customer.lastName}`.trim()}
           onRequestClose={handleCloseAddBonusModal}
           onAddBonus={handleAddBonus}
+        />
+        <DisableWalletModal
+          isOpen={isDisableWalletModalOpen}
+          wallet={selectedWallet}
+          customerName={`${customer.firstName} ${customer.lastName}`.trim()}
+          onRequestClose={handleCloseDisableWalletModal}
+          onDisableWallet={handleDisableWallet}
         />
       </motion.div>
     </>

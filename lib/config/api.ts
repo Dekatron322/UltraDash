@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
     LIST: "/Admin/Users",
     DETAILS: (id: string | number) => `/Admin/Users/${id}`,
     ADD_BONUS: "/Admin/Wallet/Bonus",
+    DISABLE: "/Admin/Wallet/Disable",
   },
 
   // Transaction endpoints
