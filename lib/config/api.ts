@@ -23,25 +23,33 @@ export const API_ENDPOINTS = {
     REFRESH_TOKEN: "/Admin/RefreshToken",
   },
 
+  SYSTEM: {
+    CURRENCIES: "/System/Currencies",
+  },
+
   // User/Customer endpoints
   USERS: {
     OVERVIEW: "/Admin/Users/Overview",
     LIST: "/Admin/Users",
     DETAILS: (id: string | number) => `/Admin/Users/${id}`,
+    
   },
 
   // Transaction endpoints
   TRANSACTIONS: {
     LIST: "/Admin/Transactions",
     DETAILS: (id: string | number) => `/Admin/Transactions/${id}`,
-    CRYPTO: "/Admin/Transactions/Crypto",
+    CRYPTO: "/Admin/Crypto/Transactions",
     OVERVIEW: "/Admin/Transactions/Overview",
+    REFUND: "/Wallet/RefundPayBills",
+    SETTLE: "/Admin/Crypto/Settle",
   },
 
   // Crypto endpoints
   CRYPTO: {
     LIST: "/Admin/Crypto",
     DETAILS: (id: string | number) => `/Admin/Crypto/${id}`,
+    OVERVIEW: "/Admin/Crypto/Overview",
   },
 
   // Dashboard endpoints

@@ -87,6 +87,57 @@ export interface TransactionOverviewResponse {
   message: string
 }
 
+export interface CryptoOverviewData {
+  master: number
+  profit: number
+  total: number
+}
+
+export interface CryptoOverviewResponse {
+  data: CryptoOverviewData
+  isSuccess: boolean
+  message: string
+}
+
+export interface Currency {
+  id: number
+  name: string
+  symbol: string
+  ticker: string
+  avatar: string
+}
+
+export interface CurrenciesResponse {
+  data: Currency[]
+  isSuccess: boolean
+  message: string
+}
+
+export interface Network {
+  id: string
+  name: string
+  deposits_enabled: boolean
+  withdraws_enabled: boolean
+}
+
+export interface CustomerBalance {
+  name: string
+  symbol: string
+  balance: number
+  locked: number
+  staked: number
+  convertedBalance: number
+  referenceCurrency: string
+  logo: string
+  networks: Network[]
+}
+
+export interface CustomerBalanceResponse {
+  data: CustomerBalance[]
+  isSuccess: boolean
+  message: string
+}
+
 export const overviewApi = createApi({
   reducerPath: "overviewApi",
   baseQuery: fetchBaseQuery({
@@ -126,7 +177,31 @@ export const overviewApi = createApi({
         method: "GET",
       }),
     }),
+    getCryptoOverview: builder.query<CryptoOverviewResponse, void>({
+      query: () => ({
+        url: API_ENDPOINTS.CRYPTO.OVERVIEW,
+        method: "GET",
+      }),
+    }),
+    getCurrencies: builder.query<CurrenciesResponse, void>({
+      query: () => ({
+        url: API_ENDPOINTS.SYSTEM.CURRENCIES,
+        method: "GET",
+      }),
+    }),
+    getCustomerBalance: builder.query<CustomerBalanceResponse, { currencyId: number }>({
+      query: ({ currencyId }) => ({
+        url: `/Admin/Customer/Balance?currencyId=${currencyId}`,
+        method: "GET",
+      }),
+    }),
   }),
 })
 
-export const { useGetOverviewQuery, useGetTransactionOverviewQuery } = overviewApi
+export const { 
+  useGetOverviewQuery, 
+  useGetTransactionOverviewQuery, 
+  useGetCryptoOverviewQuery,
+  useGetCurrenciesQuery,
+  useGetCustomerBalanceQuery 
+} = overviewApi

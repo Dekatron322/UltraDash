@@ -1,6 +1,7 @@
 // src/lib/redux/transactionApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { RootState } from "./store"
+import { API_CONFIG, API_ENDPOINTS } from "lib/config/api"
 
 export interface Status {
   label: string
@@ -82,6 +83,7 @@ export interface Transaction {
   vasPayload: VasPayload | null
   sender: Sender | null
   reciever: Receiver | null
+  canRefund: boolean
 }
 
 export interface CryptoCurrency {
@@ -104,6 +106,7 @@ export interface CryptoTransaction {
   fromAmount: string
   quotedPrice: string
   toAmount: string
+  createdAt: string
   updatedAt: string
   confirmed: boolean
   settled: boolean
@@ -147,10 +150,77 @@ export interface TransactionDetailsResponse {
   message: string
 }
 
+export interface RefundRequest {
+  reference: string
+}
+
+export interface RefundResponse {
+  isSuccess: boolean
+  message: string
+  data: {
+    isToken: boolean
+    token: string | null
+    otherField: string | null
+    reference: string
+  }
+}
+
+export interface SettleRequest {
+  currency: string
+  userId: number
+  amount: number
+  type: number
+  narration: string
+}
+
+export interface WalletBalance {
+  name: string
+  symbol: string
+  balance: number
+  bonus: number
+  locked: number
+  staked: number
+  convertedBalance: number
+  referenceCurrency: string
+  logo: string
+  networks: Array<{
+    id: string
+    name: string
+    deposits_enabled: boolean
+    withdraws_enabled: boolean
+  }>
+}
+
+export interface SettleResponse {
+  isSuccess: boolean
+  message: string
+  data: WalletBalance[]
+}
+
+export interface TransactionQueryParams {
+  pageNumber?: number
+  pageSize?: number
+  startDate?: string
+  endDate?: string
+  type?: string
+  status?: string
+  reference?: string
+}
+
+export interface CryptoTransactionQueryParams {
+  pageNumber?: number
+  pageSize?: number
+  startDate?: string
+  endDate?: string
+  type?: string
+  status?: string
+  reference?: string
+}
+
 export const transactionApi = createApi({
   reducerPath: "transactionApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://ultra-service-79baffa4bc31.herokuapp.com/",
+    baseUrl: API_CONFIG.BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState
       const accessToken = state.auth.tokens?.accessToken
@@ -174,65 +244,75 @@ export const transactionApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getTransactions: builder.query<
-      TransactionsResponse,
-      {
-        pageNumber: number
-        pageSize: number
-        filterByUserId?: number
-        referenceNumber?: string
-        type?: number
-        startDate?: string
-        endDate?: string
-      }
-    >({
-      query: ({ pageNumber, pageSize, filterByUserId, referenceNumber, type, startDate, endDate }) => ({
-        url: `Admin/Transactions`,
-        params: {
-          pageNumber,
-          pageSize,
-          ...(filterByUserId && { filterByUserId }),
-          ...(referenceNumber && { referenceNumber }),
-          ...(type && { type }),
-          ...(startDate && { startDate }),
-          ...(endDate && { endDate }),
-        },
-        method: "GET",
-      }),
+    getTransactions: builder.query<TransactionsResponse, TransactionQueryParams>({
+      query: ({ pageNumber = 1, pageSize = 10, startDate, endDate, type, status, reference }) => {
+        const params = new URLSearchParams({
+          pageNumber: pageNumber.toString(),
+          pageSize: pageSize.toString(),
+        })
+
+        if (startDate) params.append("startDate", startDate)
+        if (endDate) params.append("endDate", endDate)
+        if (type) params.append("type", type)
+        if (status) params.append("status", status)
+        if (reference) params.append("reference", reference)
+
+        return {
+          url: `${API_ENDPOINTS.TRANSACTIONS.LIST}?${params.toString()}`,
+          method: "GET",
+        }
+      },
     }),
-    getCryptoTransactions: builder.query<
-      CryptoTransactionsResponse,
-      {
-        pageNumber: number
-        pageSize: number
-        filterByUserId?: number
-        referenceNumber?: string
-        type?: number
-        startDate?: string
-        endDate?: string
-      }
-    >({
-      query: ({ pageNumber, pageSize, filterByUserId, referenceNumber, type, startDate, endDate }) => ({
-        url: `Admin/Crypto/Transactions`,
-        params: {
-          pageNumber,
-          pageSize,
-          ...(filterByUserId && { filterByUserId }),
-          ...(referenceNumber && { referenceNumber }),
-          ...(type && { type }),
-          ...(startDate && { startDate }),
-          ...(endDate && { endDate }),
-        },
-        method: "GET",
-      }),
+
+    getCryptoTransactions: builder.query<CryptoTransactionsResponse, CryptoTransactionQueryParams>({
+      query: ({ pageNumber = 1, pageSize = 10, startDate, endDate, type, status, reference }) => {
+        const params = new URLSearchParams({
+          pageNumber: pageNumber.toString(),
+          pageSize: pageSize.toString(),
+        })
+
+        if (startDate) params.append("startDate", startDate)
+        if (endDate) params.append("endDate", endDate)
+        if (type) params.append("type", type)
+        if (status) params.append("status", status)
+        if (reference) params.append("reference", reference)
+
+        return {
+          url: `${API_ENDPOINTS.TRANSACTIONS.CRYPTO}?${params.toString()}`,
+          method: "GET",
+        }
+      },
     }),
+
     getTransactionById: builder.query<TransactionDetailsResponse, number>({
       query: (id) => ({
-        url: `Admin/Transactions/${id}`,
+        url: API_ENDPOINTS.TRANSACTIONS.DETAILS(id),
         method: "GET",
+      }),
+    }),
+
+    refundTransaction: builder.mutation<RefundResponse, RefundRequest>({
+      query: (refundRequest) => ({
+        url: API_ENDPOINTS.TRANSACTIONS.REFUND,
+        method: "POST",
+        body: refundRequest,
+      }),
+    }),
+
+    settleTransaction: builder.mutation<SettleResponse, SettleRequest>({
+      query: (settleRequest) => ({
+        url: API_ENDPOINTS.TRANSACTIONS.SETTLE,
+        method: "POST",
+        body: settleRequest,
       }),
     }),
   }),
 })
 
-export const { useGetTransactionsQuery, useGetCryptoTransactionsQuery, useGetTransactionByIdQuery } = transactionApi
+export const { 
+  useGetTransactionsQuery, 
+  useGetCryptoTransactionsQuery, 
+  useGetTransactionByIdQuery,
+  useRefundTransactionMutation,
+  useSettleTransactionMutation 
+} = transactionApi

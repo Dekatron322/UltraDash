@@ -285,7 +285,7 @@ export default function CryptoTransactions() {
             </div>
 
             {/* Summary Grid */}
-            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Total Overview */}
               <div className="rounded-lg border-b-4 border-blue-500 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
@@ -294,11 +294,11 @@ export default function CryptoTransactions() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Transactions</p>
+                    <p className=" text-gray-500">Transactions</p>
                     <p className="text-xl font-semibold text-gray-900">{cryptoData.total.count.toLocaleString()}</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total Volume</p>
+                    <p className=" text-gray-500">Total Volume</p>
                     <p className="text-xl font-semibold text-gray-900">NGN {formatCurrency(cryptoData.total.volume)}</p>
                   </div>
                 </div>
@@ -312,11 +312,11 @@ export default function CryptoTransactions() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Transactions</p>
+                    <p className=" text-gray-500">Transactions</p>
                     <p className="text-xl font-semibold text-gray-900">{cryptoData.incoming.count.toLocaleString()}</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total Volume</p>
+                    <p className=" text-gray-500">Total Volume</p>
                     <p className="text-xl font-semibold text-gray-900">
                       NGN {formatCurrency(cryptoData.incoming.volume)}
                     </p>
@@ -332,11 +332,11 @@ export default function CryptoTransactions() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Transactions</p>
+                    <p className=" text-gray-500">Transactions</p>
                     <p className="text-xl font-semibold text-gray-900">{cryptoData.outgoing.count.toLocaleString()}</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total Volume</p>
+                    <p className=" text-gray-500">Total Volume</p>
                     <p className="text-xl font-semibold text-gray-900">
                       NGN {formatCurrency(cryptoData.outgoing.volume)}
                     </p>
@@ -345,22 +345,22 @@ export default function CryptoTransactions() {
               </div>
 
               {/* Unresolved */}
-              <div className="rounded-lg border-b-4 border-yellow-500 bg-white p-6 shadow-sm">
+              {/* <div className="rounded-lg border-b-4 border-yellow-500 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-sm font-medium text-gray-600">UNRESOLVED</h3>
                   <UnresolvedTransactions />
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total</p>
+                    <p className=" text-gray-500">Total</p>
                     <p className="text-xl font-semibold text-gray-900">0</p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total Volume</p>
+                    <p className=" text-gray-500">Total Volume</p>
                     <p className="text-xl font-semibold text-gray-900">NGN 0.00</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Crypto Transaction Table */}

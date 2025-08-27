@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { FiAlertCircle, FiArrowDown, FiArrowUp, FiRefreshCw, FiTrendingUp } from "react-icons/fi"
 import { useGetMasterAccountQuery, useGetProfitAccountQuery } from "lib/redux/cryptoSlice"
+import { useGetCryptoOverviewQuery } from "lib/redux/overviewSlice"
 
 interface PaymentAccount {
   id: number
@@ -43,11 +44,14 @@ export default function Dashboard() {
 
   // Fetch crypto accounts data
   const { data: masterData, refetch: refetchMaster, isFetching: isMasterFetching } = useGetMasterAccountQuery()
-
   const { data: profitData, refetch: refetchProfit, isFetching: isProfitFetching } = useGetProfitAccountQuery()
+  
+  // Fetch crypto overview data
+  const { data: cryptoOverviewData, refetch: refetchCryptoOverview, isFetching: isCryptoOverviewFetching } = useGetCryptoOverviewQuery()
 
   const masterAssets = masterData?.data || []
   const profitAssets = profitData?.data || []
+  const cryptoOverview = cryptoOverviewData?.data || { master: 0, profit: 0, total: 0 }
   const currentAssets = activeTab === "master" ? masterAssets : profitAssets
 
   // Sample data for master accounts
@@ -64,10 +68,10 @@ export default function Dashboard() {
 
   const refreshData = () => {
     setIsRefreshing(true)
-    Promise.all([refetchMaster(), refetchProfit()]).finally(() => setIsRefreshing(false))
+    Promise.all([refetchMaster(), refetchProfit(), refetchCryptoOverview()]).finally(() => setIsRefreshing(false))
   }
 
-  // Dashboard metrics
+  // Dashboard metrics - updated to include crypto overview data
   const dashboardMetrics = {
     totalTransactions: 1245,
     totalVolume: 1250000,
@@ -77,6 +81,10 @@ export default function Dashboard() {
     outgoingVolume: 400000,
     unresolvedTransactions: 12,
     unresolvedVolume: 12000,
+    // Crypto overview metrics
+    cryptoMasterBalance: cryptoOverview.master,
+    cryptoProfitBalance: cryptoOverview.profit,
+    cryptoTotalBalance: cryptoOverview.total,
   }
 
   const handleAssetClick = (asset: CryptoAsset) => {
@@ -101,7 +109,7 @@ export default function Dashboard() {
     setSelectedAsset(null)
   }
 
-  const formatCurrency = (value: number, currency: string = "USD") => {
+  const formatCurrency = (value: number, currency: string = "NGN") => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
@@ -152,11 +160,11 @@ export default function Dashboard() {
                 <button
                   onClick={refreshData}
                   className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                  disabled={isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching)}
+                  disabled={isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching) || isCryptoOverviewFetching}
                 >
                   <FiRefreshCw
                     className={`size-5 ${
-                      isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching)
+                      isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching) || isCryptoOverviewFetching
                         ? "animate-spin"
                         : ""
                     }`}
@@ -165,91 +173,47 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              {/* Metrics Cards */}
-              <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {/* Total Transactions */}
-                <motion.div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm" whileHover={{ y: -2 }}>
-                  <div className="mb-4 flex items-center gap-3 border-b pb-3">
-                    <div className="rounded-full bg-blue-100 p-2">
-                      <FiTrendingUp className="text-blue-600" />
-                    </div>
-                    <h3 className="font-medium text-gray-900">Total Transactions</h3>
-                  </div>
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {dashboardMetrics.totalTransactions.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">All time</p>
-                    </div>
-                    <p className="text-sm font-medium text-blue-600">{formatCurrency(dashboardMetrics.totalVolume)}</p>
-                  </div>
-                </motion.div>
+             
 
                 {/* Incoming */}
-                <motion.div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm" whileHover={{ y: -2 }}>
-                  <div className="mb-4 flex items-center gap-3 border-b pb-3">
-                    <div className="rounded-full bg-green-100 p-2">
-                      <FiArrowDown className="text-green-600" />
-                    </div>
-                    <h3 className="font-medium text-gray-900">Incoming</h3>
-                  </div>
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {dashboardMetrics.incomingTransactions.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">This month</p>
-                    </div>
-                    <p className="text-sm font-medium text-green-600">
-                      {formatCurrency(dashboardMetrics.incomingVolume)}
-                    </p>
-                  </div>
-                </motion.div>
+               
 
-                {/* Outgoing */}
-                <motion.div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm" whileHover={{ y: -2 }}>
-                  <div className="mb-4 flex items-center gap-3 border-b pb-3">
-                    <div className="rounded-full bg-red-100 p-2">
-                      <FiArrowUp className="text-red-600" />
-                    </div>
-                    <h3 className="font-medium text-gray-900">Outgoing</h3>
-                  </div>
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {dashboardMetrics.outgoingTransactions.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">This month</p>
-                    </div>
-                    <p className="text-sm font-medium text-red-600">
-                      {formatCurrency(dashboardMetrics.outgoingVolume)}
-                    </p>
-                  </div>
-                </motion.div>
+                
 
-                {/* Unresolved */}
-                <motion.div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm" whileHover={{ y: -2 }}>
-                  <div className="mb-4 flex items-center gap-3 border-b pb-3">
-                    <div className="rounded-full bg-yellow-100 p-2">
-                      <FiAlertCircle className="text-yellow-600" />
-                    </div>
-                    <h3 className="font-medium text-gray-900">Unresolved</h3>
+                
+             
+
+              {/* Additional Crypto Overview Card */}
+              <motion.div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm" whileHover={{ y: -2 }}>
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-full bg-indigo-100 p-3">
+                    <FiTrendingUp className="text-indigo-600 text-xl" />
                   </div>
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {dashboardMetrics.unresolvedTransactions.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">Require attention</p>
-                    </div>
-                    <p className="text-sm font-medium text-yellow-600">
-                      {formatCurrency(dashboardMetrics.unresolvedVolume)}
+                  <h3 className="text-lg font-medium text-gray-900">Crypto Overview</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div className="rounded-lg bg-blue-50 p-4">
+                    <p className="text-sm font-medium text-blue-700">Total Crypto Balance</p>
+                    <p className="text-2xl font-bold text-blue-900">{formatCurrency(dashboardMetrics.cryptoTotalBalance)}</p>
+                  </div>
+                  <div className="rounded-lg bg-purple-50 p-4">
+                    <p className="text-sm font-medium text-purple-700">Master Account</p>
+                    <p className="text-2xl font-bold text-purple-900">{formatCurrency(dashboardMetrics.cryptoMasterBalance)}</p>
+                    <p className="text-sm text-purple-600">
+                      {calculateAllocation(dashboardMetrics.cryptoMasterBalance, dashboardMetrics.cryptoTotalBalance).toFixed(1)}% of total
                     </p>
                   </div>
-                </motion.div>
-              </div>
+                  <div className="rounded-lg bg-orange-50 p-4">
+                    <p className="text-sm font-medium text-orange-700">Profit Account</p>
+                    <p className="text-2xl font-bold text-orange-900">{formatCurrency(dashboardMetrics.cryptoProfitBalance)}</p>
+                    <p className="text-sm text-orange-600">
+                      {calculateAllocation(dashboardMetrics.cryptoProfitBalance, dashboardMetrics.cryptoTotalBalance).toFixed(1)}% of total
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
+            
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

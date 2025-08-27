@@ -14,6 +14,8 @@ import { ProfitChart } from "components/Dashboard/ProfitChart"
 import { UserGrowthChart } from "components/Dashboard/UserGrowthChart"
 import { AssetDistributionChart } from "components/Dashboard/AssetDistributionChart"
 import { AccountDistributionChart } from "components/Dashboard/AccountDistributionChart"
+import { useGetCurrenciesQuery, useGetCustomerBalanceQuery } from "lib/redux/overviewSlice"
+import { useState, useEffect } from "react"
 
 interface PaymentAccount {
   id: number
@@ -22,7 +24,69 @@ interface PaymentAccount {
   balance: string
 }
 
+// Update the interface to match the actual API response
+export interface CustomerBalanceResponse {
+  data: {
+    totalBalance: number
+  }
+  isSuccess: boolean
+  message: string
+}
+
 export default function Dashboard() {
+  const [selectedCurrencyId, setSelectedCurrencyId] = useState<number>(1) // Default to NGN (ID: 1)
+  const [customerBalance, setCustomerBalance] = useState<string>("0")
+  const [selectedCurrencySymbol, setSelectedCurrencySymbol] = useState<string>("NGN")
+
+  // Fetch currencies
+  const { data: currenciesData, isLoading: currenciesLoading } = useGetCurrenciesQuery()
+
+  // Fetch customer balance based on selected currency
+  const { data: balanceData, isLoading: balanceLoading, refetch } = useGetCustomerBalanceQuery(
+    { currencyId: selectedCurrencyId },
+    { skip: !selectedCurrencyId }
+  )
+
+  useEffect(() => {
+    if (balanceData?.data) {
+      try {
+        // Try array structure first
+        if (Array.isArray(balanceData.data)) {
+          const totalBalance = balanceData.data.reduce((sum: number, currency: any) => sum + (currency.balance || 0), 0);
+          setCustomerBalance(totalBalance.toLocaleString());
+        } 
+        // If it's a single object with totalBalance property (based on your original code)
+        else if (typeof balanceData.data === 'object' && 'totalBalance' in balanceData.data) {
+          setCustomerBalance((balanceData.data as any).totalBalance.toLocaleString());
+        }
+        // Default fallback
+        else {
+          setCustomerBalance("0");
+        }
+      } catch (error) {
+        console.error('Error processing balance data:', error);
+        setCustomerBalance("0");
+      }
+    } else {
+      setCustomerBalance("0");
+    }
+  }, [balanceData]);
+
+  useEffect(() => {
+    // Update currency symbol when currency changes
+    if (currenciesData?.data) {
+      const selectedCurrency = currenciesData.data.find(currency => currency.id === selectedCurrencyId)
+      if (selectedCurrency) {
+        setSelectedCurrencySymbol(selectedCurrency.symbol)
+      }
+    }
+  }, [selectedCurrencyId, currenciesData])
+
+  const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCurrencyId = Number(event.target.value)
+    setSelectedCurrencyId(newCurrencyId)
+  }
+
   // Sample data for charts
   const transactionData = [
     { month: "Jan", crypto: 1200, fiat: 1800 },
@@ -121,21 +185,50 @@ export default function Dashboard() {
             {/* Header */}
             <div className="mb-3">
               <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Dashboard Overview</h1>
-              <p className="text-gray-500">Welcome back! Here&apos;s what&apos;s happening with your platform.</p>
             </div>
 
             {/* Exchange Rates Marquee - Would go here */}
 
             {/* Top Metrics Cards */}
             <div className="mb-3 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <div className="mb-3 flex items-center justify-between">
+              {/* Total Assets Card with Enhanced Gradient */}
+              <div className="rounded-xl bg-gradient-to-br from-[#e9f0ff] to-[#cfe2ff] p-6 shadow-sm transition-all hover:shadow-md relative overflow-hidden">
+                {/* Subtle background pattern */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIgMS44LTQgNC00czQgMS44IDQgNC0xLjggNC00IDQtNC0xLjgtNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-20"></div>
+                
+                <div className="mb-3 flex items-center justify-between relative z-10">
                   <TotalAssets />
-                  <TrendIndicator value="12.5% (30d)" positive={true} />
+                  <select
+                    value={selectedCurrencyId}
+                    onChange={handleCurrencyChange}
+                    className="rounded-md border border-gray-300 bg-white/80 px-2 py-1 text-xs backdrop-blur-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    disabled={currenciesLoading}
+                  >
+                    {currenciesLoading ? (
+                      <option value={selectedCurrencyId}>Loading currencies...</option>
+                    ) : (
+                      currenciesData?.data.map((currency) => (
+                        <option key={currency.id} value={currency.id}>
+                          {currency.symbol}
+                        </option>
+                      ))
+                    )}
+                  </select>
                 </div>
-                <Text>Total Assets</Text>
-                <Metric>$1,059,800</Metric>
-              </Card>
+                <div className="mb-2 flex items-center justify-between relative z-10">
+                  <Text>Customer Balance</Text>
+                </div>
+                {balanceLoading ? (
+                  <div className="animate-pulse relative z-10">
+                    <div className="h-8 w-32 bg-gray-200 rounded"></div>
+                  </div>
+                ) : (
+                  <Metric>
+                    {selectedCurrencySymbol}
+                    {customerBalance}
+                  </Metric>
+                )}
+              </div>
 
               <Card>
                 <div className="mb-3 flex items-center justify-between">
@@ -189,6 +282,7 @@ export default function Dashboard() {
             {/* Transaction Volume Charts */}
             <div className="mb-3 grid grid-cols-1 gap-6 lg:grid-cols-2">
               <Card title="Transaction Volume (Crypto vs Fiat)">
+                <p className="text-gray-500">Welcome back! Here&apos;s what&apos;s happening with your platform.</p>
                 <div className="mt-4 h-80">
                   <TransactionChart data={transactionData} />
                 </div>

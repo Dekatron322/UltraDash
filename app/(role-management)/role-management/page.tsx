@@ -13,7 +13,9 @@ import { FiEdit2, FiTrash2, FiUserPlus } from "react-icons/fi"
 import { Badge } from "components/ui/Badge/badge"
 import { useSelector } from "react-redux"
 import { RootState } from "lib/redux/store"
-import { useGetAdminsQuery } from "lib/redux/adminSlice"
+import { Admin, Permission, useDeleteAdminMutation, useGetAdminsQuery } from "lib/redux/adminSlice"
+import PermissionModal from "components/ui/Modal/edit-permission-modal"
+import { notify } from "components/ui/Notification/Notification"
 
 type SortOrder = "asc" | "desc" | null
 
@@ -185,7 +187,12 @@ const FilterDropdown = ({
   )
 }
 
-const EmployeesTable: React.FC<{ employees: Employee[]; isLoading: boolean }> = ({ employees, isLoading }) => {
+const EmployeesTable: React.FC<{ 
+  employees: Employee[]; 
+  isLoading: boolean;
+  adminData: Admin[] | undefined;
+  refetchAdmins: () => void;
+}> = ({ employees, isLoading, adminData, refetchAdmins }) => {
   const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
   const canManageAdmin = user?.admin?.permission?.canManageAdmin
@@ -202,6 +209,11 @@ const EmployeesTable: React.FC<{ employees: Employee[]; isLoading: boolean }> = 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false)
+  const [selectedAdmin, setSelectedAdmin] = useState<{id: number; name: string; currentPermissions: Permission | null} | null>(null)
+  
+  // Use the delete admin mutation
+  const [deleteAdmin] = useDeleteAdminMutation()
 
   const statusFilterOptions = [
     { value: "active", label: "Active" },
@@ -284,22 +296,58 @@ const EmployeesTable: React.FC<{ employees: Employee[]; isLoading: boolean }> = 
     setIsDeleteModalOpen(true)
   }
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = async (reason: string) => {
     setIsDeleting(true)
     try {
-      console.log("Deleting employee:", employeeToDelete?.id)
+      if (!employeeToDelete) return
+      
+      // Extract the admin ID from the employee ID (assuming format "EMP-{id}")
+      const adminId = parseInt(employeeToDelete.id.replace('EMP-', ''))
+      
+      // Call the delete admin mutation
+      const result = await deleteAdmin(adminId).unwrap()
+      
+      if (result.isSuccess) {
+        // Show success notification
+        notify("success", "Admin Deleted!", {
+          description: `Admin ${employeeToDelete.name} has been deleted successfully.`,
+          duration: 3000
+        })
+        
+        // Refresh the admin list
+        refetchAdmins()
+      } else {
+        // Show error notification
+        notify("error", "Delete Failed", {
+          description: result.message || "Failed to delete admin. Please try again.",
+          duration: 5000
+        })
+      }
+      
       setIsDeleteModalOpen(false)
       setEmployeeToDelete(null)
     } catch (error) {
-      console.error("Error deleting employee:", error)
+      console.error("Error deleting admin:", error)
+      // Show error notification
+      notify("error", "Delete Failed", {
+        description: "There was an error deleting the admin. Please try again.",
+        duration: 5000
+      })
     } finally {
       setIsDeleting(false)
     }
   }
 
   const handleEditRole = (employee: Employee) => {
-    setSelectedEmployee(employee)
-    setIsRoleModalOpen(true)
+    // Find the actual admin data from the passed adminData prop
+    const adminItem = adminData?.find(admin => admin.id === parseInt(employee.id.replace('EMP-', '')))
+    
+    setSelectedAdmin({
+      id: parseInt(employee.id.replace('EMP-', '')),
+      name: employee.name,
+      currentPermissions: adminItem?.permission || null
+    })
+    setIsPermissionModalOpen(true)
   }
 
   const handleAddEmployee = () => {
@@ -544,6 +592,20 @@ const EmployeesTable: React.FC<{ employees: Employee[]; isLoading: boolean }> = 
         </>
       )}
 
+      {selectedAdmin && (
+        <PermissionModal
+          isOpen={isPermissionModalOpen}
+          onRequestClose={() => {
+            setIsPermissionModalOpen(false)
+            setSelectedAdmin(null)
+          }}
+          admin={selectedAdmin}
+          onSuccess={() => {
+            // Optional: Refresh data or show success message
+          }}
+        />
+      )}
+
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onRequestClose={() => {
@@ -552,7 +614,9 @@ const EmployeesTable: React.FC<{ employees: Employee[]; isLoading: boolean }> = 
         }}
         onConfirm={handleConfirmDelete}
         loading={isDeleting}
-        businessName={employeeToDelete?.name || "this employee"}
+        businessName={employeeToDelete?.name || "this admin"}
+        successMessage={`Admin ${employeeToDelete?.name || ""} has been deleted successfully.`}
+        errorMessage="Failed to delete admin. Please try again."
       />
     </div>
   )
@@ -562,7 +626,7 @@ const RoleManagementPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
 
-  const { data, error, isLoading } = useGetAdminsQuery({
+  const { data, error, isLoading, refetch } = useGetAdminsQuery({
     pageNumber: currentPage,
     pageSize: pageSize,
   })
@@ -608,7 +672,12 @@ const RoleManagementPage: React.FC = () => {
       <div className="container mx-auto px-16 py-8">
         <h1 className="mb-6 text-2xl font-bold">Employee Role Management</h1>
         <div>
-          <EmployeesTable employees={employees} isLoading={isLoading} />
+          <EmployeesTable 
+            employees={employees} 
+            isLoading={isLoading} 
+            adminData={data?.data} 
+            refetchAdmins={refetch}
+          />
         </div>
       </div>
     </div>

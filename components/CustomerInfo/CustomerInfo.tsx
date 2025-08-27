@@ -340,19 +340,7 @@ const CustomerInfo = () => {
     refetchTransactions()
   }
 
-  const handleCancelSearch = () => {
-    setSearchText("")
-    setCurrentPage(1)
-    setIsFilterApplied(false)
-    refetchTransactions()
-  }
 
-  const handleCancelReferenceSearch = () => {
-    setReferenceSearch("")
-    setCurrentPage(1)
-    setIsFilterApplied(false)
-    refetchTransactions()
-  }
 
   if (isLoading) {
     return <LoadingSkeleton />
@@ -375,196 +363,416 @@ const CustomerInfo = () => {
   const cryptoAssets = cryptoResponse?.data?.data || []
   const baseCurrency = cryptoResponse?.data?.base?.[0] || null
 
+  const totalCryptoValue = cryptoAssets.reduce((total, asset) => {
+    return total + (asset.convertedBalance || 0);
+  }, 0);
+  
+  // Add this to your JSX where you want to display the total
+  
   return (
-    <motion.div
+    <><div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+      {customer.wallets?.map((wallet) => (
+        <motion.div
+          key={wallet.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-lg p-4 shadow-sm border"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {wallet.currency?.avatar && (
+                <img
+                  src={wallet.currency.avatar}
+                  alt={wallet.currency.name}
+                  className="size-8 rounded-full"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement
+                    target.src = "https://via.placeholder.com/32"
+                  } } />
+              )}
+              <div>
+                <h4 className="font-medium text-gray-900">
+                  {wallet.currency?.name || 'Unknown Currency'}
+                </h4>
+                <p className="text-sm text-gray-500">
+                  {wallet.currency?.ticker || ''}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-semibold">
+                {formatCurrency(wallet.balance)}
+              </p>
+              <p className="text-sm text-gray-500">
+                Available Balance
+              </p>
+            </div>
+          </div>
+          {wallet.ledgerBalance !== wallet.balance && (
+            <div className="mt-2 pt-2 border-t text-sm">
+              <p className="text-gray-600">
+                Ledger Balance: {formatCurrency(wallet.ledgerBalance)}
+              </p>
+            </div>
+          )}
+        </motion.div>
+      ))}
+    </div><motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
       className="flex items-start gap-6 "
     >
-      {/* Customer Information Section */}
-      <motion.div
-        initial={{ x: -20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.3 }}
-        className="flex h-auto w-1/3 flex-col justify-start rounded-lg bg-[#E9F0FF] p-6"
-      >
-        <div className="mb-6 flex items-center justify-between gap-2 border-b pb-3">
-          <div className="flex h-auto items-center gap-2">
-            <div className="flex size-10 items-center justify-center rounded-md bg-[#003F9F] text-xl font-semibold text-white">
-              {customer.firstName?.charAt(0) || ""}
-              {customer.lastName?.charAt(0) || ""}
+        {/* Customer Information Section */}
+        <motion.div
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.3 }}
+          className="flex h-auto w-1/3 flex-col justify-start rounded-lg bg-[#E9F0FF] p-6"
+        >
+          <div className="mb-6 flex items-center justify-between gap-2 border-b pb-3">
+            <div className="flex h-auto items-center gap-2">
+              <div className="flex size-10 items-center justify-center rounded-md bg-[#003F9F] text-xl font-semibold text-white">
+                {customer.firstName?.charAt(0) || ""}
+                {customer.lastName?.charAt(0) || ""}
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">
+                  {customer.firstName || customer.lastName
+                    ? `${customer.firstName || ""} ${customer.lastName || ""}`.trim()
+                    : customer.tag || "Customer"}
+                </h2>
+                <p className="text-sm text-gray-600">{customer.role === "admin" ? "Admin" : "Customer"} Account</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-base font-semibold">
-                {customer.firstName || customer.lastName
-                  ? `${customer.firstName || ""} ${customer.lastName || ""}`.trim()
-                  : customer.tag || "Customer"}
-              </h2>
-              <p className="text-sm text-gray-600">{customer.role === "admin" ? "Admin" : "Customer"} Account</p>
-            </div>
-          </div>
-          <ButtonModule
-            variant="black"
-            size="md"
-            icon={<ExportIcon />}
-            iconPosition="end"
-            onClick={() => setIsNotificationModalOpen(true)}
-          >
-            <p className="max-sm:hidden">Notify</p>
-          </ButtonModule>
-        </div>
-
-        <div className="space-y-4 text-sm">
-          <div className="flex items-center gap-2 border-b pb-3 font-semibold">
-            <h3 className=" text-gray-500">CUSTOMER ID:</h3>
-            <p className="text-[#202B3C]">{customer.id}</p>
-          </div>
-
-          <div className="flex items-center gap-2 border-b pb-3  font-semibold">
-            <h3 className=" text-gray-500">EMAIL:</h3>
-            <p className="text-[#202B3C]">{customer.email || "N/A"}</p>
-          </div>
-
-          <div className="flex items-center gap-2 border-b pb-3  font-semibold">
-            <h3 className="text-gray-500">PHONE NUMBER:</h3>
-            <p className="text-[#202B3C]">{customer.phoneNumber || "N/A"}</p>
-          </div>
-
-          <div className="flex items-center gap-2 border-b pb-3  font-semibold">
-            <h3 className="text-gray-500">TAG:</h3>
-            <p className="text-[#202B3C]">{customer.tag || "N/A"}</p>
-          </div>
-
-          <div className="flex items-center justify-between gap-2 border-b pb-3  font-semibold">
-            <h3 className=" font-semibold text-gray-500">2FA Verification:</h3>
-            <div
-              className={`gap-2 rounded-full p-1 px-2 text-center ${
-                customer.isTwoFactorEnabled ? "bg-[#589e67]" : "bg-[#d82e2e]"
-              }`}
+            <ButtonModule
+              variant="black"
+              size="md"
+              icon={<ExportIcon />}
+              iconPosition="end"
+              onClick={() => setIsNotificationModalOpen(true)}
             >
-              <span className=" text-white">{customer.isTwoFactorEnabled ? "Enabled" : "Disabled"}</span>
+              <p className="max-sm:hidden">Notify</p>
+            </ButtonModule>
+          </div>
+
+          <div className="space-y-4 text-sm">
+            <div className="flex items-center gap-2 border-b pb-3 font-semibold">
+              <h3 className=" text-gray-500">CUSTOMER ID:</h3>
+              <p className="text-[#202B3C]">{customer.id}</p>
+            </div>
+
+            <div className="flex items-center gap-2 border-b pb-3  font-semibold">
+              <h3 className=" text-gray-500">EMAIL:</h3>
+              <p className="text-[#202B3C]">{customer.email || "N/A"}</p>
+            </div>
+
+            <div className="flex items-center gap-2 border-b pb-3  font-semibold">
+              <h3 className="text-gray-500">PHONE NUMBER:</h3>
+              <p className="text-[#202B3C]">{customer.phoneNumber || "N/A"}</p>
+            </div>
+
+            <div className="flex items-center gap-2 border-b pb-3  font-semibold">
+              <h3 className="text-gray-500">TAG:</h3>
+              <p className="text-[#202B3C]">{customer.tag || "N/A"}</p>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 border-b pb-3  font-semibold">
+              <h3 className=" font-semibold text-gray-500">2FA Verification:</h3>
+              <div
+                className={`gap-2 rounded-full p-1 px-2 text-center ${customer.isTwoFactorEnabled ? "bg-[#589e67]" : "bg-[#d82e2e]"}`}
+              >
+                <span className=" text-white">{customer.isTwoFactorEnabled ? "Enabled" : "Disabled"}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 border-b pb-3 font-semibold">
+              <h3 className=" font-semibold text-gray-500">KYC VERIFICATION:</h3>
+              <div
+                className={`gap-2 rounded-full p-1 px-2 text-center ${customer.kyc?.status?.value === 1 ? "bg-[#d82e2e]" : "bg-[#589e67]"}`}
+              >
+                <span className=" text-white">{customer.kyc?.status?.label || "Not Verified"}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pb-3 font-semibold">
+              <h3 className="text-gray-500">COUNTRY</h3>
+              <p className="text-[#202B3C]">{customer.country || "N/A"}</p>
             </div>
           </div>
+        </motion.div>
 
-          <div className="flex items-center justify-between gap-2 border-b pb-3 font-semibold">
-            <h3 className=" font-semibold text-gray-500">KYC VERIFICATION:</h3>
-            <div
-              className={`gap-2 rounded-full p-1 px-2 text-center ${
-                customer.kyc?.status?.value === 1 ? "bg-[#d82e2e]" : "bg-[#589e67]"
-              }`}
-            >
-              <span className=" text-white">{customer.kyc?.status?.label || "Not Verified"}</span>
-            </div>
-          </div>
+        {/* Transactions and Assets Section */}
+        <motion.div
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="flex w-full items-start rounded-lg"
+        >
+          <CustomTabs activeTab={activeTab} setActiveTab={setActiveTab}>
+            {activeTab === "transactions" ? (
+              <>
+                <DateRangeFilter
+                  startDate={startDate}
+                  endDate={endDate}
+                  setStartDate={setStartDate}
+                  setEndDate={setEndDate}
+                  onSearch={handleSearch} />
 
-          <div className="flex items-center gap-2 pb-3 font-semibold">
-            <h3 className="text-gray-500">COUNTRY</h3>
-            <p className="text-[#202B3C]">{customer.country || "N/A"}</p>
-          </div>
-        </div>
-      </motion.div>
+                {isLoadingTransactions || isFetchingTransactions ? (
+                  <TransactionTableSkeleton />
+                ) : (
+                  <>
+                    <div className="w-full overflow-x-auto border-l border-r bg-[#FFFFFF]">
+                      <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
+                        <thead className="border-t">
+                          <tr>
+                            <th className="flex cursor-pointer items-center gap-2 whitespace-nowrap border-b p-4 text-sm">
+                              <MdOutlineCheckBoxOutlineBlank className="text-lg" />
+                              Transaction ID
+                            </th>
+                            <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
+                              <div className="flex items-center gap-2">
+                                Date <RxCaretSort />
+                              </div>
+                            </th>
+                            <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
+                              <div className="flex items-center gap-2">
+                                Type <RxCaretSort />
+                              </div>
+                            </th>
+                            <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
+                              <div className="flex items-center gap-2">
+                                Amount <RxCaretSort />
+                              </div>
+                            </th>
+                            <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
+                              <div className="flex items-center gap-2">
+                                Status <RxCaretSort />
+                              </div>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {transactions.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="py-4 text-center text-gray-500">
+                                No transactions found
+                              </td>
+                            </tr>
+                          ) : (
+                            transactions.map((tx) => (
+                              <motion.tr
+                                key={tx.id}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="cursor-pointer hover:bg-gray-50"
+                                onClick={() => handleTransactionClick(tx)}
+                              >
+                                <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <MdOutlineCheckBoxOutlineBlank className="text-lg" />
+                                    {tx.reference}
+                                  </div>
+                                </td>
+                                <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                                  {formatDateTime(tx.createdAt)}
+                                </td>
+                                <td className="whitespace-nowrap border-b px-4 py-2 text-sm capitalize">
+                                  {tx.type?.label || "Unknown"}
+                                </td>
+                                <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                                  {tx.currency?.ticker || ""} {tx.amount}
+                                </td>
+                                <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                                  <div
+                                    style={getStatusStyle(tx.status)}
+                                    className="flex items-center justify-center gap-1 rounded-full px-2 py-1"
+                                  >
+                                    <span
+                                      className="size-2 rounded-full"
+                                      style={{
+                                        backgroundColor: tx.status?.value === 2
+                                          ? "#589E67"
+                                          : tx.status?.value === 1
+                                            ? "#E6A441"
+                                            : "#AF4B4B",
+                                      }}
+                                    ></span>
+                                    {tx.status?.label || "Unknown"}
+                                  </div>
+                                </td>
+                              </motion.tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
 
-      {/* Transactions and Assets Section */}
-      <motion.div
-        initial={{ x: 20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-        className="flex w-full items-start rounded-lg"
-      >
-        <CustomTabs activeTab={activeTab} setActiveTab={setActiveTab}>
-          {activeTab === "transactions" ? (
-            <>
-              <DateRangeFilter
-                startDate={startDate}
-                endDate={endDate}
-                setStartDate={setStartDate}
-                setEndDate={setEndDate}
-                onSearch={handleSearch}
-              />
+                    {/* Pagination */}
+                    {transactions.length > 0 && (
+                      <div className="flex items-center justify-between border-t py-3">
+                        <div className="text-sm text-gray-700">
+                          Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)} of{" "}
+                          {totalCount} entries
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => paginate(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            className={`flex items-center justify-center rounded-md p-2 ${currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-[#003F9F] hover:bg-gray-100"}`}
+                          >
+                            <MdOutlineArrowBackIosNew />
+                          </button>
 
-              {isLoadingTransactions || isFetchingTransactions ? (
-                <TransactionTableSkeleton />
-              ) : (
-                <>
+                          {Array.from({ length: Math.min(5, totalPages) }).map((_, index) => {
+                            let pageNum
+                            if (totalPages <= 5) {
+                              pageNum = index + 1
+                            } else if (currentPage <= 3) {
+                              pageNum = index + 1
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + index
+                            } else {
+                              pageNum = currentPage - 2 + index
+                            }
+
+                            return (
+                              <button
+                                key={index}
+                                onClick={() => paginate(pageNum)}
+                                className={`flex size-8 items-center justify-center rounded-md text-sm ${currentPage === pageNum
+                                    ? "bg-[#003F9F] text-white"
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                              >
+                                {pageNum}
+                              </button>
+                            )
+                          })}
+
+                          {totalPages > 5 && currentPage < totalPages - 2 && <span className="px-2">...</span>}
+
+                          {totalPages > 5 && currentPage < totalPages - 1 && (
+                            <button
+                              onClick={() => paginate(totalPages)}
+                              className={`flex size-8 items-center justify-center rounded-md text-sm ${currentPage === totalPages
+                                  ? "bg-[#003F9F] text-white"
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                            >
+                              {totalPages}
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => paginate(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                            className={`flex items-center justify-center rounded-md p-2 ${currentPage === totalPages
+                                ? "cursor-not-allowed text-gray-400"
+                                : "text-[#003F9F] hover:bg-gray-100"}`}
+                          >
+                            <MdOutlineArrowForwardIos />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            ) : (
+              <div>
+                <div className="mb-6 flex justify-between">
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-4">Wallet Balances</h3>
+
+
+                    {/* Keep the original crypto total if you still want it */}
+                    {totalCryptoValue > 0 && (
+                      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                        <h4 className="text-md font-semibold text-blue-900">Total Crypto Value</h4>
+                        <p className="text-xl font-bold text-blue-900">{formatCurrency(totalCryptoValue)}</p>
+                      </div>
+                    )}
+
+                  </div>
+                </div>
+
+                {isLoadingCrypto || isFetchingCrypto ? (
+                  <CryptoAssetsSkeleton />
+                ) : (
                   <div className="w-full overflow-x-auto border-l border-r bg-[#FFFFFF]">
                     <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
-                      <thead className="border-t">
+                      <thead>
                         <tr>
-                          <th className="flex cursor-pointer items-center gap-2 whitespace-nowrap border-b p-4 text-sm">
-                            <MdOutlineCheckBoxOutlineBlank className="text-lg" />
-                            Transaction ID
-                          </th>
                           <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
                             <div className="flex items-center gap-2">
-                              Date <RxCaretSort />
+                              Asset <RxCaretSort />
                             </div>
                           </th>
                           <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
                             <div className="flex items-center gap-2">
-                              Type <RxCaretSort />
+                              Balance <RxCaretSort />
                             </div>
                           </th>
                           <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
                             <div className="flex items-center gap-2">
-                              Amount <RxCaretSort />
+                              Value <RxCaretSort />
                             </div>
                           </th>
                           <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
                             <div className="flex items-center gap-2">
-                              Status <RxCaretSort />
+                              Networks <RxCaretSort />
                             </div>
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {transactions.length === 0 ? (
+                        {cryptoAssets.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="py-4 text-center text-gray-500">
-                              No transactions found
+                            <td colSpan={4} className="py-4 text-center text-gray-500">
+                              No crypto assets found
                             </td>
                           </tr>
                         ) : (
-                          transactions.map((tx) => (
+                          cryptoAssets.map((asset) => (
                             <motion.tr
-                              key={tx.id}
+                              key={asset.symbol}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               className="cursor-pointer hover:bg-gray-50"
-                              onClick={() => handleTransactionClick(tx)}
+                              onClick={() => handleAssetClick(asset)}
                             >
-                              <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                                <div className="flex items-center gap-2">
-                                  <MdOutlineCheckBoxOutlineBlank className="text-lg" />
-                                  {tx.reference}
+                              <td className="whitespace-nowrap border-b px-4 py-2">
+                                <div className="flex items-center">
+                                  <img
+                                    src={asset.logo}
+                                    alt={asset.name}
+                                    className="size-8 rounded-md object-contain"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement
+                                      target.src = "https://via.placeholder.com/32"
+                                    } } />
+                                  <div className="ml-4">
+                                    <div className="text-sm font-medium text-gray-900">{asset.name}</div>
+                                    <div className="text-sm text-gray-500">{asset.symbol.toUpperCase()}</div>
+                                  </div>
                                 </div>
                               </td>
+                              <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{asset.balance.toFixed(8)}</td>
                               <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                                {formatDateTime(tx.createdAt)}
-                              </td>
-                              <td className="whitespace-nowrap border-b px-4 py-2 text-sm capitalize">
-                                {tx.type?.label || "Unknown"}
+                                {formatCurrency(asset.convertedBalance)}
                               </td>
                               <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                                {tx.currency?.ticker || ""} {tx.amount}
-                              </td>
-                              <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                                <div
-                                  style={getStatusStyle(tx.status)}
-                                  className="flex items-center justify-center gap-1 rounded-full px-2 py-1"
-                                >
-                                  <span
-                                    className="size-2 rounded-full"
-                                    style={{
-                                      backgroundColor:
-                                        tx.status?.value === 2
-                                          ? "#589E67"
-                                          : tx.status?.value === 1
-                                          ? "#E6A441"
-                                          : "#AF4B4B",
-                                    }}
-                                  ></span>
-                                  {tx.status?.label || "Unknown"}
+                                <div className="flex flex-wrap gap-1">
+                                  {asset.networks.slice(0, 3).map((network) => (
+                                    <span key={network.id} className="rounded-full bg-gray-100 px-2 py-1 text-xs">
+                                      {network.name.split(" ")[0]}
+                                    </span>
+                                  ))}
+                                  {asset.networks.length > 3 && (
+                                    <span className="rounded-full bg-gray-100 px-2 py-1 text-xs">
+                                      +{asset.networks.length - 3} more
+                                    </span>
+                                  )}
                                 </div>
                               </td>
                             </motion.tr>
@@ -573,194 +781,20 @@ const CustomerInfo = () => {
                       </tbody>
                     </table>
                   </div>
-
-                  {/* Pagination */}
-                  {transactions.length > 0 && (
-                    <div className="flex items-center justify-between border-t py-3">
-                      <div className="text-sm text-gray-700">
-                        Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)} of{" "}
-                        {totalCount} entries
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => paginate(currentPage - 1)}
-                          disabled={currentPage === 1}
-                          className={`flex items-center justify-center rounded-md p-2 ${
-                            currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-[#003F9F] hover:bg-gray-100"
-                          }`}
-                        >
-                          <MdOutlineArrowBackIosNew />
-                        </button>
-
-                        {Array.from({ length: Math.min(5, totalPages) }).map((_, index) => {
-                          let pageNum
-                          if (totalPages <= 5) {
-                            pageNum = index + 1
-                          } else if (currentPage <= 3) {
-                            pageNum = index + 1
-                          } else if (currentPage >= totalPages - 2) {
-                            pageNum = totalPages - 4 + index
-                          } else {
-                            pageNum = currentPage - 2 + index
-                          }
-
-                          return (
-                            <button
-                              key={index}
-                              onClick={() => paginate(pageNum)}
-                              className={`flex size-8 items-center justify-center rounded-md text-sm ${
-                                currentPage === pageNum
-                                  ? "bg-[#003F9F] text-white"
-                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          )
-                        })}
-
-                        {totalPages > 5 && currentPage < totalPages - 2 && <span className="px-2">...</span>}
-
-                        {totalPages > 5 && currentPage < totalPages - 1 && (
-                          <button
-                            onClick={() => paginate(totalPages)}
-                            className={`flex size-8 items-center justify-center rounded-md text-sm ${
-                              currentPage === totalPages
-                                ? "bg-[#003F9F] text-white"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                            }`}
-                          >
-                            {totalPages}
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => paginate(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                          className={`flex items-center justify-center rounded-md p-2 ${
-                            currentPage === totalPages
-                              ? "cursor-not-allowed text-gray-400"
-                              : "text-[#003F9F] hover:bg-gray-100"
-                          }`}
-                        >
-                          <MdOutlineArrowForwardIos />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <div>
-              <div className="mb-6 flex justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">Crypto Balances</h3>
-                  {baseCurrency && <p className="text-2xl font-bold">{formatCurrency(baseCurrency.balance)}</p>}
-                </div>
+                )}
               </div>
+            )}
+          </CustomTabs>
+        </motion.div>
 
-              {isLoadingCrypto || isFetchingCrypto ? (
-                <CryptoAssetsSkeleton />
-              ) : (
-                <div className="w-full overflow-x-auto border-l border-r bg-[#FFFFFF]">
-                  <table className="w-full min-w-[800px] border-separate border-spacing-0 text-left">
-                    <thead>
-                      <tr>
-                        <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            Asset <RxCaretSort />
-                          </div>
-                        </th>
-                        <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            Balance <RxCaretSort />
-                          </div>
-                        </th>
-                        <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            Value <RxCaretSort />
-                          </div>
-                        </th>
-                        <th className="cursor-pointer whitespace-nowrap border-b p-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            Networks <RxCaretSort />
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cryptoAssets.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} className="py-4 text-center text-gray-500">
-                            No crypto assets found
-                          </td>
-                        </tr>
-                      ) : (
-                        cryptoAssets.map((asset) => (
-                          <motion.tr
-                            key={asset.symbol}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="cursor-pointer hover:bg-gray-50"
-                            onClick={() => handleAssetClick(asset)}
-                          >
-                            <td className="whitespace-nowrap border-b px-4 py-2">
-                              <div className="flex items-center">
-                                <img
-                                  src={asset.logo}
-                                  alt={asset.name}
-                                  className="size-8 rounded-md object-contain"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement
-                                    target.src = "https://via.placeholder.com/32"
-                                  }}
-                                />
-                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">{asset.name}</div>
-                                  <div className="text-sm text-gray-500">{asset.symbol.toUpperCase()}</div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{asset.balance.toFixed(8)}</td>
-                            <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                              {formatCurrency(asset.convertedBalance)}
-                            </td>
-                            <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
-                              <div className="flex flex-wrap gap-1">
-                                {asset.networks.slice(0, 3).map((network) => (
-                                  <span key={network.id} className="rounded-full bg-gray-100 px-2 py-1 text-xs">
-                                    {network.name.split(" ")[0]}
-                                  </span>
-                                ))}
-                                {asset.networks.length > 3 && (
-                                  <span className="rounded-full bg-gray-100 px-2 py-1 text-xs">
-                                    +{asset.networks.length - 3} more
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                          </motion.tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
-        </CustomTabs>
-      </motion.div>
-
-      <TransactionDetailModal isOpen={isModalOpen} transaction={selectedTransaction} onRequestClose={closeModal} />
-      <AssetDetailModal isOpen={isAssetModalOpen} asset={selectedAsset} onRequestClose={closeAssetModal} />
-      <NotificationModal
-        isOpen={isNotificationModalOpen}
-        customer={{ email: customer.email || "", fullName: `${customer.firstName} ${customer.lastName}` || "Customer" }}
-        onRequestClose={() => setIsNotificationModalOpen(false)}
-        onSendNotification={handleSendNotification}
-      />
-    </motion.div>
+        <TransactionDetailModal isOpen={isModalOpen} transaction={selectedTransaction} onRequestClose={closeModal} />
+        <AssetDetailModal isOpen={isAssetModalOpen} asset={selectedAsset} onRequestClose={closeAssetModal} />
+        <NotificationModal
+          isOpen={isNotificationModalOpen}
+          customer={{ email: customer.email || "", fullName: `${customer.firstName} ${customer.lastName}` || "Customer" }}
+          onRequestClose={() => setIsNotificationModalOpen(false)}
+          onSendNotification={handleSendNotification} />
+      </motion.div></>
   )
 }
 

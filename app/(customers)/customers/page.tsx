@@ -193,7 +193,7 @@ export default function AllTransactions() {
                               <p className="text-secondary font-medium">{formatNumber(totalCustomers)}</p>
                             </div>
                             <div className="flex w-full justify-between">
-                              <p className="text-grey-200">Active Accounts:</p>
+                              <p className="text-grey-200">Verified Accounts:</p>
                               <p className="text-secondary font-medium">{formatNumber(activeCustomers)}</p>
                             </div>
                           </div>
@@ -205,7 +205,7 @@ export default function AllTransactions() {
                         >
                           <div className="flex items-center gap-2 border-b pb-4 max-sm:mb-2">
                             <IncomingIcon />
-                            Active Accounts
+                            Verified Accounts
                           </div>
                           <div className="flex flex-col items-end justify-between gap-3 pt-4">
                             <div className="flex w-full justify-between">
@@ -221,7 +221,7 @@ export default function AllTransactions() {
                           </div>
                         </motion.div>
 
-                        <motion.div
+                        {/* <motion.div
                           className="small-card rounded-md p-2 transition duration-500 md:border"
                           whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
                         >
@@ -241,7 +241,7 @@ export default function AllTransactions() {
                               </p>
                             </div>
                           </div>
-                        </motion.div>
+                        </motion.div> */}
 
                         <motion.div
                           className="small-card rounded-md p-2 transition duration-500 md:border"
@@ -249,7 +249,7 @@ export default function AllTransactions() {
                         >
                           <div className="flex items-center gap-2 border-b pb-4 max-sm:mb-2">
                             <UnresolvedTransactions />
-                            Inactive Accounts
+                            Unverified Accounts
                           </div>
                           <div className="flex flex-col items-end justify-between gap-3 pt-4">
                             <div className="flex w-full justify-between">
@@ -260,8 +260,10 @@ export default function AllTransactions() {
                               </div>
                             </div>
                             <div className="flex w-full justify-between">
-                              <p className="text-grey-200">Pending Approval:</p>
-                              <p className="text-secondary font-medium">{inactiveCustomers}</p>
+                              <p className="text-grey-200">Percentage:</p>
+                              <p className="text-secondary font-medium">
+                                {totalCustomers > 0 ? `${Math.round((inactiveCustomers / totalCustomers) * 100)}%` : "0%"}
+                              </p>
                             </div>
                           </div>
                         </motion.div>

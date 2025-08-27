@@ -428,10 +428,13 @@ const AddNewEmployee: React.FC = () => {
             )}
           </div>
 
-          {/* Rest of the form remains the same */}
-          <form onSubmit={handleSubmit}>
-            {/* Name Fields */}
-            <div className="mb-6 grid grid-cols-2 gap-4">
+          {/* Rest of the form - only show when user is selected */}
+         
+            <form onSubmit={handleSubmit}>
+              {/* Name Fields */}
+              {selectedUser && (
+              <>
+              <div className="mb-6 grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">First Name</label>
                 <div
@@ -549,6 +552,8 @@ const AddNewEmployee: React.FC = () => {
                 </div>
               </div>
             </div>
+            </>
+          )}
 
             {/* Department Field */}
             <div className="mb-6">
@@ -679,6 +684,7 @@ const AddNewEmployee: React.FC = () => {
               </ButtonModule>
             </div>
           </form>
+         
         </motion.div>
       </div>
     </div>

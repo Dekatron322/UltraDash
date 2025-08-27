@@ -17,7 +17,13 @@ import Filtericon from "public/filter-icon"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
-import { Transaction, useGetTransactionByIdQuery, useGetTransactionsQuery } from "lib/redux/transactionSlice"
+import { 
+  Transaction, 
+  useGetTransactionByIdQuery, 
+  useGetTransactionsQuery,
+  useRefundTransactionMutation 
+} from "lib/redux/transactionSlice"
+import { notify } from "components/ui/Notification/Notification"
 
 type SortOrder = "asc" | "desc" | null
 
@@ -106,9 +112,19 @@ interface TransactionDetailModalProps {
   isOpen: boolean
   transactionId: number | null
   onRequestClose: () => void
+  onRefund: (transactionId: number, reference: string) => void
+  isRefunding?: boolean
+  refundedTransactions: Set<number>
 }
 
-const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen, transactionId, onRequestClose }) => {
+const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ 
+  isOpen, 
+  transactionId, 
+  onRequestClose, 
+  onRefund,
+  isRefunding = false,
+  refundedTransactions 
+}) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const { data, isLoading, isError } = useGetTransactionByIdQuery(transactionId ?? 0, {
     skip: !transactionId || !isOpen,
@@ -151,9 +167,16 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
       alert("Failed to generate PDF. Please try again.")
     }
   }
+  
 
   const handlePrint = () => {
     window.print()
+  }
+
+  const handleRefund = () => {
+    if (transaction?.id && transaction?.reference) {
+      onRefund(transaction.id, transaction.reference)
+    }
   }
 
   const getStatusStyle = (status: string) => {
@@ -302,6 +325,10 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
               <p className="font-medium text-gray-600">Comment:</p>
               <p className="text-gray-800">{transaction.comment}</p>
             </div>
+            <div className="flex w-full justify-between text-sm">
+              <p className="font-medium text-gray-600">Can Refund:</p>
+              <p className="text-gray-800">{transaction.canRefund ? "Yes" : "No"}</p>
+            </div>
 
             {transaction.utility && (
               <div className="pt-4">
@@ -363,9 +390,107 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
                 Print
               </ButtonModule>
             </div>
+
+            {transaction.canRefund && !refundedTransactions.has(transaction.id) && (
+              <div className="mt-4 flex justify-center">
+                <ButtonModule
+                  variant="primary"
+                  size="md"
+                  onClick={handleRefund}
+                  disabled={isRefunding}
+                  className="bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                >
+                  {isRefunding ? "Processing Refund..." : "Refund Transaction"}
+                </ButtonModule>
+              </div>
+            )}
           </div>
         </div>
       )}
+    </Modal>
+  )
+}
+
+interface RefundModalProps {
+  isOpen: boolean
+  onRequestClose: () => void
+  onConfirm: (reference: string) => void
+  loading: boolean
+  transactionReference: string
+  transactionAmount: number
+  transactionCurrency: string
+}
+
+const RefundModal: React.FC<RefundModalProps> = ({
+  isOpen,
+  onRequestClose,
+  onConfirm,
+  loading,
+  transactionReference,
+  transactionAmount,
+  transactionCurrency
+}) => {
+  const handleConfirm = () => {
+    onConfirm(transactionReference)
+  }
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      className="flex h-auto w-[400px] overflow-hidden rounded-md bg-white shadow-lg outline-none max-sm:w-full max-sm:max-w-[350px]"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      ariaHideApp={false}
+    >
+      <div className="w-full">
+        <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
+          <p className="text-lg font-semibold text-[#2a2f4b]">Confirm Refund</p>
+          <button onClick={onRequestClose} className="cursor-pointer text-gray-600 hover:text-gray-800">
+            <MdClose size={24} />
+          </button>
+        </div>
+
+        <div className="p-6">
+          <div className="mb-6 text-center">
+            <p className="text-lg font-medium text-gray-800">Are you sure you want to refund this transaction?</p>
+            <p className="mt-2 text-sm text-gray-600">This action cannot be undone.</p>
+          </div>
+
+          <div className="mb-6 space-y-3 rounded-lg bg-gray-50 p-4">
+            <div className="flex justify-between">
+              <span className="font-medium text-gray-600">Reference:</span>
+              <span className="text-gray-800">{transactionReference}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-medium text-gray-600">Amount:</span>
+              <span className="text-gray-800">
+                {transactionCurrency} {transactionAmount}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-between gap-4">
+            <ButtonModule
+              variant="outline"
+              size="md"
+              onClick={onRequestClose}
+              disabled={loading}
+              className="flex-1 border-gray-300 hover:bg-gray-50"
+            >
+              Cancel
+            </ButtonModule>
+            <ButtonModule
+              variant="primary"
+              size="md"
+              onClick={handleConfirm}
+              disabled={loading}
+              className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50"
+            >
+              {loading ? "Processing..." : "Confirm Refund"}
+            </ButtonModule>
+          </div>
+        </div>
+      </div>
     </Modal>
   )
 }
@@ -503,36 +628,31 @@ const AllTransactionTable: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [orderToDelete, setOrderToDelete] = useState<Transaction | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isRefunding, setIsRefunding] = useState(false)
+  const [isRefundModalOpen, setIsRefundModalOpen] = useState(false)
+  const [transactionToRefund, setTransactionToRefund] = useState<Transaction | null>(null)
+  const [refundedTransactions, setRefundedTransactions] = useState<Set<number>>(new Set())
 
   const { data, isLoading, isError } = useGetTransactionsQuery({
     pageNumber: currentPage,
     pageSize,
     startDate: startDate ? startDate.toISOString().split("T")[0] : undefined,
     endDate: endDate ? endDate.toISOString().split("T")[0] : undefined,
-    referenceNumber: referenceSearch || undefined,
+    reference: referenceSearch || undefined,
   })
+
+  const [refundTransaction] = useRefundTransactionMutation()
 
   const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen)
   }
 
   const handleFilterChange = (filter: string) => {
-    setCurrentPage(1) // Reset to first page when filters change
+    setCurrentPage(1)
     setActiveFilters((prev) => (prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]))
   }
 
-  const filteredTransactions =
-    data?.data.filter((transaction) => {
-      const searchMatch =
-        transaction.user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
-        transaction.user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
-        transaction.comment.toLowerCase().includes(searchText.toLowerCase())
-
-      const typeMatch =
-        activeFilters.length === 0 || activeFilters.includes(transaction.type.value as unknown as string)
-
-      return searchMatch && typeMatch
-    }) || []
+  const filteredTransactions = data?.data || []
 
   const getInitial = (name: string) => {
     if (!name || name.length === 0) return ""
@@ -550,17 +670,6 @@ const AllTransactionTable: React.FC = () => {
         return { backgroundColor: "#F7EDED", color: "#AF4B4B" }
       default:
         return {}
-    }
-  }
-
-  const TypeIcon = ({ type }: { type: string }) => {
-    switch (type) {
-      case "Withdraw":
-        return <OutgoingIcon className="size-2 rounded-full" />
-      case "TopUp":
-        return <IncomingIcon className="size-2 rounded-full" />
-      default:
-        return <span className="size-2 rounded-full" />
     }
   }
 
@@ -617,14 +726,89 @@ const AllTransactionTable: React.FC = () => {
     setIsOrderDetailModalOpen(true)
   }
 
+  const handleOpenRefundModal = (transaction: Transaction) => {
+    setTransactionToRefund(transaction)
+    setIsRefundModalOpen(true)
+  }
+
+  const handleConfirmRefund = async (reference: string) => {
+    setIsRefunding(true)
+    try {
+      const result = await refundTransaction({ reference }).unwrap()
+      
+      if (result.isSuccess) {
+        notify("success", "Refund Processed!", {
+          description: "Transaction refund has been processed successfully.",
+          duration: 3000,
+        })
+        
+        // Mark transaction as refunded to hide refund button
+        if (transactionToRefund?.id) {
+          setRefundedTransactions(prev => new Set(prev).add(transactionToRefund.id))
+        }
+        
+        setIsRefundModalOpen(false)
+        setTransactionToRefund(null)
+      } else {
+        notify("error", "Refund Failed", {
+          description: result.message || "Unable to process refund at this time.",
+          duration: 4000,
+        })
+      }
+    } catch (error: any) {
+      console.error("Error processing refund:", error)
+      notify("error", "Refund Failed", {
+        description: error.data?.message || error.message || "An unexpected error occurred while processing the refund.",
+        duration: 4000,
+      })
+    } finally {
+      setIsRefunding(false)
+    }
+  }
+
+  const handleRefundFromDetailModal = async (transactionId: number, reference: string) => {
+    setIsRefunding(true)
+    try {
+      const result = await refundTransaction({ reference }).unwrap()
+      
+      if (result.isSuccess) {
+        notify("success", "Refund Processed!", {
+          description: "Transaction refund has been processed successfully.",
+          duration: 3000,
+        })
+        
+        // Mark transaction as refunded to hide refund button
+        setRefundedTransactions(prev => new Set(prev).add(transactionId))
+        
+        setIsOrderDetailModalOpen(false)
+      } else {
+        notify("error", "Refund Failed", {
+          description: result.message || "Unable to process refund at this time.",
+          duration: 4000,
+        })
+      }
+    } catch (error: any) {
+      console.error("Error processing refund:", error)
+      notify("error", "Refund Failed", {
+        description: error.data?.message || error.message || "An unexpected error occurred while processing the refund.",
+        duration: 4000,
+      })
+    } finally {
+      setIsRefunding(false)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
       month: "short",
       day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
     }
-    return date.toLocaleDateString("en-US", options)
+    return date.toLocaleString("en-US", options)
   }
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
@@ -816,17 +1000,28 @@ const AllTransactionTable: React.FC = () => {
                       {formatDate(transaction.createdAt)}
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">{transaction.channel}</td>
-                    <td className="whitespace-nowrap border-b px-4 py-1 text-sm">
-                      <ButtonModule
-                        variant="outline"
-                        size="sm"
-                        icon={<PdfFile />}
-                        iconPosition="start"
-                        className="border-gray-300 hover:bg-gray-50"
-                        onClick={() => handleViewDetails(transaction)}
-                      >
-                        View Detail
-                      </ButtonModule>
+                    <td className="border-b py-1 text-sm">
+                      <div className="flex gap-2">
+                        <ButtonModule
+                          variant="outline"
+                          size="sm"
+                          icon={<PdfFile />}
+                          iconPosition="start"
+                          className="border-gray-300 hover:bg-gray-50"
+                          onClick={() => handleViewDetails(transaction)}
+                        >
+                          View Detail
+                        </ButtonModule>
+                        {transaction.canRefund && !refundedTransactions.has(transaction.id) && (
+                          <ButtonModule
+                            variant="primary"
+                            size="sm"
+                            onClick={() => handleOpenRefundModal(transaction)}
+                          >
+                            Refund
+                          </ButtonModule>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -852,7 +1047,6 @@ const AllTransactionTable: React.FC = () => {
               </button>
 
               {Array.from({ length: Math.min(5, data?.totalPages || 1) }).map((_, index) => {
-                // Calculate page number based on current position
                 let pageNum
                 if (data?.totalPages && data.totalPages <= 5) {
                   pageNum = index + 1
@@ -919,6 +1113,22 @@ const AllTransactionTable: React.FC = () => {
           setIsOrderDetailModalOpen(false)
           setSelectedTransactionId(null)
         }}
+        onRefund={handleRefundFromDetailModal}
+        isRefunding={isRefunding}
+        refundedTransactions={refundedTransactions}
+      />
+
+      <RefundModal
+        isOpen={isRefundModalOpen}
+        onRequestClose={() => {
+          setIsRefundModalOpen(false)
+          setTransactionToRefund(null)
+        }}
+        onConfirm={handleConfirmRefund}
+        loading={isRefunding}
+        transactionReference={transactionToRefund?.reference || ""}
+        transactionAmount={transactionToRefund?.amount || 0}
+        transactionCurrency={transactionToRefund?.currency.ticker || ""}
       />
 
       <DeleteModal

@@ -10,9 +10,11 @@ import { FormInputModule } from "../Input/Input"
 interface DeleteBusinessModalProps {
   isOpen: boolean
   onRequestClose: () => void
-  onConfirm: (reason: string) => void
+  onConfirm: (reason: string) => Promise<void>
   loading: boolean
   businessName: string
+  successMessage?: string
+  errorMessage?: string
 }
 
 const DeleteModal: React.FC<DeleteBusinessModalProps> = ({
@@ -21,6 +23,8 @@ const DeleteModal: React.FC<DeleteBusinessModalProps> = ({
   onConfirm,
   loading,
   businessName,
+  successMessage,
+  errorMessage,
 }) => {
   const [deleteReason, setDeleteReason] = useState("")
 
@@ -28,8 +32,8 @@ const DeleteModal: React.FC<DeleteBusinessModalProps> = ({
     setDeleteReason(e.target.value)
   }
 
-  const handleConfirm = () => {
-    onConfirm(deleteReason)
+  const handleConfirm = async () => {
+    await onConfirm(deleteReason)
   }
 
   return (

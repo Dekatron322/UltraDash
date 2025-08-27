@@ -344,7 +344,7 @@ export default function AllTransactions() {
             </div>
 
             {/* Summary Grid */}
-            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Total Overview */}
               <div className="rounded-lg border-b-4 border-blue-500 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
@@ -353,13 +353,13 @@ export default function AllTransactions() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Transactions</p>
+                    <p className=" text-gray-500">Transactions</p>
                     <p className="text-xl font-semibold text-gray-900">
                       {transactionData.total.count.toLocaleString()}
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total Volume</p>
+                    <p className=" text-gray-500">Total Volume</p>
                     <p className="text-xl font-semibold text-gray-900">
                       NGN {formatCurrency(transactionData.total.volume)}
                     </p>
@@ -370,18 +370,18 @@ export default function AllTransactions() {
               {/* Incoming */}
               <div className="rounded-lg border-b-4 border-green-500 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-600">INCOMING</h3>
+                  <h3 className="text-sm font-medium text-gray-600">DEPOSITS</h3>
                   <IncomingIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Transactions</p>
+                    <p className=" text-gray-500">Transactions</p>
                     <p className="text-xl font-semibold text-gray-900">
                       {transactionData.incoming.count.toLocaleString()}
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total Volume</p>
+                    <p className="text-gray-500">Total Volume</p>
                     <p className="text-xl font-semibold text-gray-900">
                       NGN {formatCurrency(transactionData.incoming.volume)}
                     </p>
@@ -392,18 +392,18 @@ export default function AllTransactions() {
               {/* Outgoing */}
               <div className="rounded-lg border-b-4 border-red-500 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-600">OUTGOING</h3>
+                  <h3 className="text-sm font-medium text-gray-600">WITHDRAWALS</h3>
                   <OutgoingIcon className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Transactions</p>
+                    <p className="text-gray-500">Transactions</p>
                     <p className="text-xl font-semibold text-gray-900">
                       {transactionData.outgoing.count.toLocaleString()}
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-gray-500">Total Volume</p>
+                    <p className="text-gray-500">Total Volume</p>
                     <p className="text-xl font-semibold text-gray-900">
                       NGN {formatCurrency(transactionData.outgoing.volume)}
                     </p>
@@ -412,7 +412,7 @@ export default function AllTransactions() {
               </div>
 
               {/* Unresolved */}
-              <div className="rounded-lg border-b-4 border-yellow-500 bg-white p-6 shadow-sm">
+              {/* <div className="rounded-lg border-b-4 border-yellow-500 bg-white p-6 shadow-sm">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-sm font-medium text-gray-600">UNRESOLVED</h3>
                   <UnresolvedTransactions />
@@ -427,7 +427,7 @@ export default function AllTransactions() {
                     <p className="text-xl font-semibold text-gray-900">NGN 0.00</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Transaction Breakdown */}

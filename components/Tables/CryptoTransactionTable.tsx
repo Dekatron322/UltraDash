@@ -15,7 +15,8 @@ import { jsPDF } from "jspdf"
 import Filtericon from "public/filter-icon"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { useGetCryptoTransactionsQuery } from "lib/redux/transactionSlice"
+import { useGetCryptoTransactionsQuery, CryptoTransaction } from "lib/redux/transactionSlice"
+import { API_CONFIG, API_ENDPOINTS } from "lib/config/api"
 
 type SortOrder = "asc" | "desc" | null
 
@@ -191,6 +192,12 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
     return date.toLocaleDateString("en-US", options)
   }
 
+  const handleSettleTransaction = () => {
+    // Implement settle transaction logic here
+    console.log("Settle transaction:", transactionId)
+    alert(`Settle transaction ${transactionId} functionality to be implemented`)
+  }
+
   if (!isOpen || !transactionId) return null
 
   return (
@@ -318,6 +325,9 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
                 Print
               </ButtonModule>
             </div>
+
+            {/* Settle Button - Only show if transaction is not settled */}
+
           </div>
         </div>
       )}
@@ -338,12 +348,28 @@ const CryptoTransactionTable: React.FC = () => {
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null)
   const [isOrderDetailModalOpen, setIsOrderDetailModalOpen] = useState(false)
 
-  const { data, isLoading, isError } = useGetCryptoTransactionsQuery({
+  const { data, isLoading, isError, error } = useGetCryptoTransactionsQuery({
     pageNumber: currentPage,
     pageSize,
     startDate: startDate ? startDate.toISOString().split("T")[0] : undefined,
     endDate: endDate ? endDate.toISOString().split("T")[0] : undefined,
-    referenceNumber: referenceSearch || undefined,
+    reference: referenceSearch || undefined,
+  })
+
+  // Debug logging
+  console.log('Crypto Transactions Query:', {
+    data,
+    isLoading,
+    isError,
+    error,
+    apiEndpoint: `${API_CONFIG.BASE_URL}${API_ENDPOINTS.TRANSACTIONS.CRYPTO}`,
+    queryParams: {
+      pageNumber: currentPage,
+      pageSize,
+      startDate: startDate ? startDate.toISOString().split("T")[0] : undefined,
+      endDate: endDate ? endDate.toISOString().split("T")[0] : undefined,
+      reference: referenceSearch || undefined,
+    }
   })
 
   const getInitial = (name: string) => {
@@ -398,8 +424,11 @@ const CryptoTransactionTable: React.FC = () => {
       year: "numeric",
       month: "short",
       day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
     }
-    return date.toLocaleDateString("en-US", options)
+    return date.toLocaleString("en-US", options)
   }
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
@@ -420,9 +449,13 @@ const CryptoTransactionTable: React.FC = () => {
   }
 
   if (isError) {
+    console.error('Crypto transactions error:', error)
     return (
       <div className="flex h-60 flex-col items-center justify-center gap-2 bg-[#f9f9f9]">
         <p className="text-base font-bold text-[#202B3C]">Error loading crypto transactions. Please try again.</p>
+        <p className="text-sm text-red-600">
+          {error && 'data' in error ? JSON.stringify(error.data) : 'Network error'}
+        </p>
       </div>
     )
   }
@@ -490,10 +523,16 @@ const CryptoTransactionTable: React.FC = () => {
         </button>
       </div>
 
-      {data?.data.length === 0 ? (
+      {!data || data?.data.length === 0 ? (
         <div className="flex h-60 flex-col items-center justify-center gap-2 bg-[#f9f9f9]">
           <EmptyState />
           <p className="text-base font-bold text-[#202B3C]">No crypto transactions found.</p>
+          <p className="text-sm text-gray-600">
+            {!data ? 'No data received from API' : `API returned ${data.data.length} transactions`}
+          </p>
+          <p className="text-xs text-gray-500">
+            Total count: {data?.totalCount || 'N/A'} | Current page: {currentPage}
+          </p>
         </div>
       ) : (
         <>
@@ -596,9 +635,9 @@ const CryptoTransactionTable: React.FC = () => {
                       </div>
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
-                      {formatDate(transaction.updatedAt)}
+                      {formatDate(transaction.createdAt)}
                     </td>
-                    <td className="whitespace-nowrap border-b px-4 py-1 text-sm">
+                    <td className="whitespace-nowrap flex gap-2 border-b px-4 py-1 text-sm">
                       <ButtonModule
                         variant="outline"
                         size="sm"
@@ -609,6 +648,18 @@ const CryptoTransactionTable: React.FC = () => {
                       >
                         View Detail
                       </ButtonModule>
+                      {transaction.confirmed && !transaction.settled && (
+              
+                <ButtonModule
+                  variant="primary"
+                  size="sm"
+                  // onClick={handleSettleTransaction}
+                 
+                >
+                  Settle Transaction
+                </ButtonModule>
+              
+            )}
                     </td>
                   </tr>
                 ))}
