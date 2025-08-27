@@ -17,11 +17,11 @@ import Filtericon from "public/filter-icon"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
-import { 
-  Transaction, 
-  useGetTransactionByIdQuery, 
+import {
+  Transaction,
+  useGetTransactionByIdQuery,
   useGetTransactionsQuery,
-  useRefundTransactionMutation 
+  useRefundTransactionMutation,
 } from "lib/redux/transactionSlice"
 import { notify } from "components/ui/Notification/Notification"
 
@@ -117,13 +117,13 @@ interface TransactionDetailModalProps {
   refundedTransactions: Set<number>
 }
 
-const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ 
-  isOpen, 
-  transactionId, 
-  onRequestClose, 
+const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
+  isOpen,
+  transactionId,
+  onRequestClose,
   onRefund,
   isRefunding = false,
-  refundedTransactions 
+  refundedTransactions,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const { data, isLoading, isError } = useGetTransactionByIdQuery(transactionId ?? 0, {
@@ -167,7 +167,6 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
       alert("Failed to generate PDF. Please try again.")
     }
   }
-  
 
   const handlePrint = () => {
     window.print()
@@ -428,7 +427,7 @@ const RefundModal: React.FC<RefundModalProps> = ({
   loading,
   transactionReference,
   transactionAmount,
-  transactionCurrency
+  transactionCurrency,
 }) => {
   const handleConfirm = () => {
     onConfirm(transactionReference)
@@ -735,18 +734,18 @@ const AllTransactionTable: React.FC = () => {
     setIsRefunding(true)
     try {
       const result = await refundTransaction({ reference }).unwrap()
-      
+
       if (result.isSuccess) {
         notify("success", "Refund Processed!", {
           description: "Transaction refund has been processed successfully.",
           duration: 3000,
         })
-        
+
         // Mark transaction as refunded to hide refund button
         if (transactionToRefund?.id) {
-          setRefundedTransactions(prev => new Set(prev).add(transactionToRefund.id))
+          setRefundedTransactions((prev) => new Set(prev).add(transactionToRefund.id))
         }
-        
+
         setIsRefundModalOpen(false)
         setTransactionToRefund(null)
       } else {
@@ -758,7 +757,8 @@ const AllTransactionTable: React.FC = () => {
     } catch (error: any) {
       console.error("Error processing refund:", error)
       notify("error", "Refund Failed", {
-        description: error.data?.message || error.message || "An unexpected error occurred while processing the refund.",
+        description:
+          error.data?.message || error.message || "An unexpected error occurred while processing the refund.",
         duration: 4000,
       })
     } finally {
@@ -770,16 +770,16 @@ const AllTransactionTable: React.FC = () => {
     setIsRefunding(true)
     try {
       const result = await refundTransaction({ reference }).unwrap()
-      
+
       if (result.isSuccess) {
         notify("success", "Refund Processed!", {
           description: "Transaction refund has been processed successfully.",
           duration: 3000,
         })
-        
+
         // Mark transaction as refunded to hide refund button
-        setRefundedTransactions(prev => new Set(prev).add(transactionId))
-        
+        setRefundedTransactions((prev) => new Set(prev).add(transactionId))
+
         setIsOrderDetailModalOpen(false)
       } else {
         notify("error", "Refund Failed", {
@@ -790,7 +790,8 @@ const AllTransactionTable: React.FC = () => {
     } catch (error: any) {
       console.error("Error processing refund:", error)
       notify("error", "Refund Failed", {
-        description: error.data?.message || error.message || "An unexpected error occurred while processing the refund.",
+        description:
+          error.data?.message || error.message || "An unexpected error occurred while processing the refund.",
         duration: 4000,
       })
     } finally {
@@ -1013,11 +1014,7 @@ const AllTransactionTable: React.FC = () => {
                           View Detail
                         </ButtonModule>
                         {transaction.canRefund && !refundedTransactions.has(transaction.id) && (
-                          <ButtonModule
-                            variant="primary"
-                            size="sm"
-                            onClick={() => handleOpenRefundModal(transaction)}
-                          >
+                          <ButtonModule variant="primary" size="sm" onClick={() => handleOpenRefundModal(transaction)}>
                             Refund
                           </ButtonModule>
                         )}

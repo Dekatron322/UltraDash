@@ -125,8 +125,6 @@ const CustomerDetailPage: React.FC = () => {
 
             {canManageUsers && (
               <div className="flex gap-4 max-sm:pt-4">
-                
-
                 <ButtonModule variant="danger" size="md" iconPosition="end" onClick={() => setIsDeleteModalOpen(true)}>
                   Suspend
                 </ButtonModule>

@@ -18,12 +18,7 @@ interface PermissionModalProps {
   onSuccess?: () => void
 }
 
-const PermissionModal: React.FC<PermissionModalProps> = ({
-  isOpen,
-  onRequestClose,
-  admin,
-  onSuccess
-}) => {
+const PermissionModal: React.FC<PermissionModalProps> = ({ isOpen, onRequestClose, admin, onSuccess }) => {
   const [updatePermission, { isLoading }] = useUpdateAdminPermissionMutation()
   const [permissions, setPermissions] = useState<Permission>({
     canViewUsers: false,
@@ -31,7 +26,7 @@ const PermissionModal: React.FC<PermissionModalProps> = ({
     canManageAdmin: false,
     canViewDashboard: false,
     canViewTransactions: false,
-    canManageSystemSettings: false
+    canManageSystemSettings: false,
   })
 
   useEffect(() => {
@@ -41,9 +36,9 @@ const PermissionModal: React.FC<PermissionModalProps> = ({
   }, [admin.currentPermissions])
 
   const handleTogglePermission = (permissionKey: keyof Permission) => {
-    setPermissions(prev => ({
+    setPermissions((prev) => ({
       ...prev,
-      [permissionKey]: !prev[permissionKey]
+      [permissionKey]: !prev[permissionKey],
     }))
   }
 
@@ -52,55 +47,56 @@ const PermissionModal: React.FC<PermissionModalProps> = ({
     try {
       await updatePermission({
         id: admin.id,
-        permission: permissions
+        permission: permissions,
       }).unwrap()
-      
+
       // Show success notification
       notify("success", "Permissions Updated!", {
         description: `Permissions for ${admin.name} have been updated successfully.`,
-        duration: 3000
+        duration: 3000,
       })
-      
+
       if (onSuccess) onSuccess()
       onRequestClose()
     } catch (error) {
       console.error("Failed to update permissions:", error)
-      
+
       // Show error notification
       notify("error", "Update Failed", {
         description: "There was an error updating the permissions. Please try again.",
-        duration: 5000
+        duration: 5000,
       })
     }
   }
 
-  const PermissionToggle = ({ 
-    label, 
-    description, 
-    permissionKey 
-  }: { 
+  const PermissionToggle = ({
+    label,
+    description,
+    permissionKey,
+  }: {
     label: string
     description: string
     permissionKey: keyof Permission
   }) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+    <div className="flex items-center justify-between border-b border-gray-100 py-3 last:border-b-0">
       <div className="flex-1">
         <p className="font-medium text-gray-900">{label}</p>
         <p className="text-sm text-gray-500">{description}</p>
       </div>
-      <label className="relative inline-flex items-center cursor-pointer">
+      <label className="relative inline-flex cursor-pointer items-center">
         <input
           type="checkbox"
           checked={permissions[permissionKey]}
           onChange={() => handleTogglePermission(permissionKey)}
-          className="sr-only peer"
+          className="peer sr-only"
         />
-        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer 
-          peer-checked:after:translate-x-full peer-checked:after:border-white 
-          after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
-          after:bg-white after:border-gray-300 after:border after:rounded-full 
-          after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600">
-        </div>
+        <div
+          className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute 
+          after:left-[2px] after:top-[2px] 
+          after:h-5 after:w-5 after:rounded-full after:border 
+          after:border-gray-300 after:bg-white after:transition-all after:content-[''] 
+          peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none"
+        ></div>
       </label>
     </div>
   )
@@ -118,8 +114,8 @@ const PermissionModal: React.FC<PermissionModalProps> = ({
           <CloseIcon />
         </div>
       </div>
-      
-      <div className="px-6 pb-6 max-h-[70vh] overflow-y-auto">
+
+      <div className="max-h-[70vh] overflow-y-auto px-6 pb-6">
         <form onSubmit={handleSubmit}>
           <div className="my-6 space-y-2">
             <PermissionToggle
@@ -127,31 +123,31 @@ const PermissionModal: React.FC<PermissionModalProps> = ({
               description="Allow viewing user accounts and details"
               permissionKey="canViewUsers"
             />
-            
+
             <PermissionToggle
               label="Manage Users"
               description="Allow creating, editing, and deleting users"
               permissionKey="canManageUsers"
             />
-            
+
             <PermissionToggle
               label="Manage Admins"
               description="Allow managing other admin accounts"
               permissionKey="canManageAdmin"
             />
-            
+
             <PermissionToggle
               label="View Dashboard"
               description="Allow access to the admin dashboard"
               permissionKey="canViewDashboard"
             />
-            
+
             <PermissionToggle
               label="View Transactions"
               description="Allow viewing transaction history"
               permissionKey="canViewTransactions"
             />
-            
+
             <PermissionToggle
               label="Manage System Settings"
               description="Allow modifying system configuration"
@@ -159,21 +155,12 @@ const PermissionModal: React.FC<PermissionModalProps> = ({
             />
           </div>
 
-          <div className="flex gap-3 justify-end mt-6">
-            <ButtonModule
-              type="button"
-              variant="outline"
-              onClick={onRequestClose}
-              disabled={isLoading}
-            >
+          <div className="mt-6 flex justify-end gap-3">
+            <ButtonModule type="button" variant="outline" onClick={onRequestClose} disabled={isLoading}>
               Cancel
             </ButtonModule>
-            
-            <ButtonModule
-              type="submit"
-              variant="primary"
-              disabled={isLoading}
-            >
+
+            <ButtonModule type="submit" variant="primary" disabled={isLoading}>
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <svg
@@ -182,7 +169,14 @@ const PermissionModal: React.FC<PermissionModalProps> = ({
                     fill="none"
                     viewBox="0 0 24 24"
                   >
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
                     <path
                       className="opacity-75"
                       fill="currentColor"

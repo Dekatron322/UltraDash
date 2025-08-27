@@ -328,11 +328,11 @@ export const transactionApi = createApi({
   }),
 })
 
-export const { 
-  useGetTransactionsQuery, 
-  useGetCryptoTransactionsQuery, 
+export const {
+  useGetTransactionsQuery,
+  useGetCryptoTransactionsQuery,
   useGetTransactionByIdQuery,
   useRefundTransactionMutation,
   useSettleTransactionMutation,
-  useSettleTransactionByReferenceMutation 
+  useSettleTransactionByReferenceMutation,
 } = transactionApi

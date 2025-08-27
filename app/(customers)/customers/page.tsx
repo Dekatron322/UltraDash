@@ -262,7 +262,9 @@ export default function AllTransactions() {
                             <div className="flex w-full justify-between">
                               <p className="text-grey-200">Percentage:</p>
                               <p className="text-secondary font-medium">
-                                {totalCustomers > 0 ? `${Math.round((inactiveCustomers / totalCustomers) * 100)}%` : "0%"}
+                                {totalCustomers > 0
+                                  ? `${Math.round((inactiveCustomers / totalCustomers) * 100)}%`
+                                  : "0%"}
                               </p>
                             </div>
                           </div>

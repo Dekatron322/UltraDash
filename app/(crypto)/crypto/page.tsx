@@ -45,9 +45,13 @@ export default function Dashboard() {
   // Fetch crypto accounts data
   const { data: masterData, refetch: refetchMaster, isFetching: isMasterFetching } = useGetMasterAccountQuery()
   const { data: profitData, refetch: refetchProfit, isFetching: isProfitFetching } = useGetProfitAccountQuery()
-  
+
   // Fetch crypto overview data
-  const { data: cryptoOverviewData, refetch: refetchCryptoOverview, isFetching: isCryptoOverviewFetching } = useGetCryptoOverviewQuery()
+  const {
+    data: cryptoOverviewData,
+    refetch: refetchCryptoOverview,
+    isFetching: isCryptoOverviewFetching,
+  } = useGetCryptoOverviewQuery()
 
   const masterAssets = masterData?.data || []
   const profitAssets = profitData?.data || []
@@ -160,11 +164,17 @@ export default function Dashboard() {
                 <button
                   onClick={refreshData}
                   className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                  disabled={isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching) || isCryptoOverviewFetching}
+                  disabled={
+                    isRefreshing ||
+                    (activeTab === "master" ? isMasterFetching : isProfitFetching) ||
+                    isCryptoOverviewFetching
+                  }
                 >
                   <FiRefreshCw
                     className={`size-5 ${
-                      isRefreshing || (activeTab === "master" ? isMasterFetching : isProfitFetching) || isCryptoOverviewFetching
+                      isRefreshing ||
+                      (activeTab === "master" ? isMasterFetching : isProfitFetching) ||
+                      isCryptoOverviewFetching
                         ? "animate-spin"
                         : ""
                     }`}
@@ -173,47 +183,53 @@ export default function Dashboard() {
                 </button>
               </div>
 
-             
-
-                {/* Incoming */}
-               
-
-                
-
-                
-             
+              {/* Incoming */}
 
               {/* Additional Crypto Overview Card */}
               <motion.div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm" whileHover={{ y: -2 }}>
                 <div className="mb-4 flex items-center gap-3">
                   <div className="rounded-full bg-indigo-100 p-3">
-                    <FiTrendingUp className="text-indigo-600 text-xl" />
+                    <FiTrendingUp className="text-xl text-indigo-600" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900">Crypto Overview</h3>
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div className="rounded-lg bg-blue-50 p-4">
                     <p className="text-sm font-medium text-blue-700">Total Crypto Balance</p>
-                    <p className="text-2xl font-bold text-blue-900">{formatCurrency(dashboardMetrics.cryptoTotalBalance)}</p>
+                    <p className="text-2xl font-bold text-blue-900">
+                      {formatCurrency(dashboardMetrics.cryptoTotalBalance)}
+                    </p>
                   </div>
                   <div className="rounded-lg bg-purple-50 p-4">
                     <p className="text-sm font-medium text-purple-700">Master Account</p>
-                    <p className="text-2xl font-bold text-purple-900">{formatCurrency(dashboardMetrics.cryptoMasterBalance)}</p>
+                    <p className="text-2xl font-bold text-purple-900">
+                      {formatCurrency(dashboardMetrics.cryptoMasterBalance)}
+                    </p>
                     <p className="text-sm text-purple-600">
-                      {calculateAllocation(dashboardMetrics.cryptoMasterBalance, dashboardMetrics.cryptoTotalBalance).toFixed(1)}% of total
+                      {calculateAllocation(
+                        dashboardMetrics.cryptoMasterBalance,
+                        dashboardMetrics.cryptoTotalBalance
+                      ).toFixed(1)}
+                      % of total
                     </p>
                   </div>
                   <div className="rounded-lg bg-orange-50 p-4">
                     <p className="text-sm font-medium text-orange-700">Profit Account</p>
-                    <p className="text-2xl font-bold text-orange-900">{formatCurrency(dashboardMetrics.cryptoProfitBalance)}</p>
+                    <p className="text-2xl font-bold text-orange-900">
+                      {formatCurrency(dashboardMetrics.cryptoProfitBalance)}
+                    </p>
                     <p className="text-sm text-orange-600">
-                      {calculateAllocation(dashboardMetrics.cryptoProfitBalance, dashboardMetrics.cryptoTotalBalance).toFixed(1)}% of total
+                      {calculateAllocation(
+                        dashboardMetrics.cryptoProfitBalance,
+                        dashboardMetrics.cryptoTotalBalance
+                      ).toFixed(1)}
+                      % of total
                     </p>
                   </div>
                 </div>
               </motion.div>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

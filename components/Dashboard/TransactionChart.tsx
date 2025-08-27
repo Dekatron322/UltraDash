@@ -20,52 +20,79 @@ export function TransactionChart({ timeFilter, theme }: TransactionChartProps) {
     }
 
     const data = transactionData.data
-    
+
     // Generate chart data based on time filter
     const getDataForPeriod = () => {
       switch (timeFilter) {
         case "day":
           return {
             crypto: (data.buyCrypto_Today || 0) + (data.sellCrypto_Today || 0),
-            fiat: (data.topUp_Today || 0) + (data.withdraw_Today || 0) + (data.airtime_Today || 0) + (data.internetBundle_Today || 0) + (data.utility_Today || 0)
+            fiat:
+              (data.topUp_Today || 0) +
+              (data.withdraw_Today || 0) +
+              (data.airtime_Today || 0) +
+              (data.internetBundle_Today || 0) +
+              (data.utility_Today || 0),
           }
         case "week":
           return {
             crypto: (data.buyCrypto_ThisWeek || 0) + (data.sellCrypto_ThisWeek || 0),
-            fiat: (data.topUp_ThisWeek || 0) + (data.withdraw_ThisWeek || 0) + (data.airtime_ThisWeek || 0) + (data.internetBundle_ThisWeek || 0) + (data.utility_ThisWeek || 0)
+            fiat:
+              (data.topUp_ThisWeek || 0) +
+              (data.withdraw_ThisWeek || 0) +
+              (data.airtime_ThisWeek || 0) +
+              (data.internetBundle_ThisWeek || 0) +
+              (data.utility_ThisWeek || 0),
           }
         case "month":
           return {
             crypto: (data.buyCrypto_ThisMonth || 0) + (data.sellCrypto_ThisMonth || 0),
-            fiat: (data.topUp_ThisMonth || 0) + (data.withdraw_ThisMonth || 0) + (data.airtime_ThisMonth || 0) + (data.internetBundle_ThisMonth || 0) + (data.utility_ThisMonth || 0)
+            fiat:
+              (data.topUp_ThisMonth || 0) +
+              (data.withdraw_ThisMonth || 0) +
+              (data.airtime_ThisMonth || 0) +
+              (data.internetBundle_ThisMonth || 0) +
+              (data.utility_ThisMonth || 0),
           }
         default: // all
           return {
             crypto: (data.buyCrypto_AllTime || 0) + (data.sellCrypto_AllTime || 0),
-            fiat: (data.topUp_AllTime || 0) + (data.withdraw_AllTime || 0) + (data.airtime_AllTime || 0) + (data.internetBundle_AllTime || 0) + (data.utility_AllTime || 0)
+            fiat:
+              (data.topUp_AllTime || 0) +
+              (data.withdraw_AllTime || 0) +
+              (data.airtime_AllTime || 0) +
+              (data.internetBundle_AllTime || 0) +
+              (data.utility_AllTime || 0),
           }
       }
     }
 
     const periodData = getDataForPeriod()
-    
+
     // Create a simple chart with current period data
     // In a real scenario, you might want historical data for multiple periods
     return [
       {
-        period: timeFilter === "day" ? "Today" : timeFilter === "week" ? "This Week" : timeFilter === "month" ? "This Month" : "All Time",
+        period:
+          timeFilter === "day"
+            ? "Today"
+            : timeFilter === "week"
+            ? "This Week"
+            : timeFilter === "month"
+            ? "This Month"
+            : "All Time",
         crypto: Math.round(periodData.crypto),
-        fiat: Math.round(periodData.fiat)
-      }
+        fiat: Math.round(periodData.fiat),
+      },
     ]
   }, [transactionData, timeFilter])
 
   if (isLoading) {
     return (
-      <div className="h-[300px] flex items-center justify-center">
+      <div className="flex h-[300px] items-center justify-center">
         <div className="animate-pulse">
-          <div className="h-4 w-32 bg-gray-200 rounded mb-2"></div>
-          <div className="h-64 w-full bg-gray-200 rounded"></div>
+          <div className="mb-2 h-4 w-32 rounded bg-gray-200"></div>
+          <div className="h-64 w-full rounded bg-gray-200"></div>
         </div>
       </div>
     )
@@ -73,7 +100,7 @@ export function TransactionChart({ timeFilter, theme }: TransactionChartProps) {
 
   if (isError || !chartData.length) {
     return (
-      <div className="h-[300px] flex items-center justify-center">
+      <div className="flex h-[300px] items-center justify-center">
         <p className="text-gray-500">Unable to load transaction data</p>
       </div>
     )
@@ -92,7 +119,7 @@ export function TransactionChart({ timeFilter, theme }: TransactionChartProps) {
               borderColor: theme === "dark" ? "#374151" : "#e5e7eb",
               borderRadius: "0.5rem",
             }}
-            formatter={(value: number) => [`$${value.toLocaleString()}`, '']}
+            formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
           />
           <Legend />
           <Bar dataKey="crypto" fill="#3b82f6" name="Crypto Transactions" />

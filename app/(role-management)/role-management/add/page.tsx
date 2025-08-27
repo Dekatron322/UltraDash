@@ -429,131 +429,133 @@ const AddNewEmployee: React.FC = () => {
           </div>
 
           {/* Rest of the form - only show when user is selected */}
-         
-            <form onSubmit={handleSubmit}>
-              {/* Name Fields */}
-              {selectedUser && (
+
+          <form onSubmit={handleSubmit}>
+            {/* Name Fields */}
+            {selectedUser && (
               <>
-              <div className="mb-6 grid grid-cols-2 gap-4">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">First Name</label>
-                <div
-                  className={`relative rounded-xl border p-3 transition-all ${
-                    activeField === "firstName"
-                      ? "border-blue-500 bg-white ring-2 ring-blue-200"
-                      : "border-gray-200 bg-gray-50"
-                  } ${selectedUser ? "opacity-70" : ""}`}
-                  onClick={() => !selectedUser && setActiveField("firstName")}
-                >
-                  <div className="flex items-center">
-                    <FiUser className={`mr-2 text-gray-400 ${activeField === "firstName" ? "text-blue-500" : ""}`} />
-                    <input
-                      type="text"
-                      placeholder="John"
-                      className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      onFocus={() => !selectedUser && setActiveField("firstName")}
-                      onBlur={() => setActiveField(null)}
-                      disabled={!!selectedUser}
-                      required
-                    />
+                <div className="mb-6 grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">First Name</label>
+                    <div
+                      className={`relative rounded-xl border p-3 transition-all ${
+                        activeField === "firstName"
+                          ? "border-blue-500 bg-white ring-2 ring-blue-200"
+                          : "border-gray-200 bg-gray-50"
+                      } ${selectedUser ? "opacity-70" : ""}`}
+                      onClick={() => !selectedUser && setActiveField("firstName")}
+                    >
+                      <div className="flex items-center">
+                        <FiUser
+                          className={`mr-2 text-gray-400 ${activeField === "firstName" ? "text-blue-500" : ""}`}
+                        />
+                        <input
+                          type="text"
+                          placeholder="John"
+                          className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          onFocus={() => !selectedUser && setActiveField("firstName")}
+                          onBlur={() => setActiveField(null)}
+                          disabled={!!selectedUser}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-700">Last Name</label>
+                    <div
+                      className={`relative rounded-xl border p-3 transition-all ${
+                        activeField === "lastName"
+                          ? "border-blue-500 bg-white ring-2 ring-blue-200"
+                          : "border-gray-200 bg-gray-50"
+                      } ${selectedUser ? "opacity-70" : ""}`}
+                      onClick={() => !selectedUser && setActiveField("lastName")}
+                    >
+                      <div className="flex items-center">
+                        <FiUser className={`mr-2 text-gray-400 ${activeField === "lastName" ? "text-blue-500" : ""}`} />
+                        <input
+                          type="text"
+                          placeholder="Doe"
+                          className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          onFocus={() => !selectedUser && setActiveField("lastName")}
+                          onBlur={() => setActiveField(null)}
+                          disabled={!!selectedUser}
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Last Name</label>
-                <div
-                  className={`relative rounded-xl border p-3 transition-all ${
-                    activeField === "lastName"
-                      ? "border-blue-500 bg-white ring-2 ring-blue-200"
-                      : "border-gray-200 bg-gray-50"
-                  } ${selectedUser ? "opacity-70" : ""}`}
-                  onClick={() => !selectedUser && setActiveField("lastName")}
-                >
-                  <div className="flex items-center">
-                    <FiUser className={`mr-2 text-gray-400 ${activeField === "lastName" ? "text-blue-500" : ""}`} />
-                    <input
-                      type="text"
-                      placeholder="Doe"
-                      className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      onFocus={() => !selectedUser && setActiveField("lastName")}
-                      onBlur={() => setActiveField(null)}
-                      disabled={!!selectedUser}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Email Field */}
-            <div className="mb-6">
-              <label className="mb-2 block text-sm font-medium text-gray-700">Email</label>
-              <div
-                className={`relative rounded-xl border p-3 transition-all ${
-                  activeField === "email"
-                    ? "border-blue-500 bg-white ring-2 ring-blue-200"
-                    : "border-gray-200 bg-gray-50"
-                } ${selectedUser ? "opacity-70" : ""}`}
-                onClick={() => !selectedUser && setActiveField("email")}
-              >
-                <div className="flex items-center">
-                  <FiMail className={`mr-2 text-gray-400 ${activeField === "email" ? "text-blue-500" : ""}`} />
-                  <input
-                    type="email"
-                    placeholder="john.doe@company.com"
-                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
-                    value={email}
-                    onChange={handleEmailChange}
-                    onFocus={() => !selectedUser && setActiveField("email")}
-                    onBlur={() => setActiveField(null)}
-                    disabled={!!selectedUser}
-                    required
-                  />
-                </div>
-                {!isValidEmail && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="mt-1 text-xs text-red-500"
+                {/* Email Field */}
+                <div className="mb-6">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Email</label>
+                  <div
+                    className={`relative rounded-xl border p-3 transition-all ${
+                      activeField === "email"
+                        ? "border-blue-500 bg-white ring-2 ring-blue-200"
+                        : "border-gray-200 bg-gray-50"
+                    } ${selectedUser ? "opacity-70" : ""}`}
+                    onClick={() => !selectedUser && setActiveField("email")}
                   >
-                    Please enter a valid email
-                  </motion.p>
-                )}
-              </div>
-            </div>
-
-            {/* Phone Field */}
-            <div className="mb-6">
-              <label className="mb-2 block text-sm font-medium text-gray-700">Phone (Optional)</label>
-              <div
-                className={`relative rounded-xl border p-3 transition-all ${
-                  activeField === "phone"
-                    ? "border-blue-500 bg-white ring-2 ring-blue-200"
-                    : "border-gray-200 bg-gray-50"
-                } ${selectedUser ? "opacity-70" : ""}`}
-                onClick={() => !selectedUser && setActiveField("phone")}
-              >
-                <div className="flex items-center">
-                  <FiPhone className={`mr-2 text-gray-400 ${activeField === "phone" ? "text-blue-500" : ""}`} />
-                  <input
-                    type="tel"
-                    placeholder="(123) 456-7890"
-                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    onFocus={() => !selectedUser && setActiveField("phone")}
-                    onBlur={() => setActiveField(null)}
-                    disabled={!!selectedUser}
-                  />
+                    <div className="flex items-center">
+                      <FiMail className={`mr-2 text-gray-400 ${activeField === "email" ? "text-blue-500" : ""}`} />
+                      <input
+                        type="email"
+                        placeholder="john.doe@company.com"
+                        className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
+                        value={email}
+                        onChange={handleEmailChange}
+                        onFocus={() => !selectedUser && setActiveField("email")}
+                        onBlur={() => setActiveField(null)}
+                        disabled={!!selectedUser}
+                        required
+                      />
+                    </div>
+                    {!isValidEmail && (
+                      <motion.p
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        className="mt-1 text-xs text-red-500"
+                      >
+                        Please enter a valid email
+                      </motion.p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
-            </>
-          )}
+
+                {/* Phone Field */}
+                <div className="mb-6">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Phone (Optional)</label>
+                  <div
+                    className={`relative rounded-xl border p-3 transition-all ${
+                      activeField === "phone"
+                        ? "border-blue-500 bg-white ring-2 ring-blue-200"
+                        : "border-gray-200 bg-gray-50"
+                    } ${selectedUser ? "opacity-70" : ""}`}
+                    onClick={() => !selectedUser && setActiveField("phone")}
+                  >
+                    <div className="flex items-center">
+                      <FiPhone className={`mr-2 text-gray-400 ${activeField === "phone" ? "text-blue-500" : ""}`} />
+                      <input
+                        type="tel"
+                        placeholder="(123) 456-7890"
+                        className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        onFocus={() => !selectedUser && setActiveField("phone")}
+                        onBlur={() => setActiveField(null)}
+                        disabled={!!selectedUser}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Department Field */}
             <div className="mb-6">
@@ -684,7 +686,6 @@ const AddNewEmployee: React.FC = () => {
               </ButtonModule>
             </div>
           </form>
-         
         </motion.div>
       </div>
     </div>
