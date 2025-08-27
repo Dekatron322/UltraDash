@@ -93,6 +93,17 @@ export interface UpdateAdminPermissionResponse {
   message: string
 }
 
+export interface NotifyUserRequest {
+  userId: number
+  title: string
+  message: string
+}
+
+export interface NotifyUserResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({
@@ -181,6 +192,14 @@ export const adminApi = createApi({
       }),
       invalidatesTags: ["Admin"],
     }),
+
+    notifyUser: builder.mutation<NotifyUserResponse, NotifyUserRequest>({
+      query: (notificationData) => ({
+        url: "/Admin/User/Notify",
+        method: "POST",
+        body: notificationData,
+      }),
+    }),
   }),
 })
 
@@ -191,4 +210,5 @@ export const {
   useDeleteAdminMutation,
   useGetAdminByIdQuery,
   useUpdateAdminPermissionMutation,
+  useNotifyUserMutation,
 } = adminApi

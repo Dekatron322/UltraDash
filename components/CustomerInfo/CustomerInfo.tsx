@@ -10,11 +10,14 @@ import AssetDetailModal from "components/ui/Modal/asset-detail-modal"
 import NotificationModal from "components/ui/Modal/notification-modal"
 import { motion } from "framer-motion"
 import { useGetUserByIdQuery, useGetUserCryptoQuery, useGetUserTransactionsQuery } from "lib/redux/customerSlice"
+import { useNotifyUserMutation } from "lib/redux/adminSlice" // Import the notification mutation
 import { useParams } from "next/navigation"
 import LoadingSkeleton from "components/ui/Loader/LoadingSkeleton"
 import { format, subDays } from "date-fns"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+import { notify } from "components/ui/Notification/Notification"
+
 
 const CustomTabs = ({
   activeTab,
@@ -264,6 +267,9 @@ const CustomerInfo = () => {
     isFetching: isFetchingCrypto,
   } = useGetUserCryptoQuery(Number(userId))
 
+  // Add the notification mutation hook
+  const [notifyUser, { isLoading: isNotifying }] = useNotifyUserMutation()
+
   const [activeTab, setActiveTab] = useState("transactions")
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -325,9 +331,32 @@ const CustomerInfo = () => {
     setSelectedAsset(null)
   }
 
+  // Update the handleSendNotification function to use the API
   const handleSendNotification = async (message: string) => {
-    console.log(`Sending notification to ${userResponse?.data.email}:`, message)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    if (!userResponse?.data?.id) {
+      notify("error", "User ID is required to send notification")
+      return
+    }
+
+    try {
+      const result = await notifyUser({
+        userId: userResponse.data.id,
+        title: "Admin Notification",
+        message: message,
+      }).unwrap()
+
+      if (result.isSuccess) {
+        notify("success", "Notification sent successfully!")
+        return result
+      } else {
+        notify("error", result.message || "Failed to send notification")
+        throw new Error(result.message)
+      }
+    } catch (error: any) {
+      console.error("Failed to send notification:", error)
+      notify("error", error.data?.message || error.message || "Failed to send notification")
+      throw error
+    }
   }
 
   const paginate = (pageNumber: number) => {
@@ -339,8 +368,6 @@ const CustomerInfo = () => {
     setIsFilterApplied(true)
     refetchTransactions()
   }
-
-
 
   if (isLoading) {
     return <LoadingSkeleton />
@@ -366,9 +393,7 @@ const CustomerInfo = () => {
   const totalCryptoValue = cryptoAssets.reduce((total, asset) => {
     return total + (asset.convertedBalance || 0);
   }, 0);
-  
-  // Add this to your JSX where you want to display the total
-  
+
   return (
     <><div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
       {customer.wallets?.map((wallet) => (
@@ -683,7 +708,6 @@ const CustomerInfo = () => {
                 <div className="mb-6 flex justify-between">
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-4">Wallet Balances</h3>
-
 
                     {/* Keep the original crypto total if you still want it */}
                     {totalCryptoValue > 0 && (
