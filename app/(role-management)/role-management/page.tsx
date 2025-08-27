@@ -187,11 +187,11 @@ const FilterDropdown = ({
   )
 }
 
-const EmployeesTable: React.FC<{ 
-  employees: Employee[]; 
-  isLoading: boolean;
-  adminData: Admin[] | undefined;
-  refetchAdmins: () => void;
+const EmployeesTable: React.FC<{
+  employees: Employee[]
+  isLoading: boolean
+  adminData: Admin[] | undefined
+  refetchAdmins: () => void
 }> = ({ employees, isLoading, adminData, refetchAdmins }) => {
   const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
@@ -210,8 +210,12 @@ const EmployeesTable: React.FC<{
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false)
-  const [selectedAdmin, setSelectedAdmin] = useState<{id: number; name: string; currentPermissions: Permission | null} | null>(null)
-  
+  const [selectedAdmin, setSelectedAdmin] = useState<{
+    id: number
+    name: string
+    currentPermissions: Permission | null
+  } | null>(null)
+
   // Use the delete admin mutation
   const [deleteAdmin] = useDeleteAdminMutation()
 
@@ -300,30 +304,30 @@ const EmployeesTable: React.FC<{
     setIsDeleting(true)
     try {
       if (!employeeToDelete) return
-      
+
       // Extract the admin ID from the employee ID (assuming format "EMP-{id}")
-      const adminId = parseInt(employeeToDelete.id.replace('EMP-', ''))
-      
+      const adminId = parseInt(employeeToDelete.id.replace("EMP-", ""))
+
       // Call the delete admin mutation
       const result = await deleteAdmin(adminId).unwrap()
-      
+
       if (result.isSuccess) {
         // Show success notification
         notify("success", "Admin Deleted!", {
           description: `Admin ${employeeToDelete.name} has been deleted successfully.`,
-          duration: 3000
+          duration: 3000,
         })
-        
+
         // Refresh the admin list
         refetchAdmins()
       } else {
         // Show error notification
         notify("error", "Delete Failed", {
           description: result.message || "Failed to delete admin. Please try again.",
-          duration: 5000
+          duration: 5000,
         })
       }
-      
+
       setIsDeleteModalOpen(false)
       setEmployeeToDelete(null)
     } catch (error) {
@@ -331,7 +335,7 @@ const EmployeesTable: React.FC<{
       // Show error notification
       notify("error", "Delete Failed", {
         description: "There was an error deleting the admin. Please try again.",
-        duration: 5000
+        duration: 5000,
       })
     } finally {
       setIsDeleting(false)
@@ -340,12 +344,12 @@ const EmployeesTable: React.FC<{
 
   const handleEditRole = (employee: Employee) => {
     // Find the actual admin data from the passed adminData prop
-    const adminItem = adminData?.find(admin => admin.id === parseInt(employee.id.replace('EMP-', '')))
-    
+    const adminItem = adminData?.find((admin) => admin.id === parseInt(employee.id.replace("EMP-", "")))
+
     setSelectedAdmin({
-      id: parseInt(employee.id.replace('EMP-', '')),
+      id: parseInt(employee.id.replace("EMP-", "")),
       name: employee.name,
-      currentPermissions: adminItem?.permission || null
+      currentPermissions: adminItem?.permission || null,
     })
     setIsPermissionModalOpen(true)
   }
@@ -672,12 +676,7 @@ const RoleManagementPage: React.FC = () => {
       <div className="container mx-auto px-16 py-8">
         <h1 className="mb-6 text-2xl font-bold">Employee Role Management</h1>
         <div>
-          <EmployeesTable 
-            employees={employees} 
-            isLoading={isLoading} 
-            adminData={data?.data} 
-            refetchAdmins={refetch}
-          />
+          <EmployeesTable employees={employees} isLoading={isLoading} adminData={data?.data} refetchAdmins={refetch} />
         </div>
       </div>
     </div>
