@@ -3,20 +3,19 @@ import React, { useRef, useState } from "react"
 import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
 import { RxCaretSort, RxDotsVertical } from "react-icons/rx"
 import { ButtonModule } from "components/ui/Button/Button"
-
 import { SearchModule } from "components/ui/Search/search-module"
 import EmptyState from "public/empty-state"
 import PdfFile from "public/pdf-file"
-
 import Modal from "react-modal"
 import { MdClose } from "react-icons/md"
 import html2canvas from "html2canvas"
 import { jsPDF } from "jspdf"
-
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { useGetCryptoTransactionsQuery } from "lib/redux/transactionSlice"
+import { useGetCryptoTransactionsQuery, useSettleTransactionByReferenceMutation } from "lib/redux/transactionSlice"
 import { API_CONFIG, API_ENDPOINTS } from "lib/config/api"
+import { notify } from "components/ui/Notification/Notification"
+
 
 type SortOrder = "asc" | "desc" | null
 
@@ -88,9 +87,15 @@ interface TransactionDetailModalProps {
   isOpen: boolean
   transactionId: number | null
   onRequestClose: () => void
+  onSettleTransaction: (transactionReference: string) => Promise<void>
 }
 
-const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen, transactionId, onRequestClose }) => {
+const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ 
+  isOpen, 
+  transactionId, 
+  onRequestClose,
+  onSettleTransaction 
+}) => {
   const modalRef = useRef<HTMLDivElement>(null)
   const { data, isLoading, isError } = useGetCryptoTransactionsQuery(
     {
@@ -192,10 +197,15 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
     return date.toLocaleDateString("en-US", options)
   }
 
-  const handleSettleTransaction = () => {
-    // Implement settle transaction logic here
-    console.log("Settle transaction:", transactionId)
-    alert(`Settle transaction ${transactionId} functionality to be implemented`)
+  const handleSettleTransaction = async () => {
+    if (!transaction?.reference) return
+    
+    try {
+      await onSettleTransaction(transaction.reference)
+      onRequestClose()
+    } catch (error) {
+      console.error("Failed to settle transaction:", error)
+    }
   }
 
   if (!isOpen || !transactionId) return null
@@ -327,7 +337,18 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({ isOpen,
             </div>
 
             {/* Settle Button - Only show if transaction is not settled */}
-
+            {transaction.confirmed && !transaction.settled && (
+              <div className="mt-4 flex justify-center">
+                <ButtonModule
+                  variant="primary"
+                  size="md"
+                  onClick={handleSettleTransaction}
+                  className="w-full"
+                >
+                  Settle Transaction
+                </ButtonModule>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -348,7 +369,7 @@ const CryptoTransactionTable: React.FC = () => {
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null)
   const [isOrderDetailModalOpen, setIsOrderDetailModalOpen] = useState(false)
 
-  const { data, isLoading, isError, error } = useGetCryptoTransactionsQuery({
+  const { data, isLoading, isError, error, refetch } = useGetCryptoTransactionsQuery({
     pageNumber: currentPage,
     pageSize,
     startDate: startDate ? startDate.toISOString().split("T")[0] : undefined,
@@ -356,21 +377,25 @@ const CryptoTransactionTable: React.FC = () => {
     reference: referenceSearch || undefined,
   })
 
-  // Debug logging
-  console.log('Crypto Transactions Query:', {
-    data,
-    isLoading,
-    isError,
-    error,
-    apiEndpoint: `${API_CONFIG.BASE_URL}${API_ENDPOINTS.TRANSACTIONS.CRYPTO}`,
-    queryParams: {
-      pageNumber: currentPage,
-      pageSize,
-      startDate: startDate ? startDate.toISOString().split("T")[0] : undefined,
-      endDate: endDate ? endDate.toISOString().split("T")[0] : undefined,
-      reference: referenceSearch || undefined,
+  const [settleTransaction, { isLoading: isSettling }] = useSettleTransactionByReferenceMutation()
+
+  const handleSettleTransaction = async (transactionReference: string) => {
+    try {
+      const result = await settleTransaction({ transactionReference }).unwrap()
+      
+      if (result.isSuccess) {
+        notify("success", "Transaction settled successfully!")
+        // Refetch the transactions to update the UI
+        refetch()
+      } else {
+        notify("error", result.message || "Failed to settle transaction")
+      }
+    } catch (error: any) {
+      console.error("Failed to settle transaction:", error)
+      notify("error", error.data?.message || error.message || "Failed to settle transaction")
+      throw error
     }
-  })
+  }
 
   const getInitial = (name: string) => {
     if (!name || name.length === 0) return ""
@@ -573,6 +598,14 @@ const CryptoTransactionTable: React.FC = () => {
                   </th>
                   <th
                     className="cursor-pointer whitespace-nowrap border-b p-4 text-sm"
+                    onClick={() => toggleSort("profit")}
+                  >
+                    <div className="flex items-center gap-2">
+                      Profit <RxCaretSort />
+                    </div>
+                  </th>
+                  <th
+                    className="cursor-pointer whitespace-nowrap border-b p-4 text-sm"
                     onClick={() => toggleSort("status")}
                   >
                     <div className="flex items-center gap-2">
@@ -612,6 +645,7 @@ const CryptoTransactionTable: React.FC = () => {
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
                       <div className="flex items-center gap-2 rounded-full py-1">{transaction.type.label}</div>
                     </td>
+                    
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
                       <div className="flex">
                         <div className="flex items-center justify-center gap-1 rounded-full px-2 py-1">
@@ -619,6 +653,10 @@ const CryptoTransactionTable: React.FC = () => {
                           {transaction.toCurrency}
                         </div>
                       </div>
+                    </td>
+                    <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
+                    
+                      <div className="flex items-center gap-2 rounded-full py-1">{transaction.profitCurrency}{transaction.profit}</div>
                     </td>
                     <td className="whitespace-nowrap border-b px-4 py-3 text-sm">
                       <div className="flex">
@@ -649,17 +687,15 @@ const CryptoTransactionTable: React.FC = () => {
                         View Detail
                       </ButtonModule>
                       {transaction.confirmed && !transaction.settled && (
-              
-                <ButtonModule
-                  variant="primary"
-                  size="sm"
-                  // onClick={handleSettleTransaction}
-                 
-                >
-                  Settle Transaction
-                </ButtonModule>
-              
-            )}
+                        <ButtonModule
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleSettleTransaction(transaction.reference)}
+                          disabled={isSettling}
+                        >
+                          {isSettling ? "Settling..." : "Settle"}
+                        </ButtonModule>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -751,6 +787,7 @@ const CryptoTransactionTable: React.FC = () => {
           setIsOrderDetailModalOpen(false)
           setSelectedTransactionId(null)
         }}
+        onSettleTransaction={handleSettleTransaction}
       />
     </div>
   )

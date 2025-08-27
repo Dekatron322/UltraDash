@@ -110,6 +110,7 @@ export interface CryptoTransaction {
   updatedAt: string
   confirmed: boolean
   settled: boolean
+  profitCurrency: string
   profit: number
   settlementAmount: number
   adjustedQuotedPrice: number
@@ -173,6 +174,10 @@ export interface SettleRequest {
   narration: string
 }
 
+export interface SettleByReferenceRequest {
+  transactionReference: string
+}
+
 export interface WalletBalance {
   name: string
   symbol: string
@@ -192,6 +197,12 @@ export interface WalletBalance {
 }
 
 export interface SettleResponse {
+  isSuccess: boolean
+  message: string
+  data: WalletBalance[]
+}
+
+export interface SettleByReferenceResponse {
   isSuccess: boolean
   message: string
   data: WalletBalance[]
@@ -306,6 +317,14 @@ export const transactionApi = createApi({
         body: settleRequest,
       }),
     }),
+
+    settleTransactionByReference: builder.mutation<SettleByReferenceResponse, SettleByReferenceRequest>({
+      query: (settleRequest) => ({
+        url: API_ENDPOINTS.TRANSACTIONS.SETTLE,
+        method: "POST",
+        body: settleRequest,
+      }),
+    }),
   }),
 })
 
@@ -314,5 +333,6 @@ export const {
   useGetCryptoTransactionsQuery, 
   useGetTransactionByIdQuery,
   useRefundTransactionMutation,
-  useSettleTransactionMutation 
+  useSettleTransactionMutation,
+  useSettleTransactionByReferenceMutation 
 } = transactionApi

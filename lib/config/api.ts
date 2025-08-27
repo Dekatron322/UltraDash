@@ -42,7 +42,7 @@ export const API_ENDPOINTS = {
     CRYPTO: "/Admin/Crypto/Transactions",
     OVERVIEW: "/Admin/Transactions/Overview",
     REFUND: "/Wallet/RefundPayBills",
-    SETTLE: "/Admin/Crypto/Settle",
+    SETTLE: "Admin/Crypto/Refund",
   },
 
   // Crypto endpoints
