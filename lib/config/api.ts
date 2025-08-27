@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
     OVERVIEW: "/Admin/Users/Overview",
     LIST: "/Admin/Users",
     DETAILS: (id: string | number) => `/Admin/Users/${id}`,
+    ADD_BONUS:  "/Admin/Wallet/Bonus",
     
   },
 

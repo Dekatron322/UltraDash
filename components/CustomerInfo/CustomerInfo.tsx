@@ -9,15 +9,21 @@ import ExportIcon from "public/export-icon"
 import AssetDetailModal from "components/ui/Modal/asset-detail-modal"
 import NotificationModal from "components/ui/Modal/notification-modal"
 import { motion } from "framer-motion"
-import { useGetUserByIdQuery, useGetUserCryptoQuery, useGetUserTransactionsQuery } from "lib/redux/customerSlice"
-import { useNotifyUserMutation } from "lib/redux/adminSlice" // Import the notification mutation
+import {
+  useGetUserByIdQuery,
+  useGetUserCryptoQuery,
+  useGetUserTransactionsQuery,
+  useAddBonusMutation,
+} from "lib/redux/customerSlice"
+import { useNotifyUserMutation } from "lib/redux/adminSlice"
 import { useParams } from "next/navigation"
 import LoadingSkeleton from "components/ui/Loader/LoadingSkeleton"
 import { format, subDays } from "date-fns"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { notify } from "components/ui/Notification/Notification"
-
+import Modal from "react-modal"
+import { MdClose } from "react-icons/md"
 
 const CustomTabs = ({
   activeTab,
@@ -229,6 +235,147 @@ const DateRangeFilter = ({
   )
 }
 
+interface AddBonusModalProps {
+  isOpen: boolean
+  wallet: any
+  customerName: string
+  onRequestClose: () => void
+  onAddBonus: (data: { walletId: number; bonus: number; campaign: string; message: string }) => Promise<any>
+}
+
+const AddBonusModal: React.FC<AddBonusModalProps> = ({ isOpen, wallet, customerName, onRequestClose, onAddBonus }) => {
+  const [bonusAmount, setBonusAmount] = useState("")
+  const [campaign, setCampaign] = useState("")
+  const [message, setMessage] = useState("")
+  const [isAdding, setIsAdding] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+
+  const handleAddBonus = async () => {
+    if (!bonusAmount || !wallet) return
+
+    setIsAdding(true)
+    try {
+      const bonusData = {
+        walletId: wallet.id,
+        bonus: parseFloat(bonusAmount),
+        campaign: campaign || "Admin Bonus",
+        message: message || "Bonus added by admin",
+      }
+
+      await onAddBonus(bonusData)
+      setIsSuccess(true)
+      setTimeout(() => {
+        onRequestClose()
+        setIsSuccess(false)
+        setBonusAmount("")
+        setCampaign("")
+        setMessage("")
+      }, 1500)
+    } catch (error) {
+      console.error("Failed to add bonus:", error)
+    } finally {
+      setIsAdding(false)
+    }
+  }
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      className="flex h-auto w-[500px] overflow-hidden rounded-md bg-white shadow-lg outline-none max-sm:w-full max-sm:max-w-[380px]"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      ariaHideApp={false}
+    >
+      <div className="w-full">
+        {/* Header */}
+        <div className="flex items-center justify-between bg-[#E9F0FF] p-4">
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-md bg-[#003F9F] font-semibold text-white">
+              ₦
+            </div>
+            <p className="text-xl font-semibold text-[#2a2f4b]">Add Bonus</p>
+          </div>
+          <button onClick={onRequestClose} className="cursor-pointer text-gray-600 hover:text-gray-800">
+            <MdClose size={24} />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {isSuccess ? (
+            <div className="py-8 text-center">
+              <div className="mb-4 text-5xl text-green-500">✓</div>
+              <h3 className="mb-1 text-lg font-semibold">Bonus Added!</h3>
+              <p className="text-gray-600">
+                {bonusAmount} {wallet?.currency?.ticker || 'Unknown'} bonus has been added to {customerName}'s wallet
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-6">
+                <p className="mb-2 text-sm text-gray-600">
+                  Customer: {customerName} ({wallet?.currency?.ticker || 'Unknown'} Wallet)
+                </p>
+
+                <div className="mb-4">
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Bonus Amount</label>
+                  <input
+                    type="number"
+                    className="w-full rounded-md border border-gray-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-[#003F9F]"
+                    placeholder="Enter bonus amount"
+                    value={bonusAmount}
+                    onChange={(e) => setBonusAmount(e.target.value)}
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Campaign (Optional)</label>
+                  <input
+                    type="text"
+                    className="w-full rounded-md border border-gray-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-[#003F9F]"
+                    placeholder="Enter campaign name"
+                    value={campaign}
+                    onChange={(e) => setCampaign(e.target.value)}
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="mb-1 block text-sm font-medium text-gray-700">Message (Optional)</label>
+                  <textarea
+                    className="h-20 w-full rounded-md border border-gray-300 bg-white p-3 focus:outline-none focus:ring-2 focus:ring-[#003F9F]"
+                    placeholder="Enter message for the user"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <ButtonModule
+                  variant="outline"
+                  size="md"
+                  onClick={onRequestClose}
+                  className="border-gray-300 hover:bg-gray-50"
+                >
+                  Cancel
+                </ButtonModule>
+                <ButtonModule
+                  variant="primary"
+                  size="md"
+                  onClick={handleAddBonus}
+                  disabled={!bonusAmount || isAdding || parseFloat(bonusAmount) <= 0}
+                >
+                  {isAdding ? "Adding..." : "Add Bonus"}
+                </ButtonModule>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 const CustomerInfo = () => {
   const { id } = useParams()
   const userId = Array.isArray(id) ? id[0] : id
@@ -244,7 +391,7 @@ const CustomerInfo = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const pageSize = 10
 
-  const { data: userResponse, isLoading, isError } = useGetUserByIdQuery(Number(userId))
+  const { data: userResponse, isLoading, isError, refetch: refetchUser } = useGetUserByIdQuery(Number(userId))
 
   const {
     data: transactionsResponse,
@@ -270,12 +417,17 @@ const CustomerInfo = () => {
   // Add the notification mutation hook
   const [notifyUser, { isLoading: isNotifying }] = useNotifyUserMutation()
 
+  // Add the bonus mutation hook
+  const [addBonus, { isLoading: isAddingBonus }] = useAddBonusMutation()
+
   const [activeTab, setActiveTab] = useState("transactions")
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAssetModalOpen, setIsAssetModalOpen] = useState(false)
   const [selectedAsset, setSelectedAsset] = useState<any>(null)
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false)
+  const [isAddBonusModalOpen, setIsAddBonusModalOpen] = useState(false)
+  const [selectedWallet, setSelectedWallet] = useState<any>(null)
 
   const formatDateTime = (dateString: string) => {
     return format(new Date(dateString), "MMM dd, yyyy hh:mm a")
@@ -331,6 +483,16 @@ const CustomerInfo = () => {
     setSelectedAsset(null)
   }
 
+  const handleOpenAddBonusModal = (wallet: any) => {
+    setSelectedWallet(wallet)
+    setIsAddBonusModalOpen(true)
+  }
+
+  const handleCloseAddBonusModal = () => {
+    setIsAddBonusModalOpen(false)
+    setSelectedWallet(null)
+  }
+
   // Update the handleSendNotification function to use the API
   const handleSendNotification = async (message: string) => {
     if (!userResponse?.data?.id) {
@@ -355,6 +517,27 @@ const CustomerInfo = () => {
     } catch (error: any) {
       console.error("Failed to send notification:", error)
       notify("error", error.data?.message || error.message || "Failed to send notification")
+      throw error
+    }
+  }
+
+  // Handle adding bonus
+  const handleAddBonus = async (bonusData: { walletId: number; bonus: number; campaign: string; message: string }) => {
+    try {
+      const result = await addBonus(bonusData).unwrap()
+
+      if (result.isSuccess) {
+        notify("success", "Bonus added successfully!")
+        // Refetch user data to update the wallet balances
+        refetchUser()
+        return result
+      } else {
+        notify("error", result.message || "Failed to add bonus")
+        throw new Error(result.message)
+      }
+    } catch (error: any) {
+      console.error("Failed to add bonus:", error)
+      notify("error", error.data?.message || error.message || "Failed to add bonus")
       throw error
     }
   }
@@ -391,63 +574,59 @@ const CustomerInfo = () => {
   const baseCurrency = cryptoResponse?.data?.base?.[0] || null
 
   const totalCryptoValue = cryptoAssets.reduce((total, asset) => {
-    return total + (asset.convertedBalance || 0);
-  }, 0);
+    return total + (asset.convertedBalance || 0)
+  }, 0)
 
   return (
-    <><div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
-      {customer.wallets?.map((wallet) => (
-        <motion.div
-          key={wallet.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg p-4 shadow-sm border"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {wallet.currency?.avatar && (
-                <img
-                  src={wallet.currency.avatar}
-                  alt={wallet.currency.name}
-                  className="size-8 rounded-full"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.src = "https://via.placeholder.com/32"
-                  } } />
-              )}
-              <div>
-                <h4 className="font-medium text-gray-900">
-                  {wallet.currency?.name || 'Unknown Currency'}
-                </h4>
-                <p className="text-sm text-gray-500">
-                  {wallet.currency?.ticker || ''}
-                </p>
+    <>
+      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-4">
+        {customer.wallets?.map((wallet) => (
+          <motion.div
+            key={wallet.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-lg border bg-white p-4 shadow-sm"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {wallet.currency?.avatar && (
+                  <img
+                    src={wallet.currency.avatar}
+                    alt={wallet.currency.name}
+                    className="size-8 rounded-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.src = "https://via.placeholder.com/32"
+                    }}
+                  />
+                )}
+                <div>
+                  <h4 className="font-medium text-gray-900">{wallet.currency?.name || "Unknown Currency"}</h4>
+                  <p className="text-sm text-gray-500">{wallet.currency?.ticker || ""}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-semibold">{formatCurrency(wallet.balance)}</p>
+                <p className="text-sm text-gray-500">Available Balance</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-lg font-semibold">
-                {formatCurrency(wallet.balance)}
-              </p>
-              <p className="text-sm text-gray-500">
-                Available Balance
-              </p>
-            </div>
-          </div>
-          {wallet.ledgerBalance !== wallet.balance && (
-            <div className="mt-2 pt-2 border-t text-sm">
-              <p className="text-gray-600">
-                Ledger Balance: {formatCurrency(wallet.ledgerBalance)}
-              </p>
-            </div>
-          )}
-        </motion.div>
-      ))}
-    </div><motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="flex items-start gap-6 "
-    >
+            {wallet.bonus !== wallet.balance && (
+              <div className="mt-2 flex items-center justify-between border-t pt-2 text-sm">
+                <p className="text-gray-600">Bonus: {formatCurrency(wallet.bonus)}</p>
+                <ButtonModule onClick={() => handleOpenAddBonusModal(wallet)} variant="outline" size="sm" className="">
+                  Add Bonus
+                </ButtonModule>
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-start gap-6 "
+      >
         {/* Customer Information Section */}
         <motion.div
           initial={{ x: -20, opacity: 0 }}
@@ -505,7 +684,9 @@ const CustomerInfo = () => {
             <div className="flex items-center justify-between gap-2 border-b pb-3  font-semibold">
               <h3 className=" font-semibold text-gray-500">2FA Verification:</h3>
               <div
-                className={`gap-2 rounded-full p-1 px-2 text-center ${customer.isTwoFactorEnabled ? "bg-[#589e67]" : "bg-[#d82e2e]"}`}
+                className={`gap-2 rounded-full p-1 px-2 text-center ${
+                  customer.isTwoFactorEnabled ? "bg-[#589e67]" : "bg-[#d82e2e]"
+                }`}
               >
                 <span className=" text-white">{customer.isTwoFactorEnabled ? "Enabled" : "Disabled"}</span>
               </div>
@@ -514,7 +695,9 @@ const CustomerInfo = () => {
             <div className="flex items-center justify-between gap-2 border-b pb-3 font-semibold">
               <h3 className=" font-semibold text-gray-500">KYC VERIFICATION:</h3>
               <div
-                className={`gap-2 rounded-full p-1 px-2 text-center ${customer.kyc?.status?.value === 1 ? "bg-[#d82e2e]" : "bg-[#589e67]"}`}
+                className={`gap-2 rounded-full p-1 px-2 text-center ${
+                  customer.kyc?.status?.value === 1 ? "bg-[#d82e2e]" : "bg-[#589e67]"
+                }`}
               >
                 <span className=" text-white">{customer.kyc?.status?.label || "Not Verified"}</span>
               </div>
@@ -542,7 +725,8 @@ const CustomerInfo = () => {
                   endDate={endDate}
                   setStartDate={setStartDate}
                   setEndDate={setEndDate}
-                  onSearch={handleSearch} />
+                  onSearch={handleSearch}
+                />
 
                 {isLoadingTransactions || isFetchingTransactions ? (
                   <TransactionTableSkeleton />
@@ -617,9 +801,10 @@ const CustomerInfo = () => {
                                     <span
                                       className="size-2 rounded-full"
                                       style={{
-                                        backgroundColor: tx.status?.value === 2
-                                          ? "#589E67"
-                                          : tx.status?.value === 1
+                                        backgroundColor:
+                                          tx.status?.value === 2
+                                            ? "#589E67"
+                                            : tx.status?.value === 1
                                             ? "#E6A441"
                                             : "#AF4B4B",
                                       }}
@@ -638,14 +823,18 @@ const CustomerInfo = () => {
                     {transactions.length > 0 && (
                       <div className="flex items-center justify-between border-t py-3">
                         <div className="text-sm text-gray-700">
-                          Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)} of{" "}
-                          {totalCount} entries
+                          Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalCount)}{" "}
+                          of {totalCount} entries
                         </div>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => paginate(currentPage - 1)}
                             disabled={currentPage === 1}
-                            className={`flex items-center justify-center rounded-md p-2 ${currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-[#003F9F] hover:bg-gray-100"}`}
+                            className={`flex items-center justify-center rounded-md p-2 ${
+                              currentPage === 1
+                                ? "cursor-not-allowed text-gray-400"
+                                : "text-[#003F9F] hover:bg-gray-100"
+                            }`}
                           >
                             <MdOutlineArrowBackIosNew />
                           </button>
@@ -666,9 +855,11 @@ const CustomerInfo = () => {
                               <button
                                 key={index}
                                 onClick={() => paginate(pageNum)}
-                                className={`flex size-8 items-center justify-center rounded-md text-sm ${currentPage === pageNum
+                                className={`flex size-8 items-center justify-center rounded-md text-sm ${
+                                  currentPage === pageNum
                                     ? "bg-[#003F9F] text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                }`}
                               >
                                 {pageNum}
                               </button>
@@ -680,9 +871,11 @@ const CustomerInfo = () => {
                           {totalPages > 5 && currentPage < totalPages - 1 && (
                             <button
                               onClick={() => paginate(totalPages)}
-                              className={`flex size-8 items-center justify-center rounded-md text-sm ${currentPage === totalPages
+                              className={`flex size-8 items-center justify-center rounded-md text-sm ${
+                                currentPage === totalPages
                                   ? "bg-[#003F9F] text-white"
-                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
                             >
                               {totalPages}
                             </button>
@@ -691,9 +884,11 @@ const CustomerInfo = () => {
                           <button
                             onClick={() => paginate(currentPage + 1)}
                             disabled={currentPage === totalPages}
-                            className={`flex items-center justify-center rounded-md p-2 ${currentPage === totalPages
+                            className={`flex items-center justify-center rounded-md p-2 ${
+                              currentPage === totalPages
                                 ? "cursor-not-allowed text-gray-400"
-                                : "text-[#003F9F] hover:bg-gray-100"}`}
+                                : "text-[#003F9F] hover:bg-gray-100"
+                            }`}
                           >
                             <MdOutlineArrowForwardIos />
                           </button>
@@ -707,16 +902,15 @@ const CustomerInfo = () => {
               <div>
                 <div className="mb-6 flex justify-between">
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-4">Wallet Balances</h3>
+                    <h3 className="mb-4 text-lg font-semibold">Wallet Balances</h3>
 
                     {/* Keep the original crypto total if you still want it */}
                     {totalCryptoValue > 0 && (
-                      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                      <div className="mt-4 rounded-lg bg-blue-50 p-4">
                         <h4 className="text-md font-semibold text-blue-900">Total Crypto Value</h4>
                         <p className="text-xl font-bold text-blue-900">{formatCurrency(totalCryptoValue)}</p>
                       </div>
                     )}
-
                   </div>
                 </div>
 
@@ -774,14 +968,17 @@ const CustomerInfo = () => {
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement
                                       target.src = "https://via.placeholder.com/32"
-                                    } } />
+                                    }}
+                                  />
                                   <div className="ml-4">
                                     <div className="text-sm font-medium text-gray-900">{asset.name}</div>
                                     <div className="text-sm text-gray-500">{asset.symbol.toUpperCase()}</div>
                                   </div>
                                 </div>
                               </td>
-                              <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{asset.balance.toFixed(8)}</td>
+                              <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                                {asset.balance.toFixed(8)}
+                              </td>
                               <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
                                 {formatCurrency(asset.convertedBalance)}
                               </td>
@@ -815,10 +1012,22 @@ const CustomerInfo = () => {
         <AssetDetailModal isOpen={isAssetModalOpen} asset={selectedAsset} onRequestClose={closeAssetModal} />
         <NotificationModal
           isOpen={isNotificationModalOpen}
-          customer={{ email: customer.email || "", fullName: `${customer.firstName} ${customer.lastName}` || "Customer" }}
+          customer={{
+            email: customer.email || "",
+            fullName: `${customer.firstName} ${customer.lastName}` || "Customer",
+          }}
           onRequestClose={() => setIsNotificationModalOpen(false)}
-          onSendNotification={handleSendNotification} />
-      </motion.div></>
+          onSendNotification={handleSendNotification}
+        />
+        <AddBonusModal
+          isOpen={isAddBonusModalOpen}
+          wallet={selectedWallet}
+          customerName={`${customer.firstName} ${customer.lastName}`.trim()}
+          onRequestClose={handleCloseAddBonusModal}
+          onAddBonus={handleAddBonus}
+        />
+      </motion.div>
+    </>
   )
 }
 

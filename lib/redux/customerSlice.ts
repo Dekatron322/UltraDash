@@ -36,6 +36,7 @@ export interface Wallet {
   id: number
   userId: number
   balance: number
+  bonus: number
   ledgerBalance: number
   currency: Currency
   isLocal: boolean
@@ -178,6 +179,20 @@ export interface UserCryptoResponse {
   message: string
 }
 
+// Add Bonus Request Interface
+export interface AddBonusRequest {
+  walletId: number
+  bonus: number
+  campaign: string
+  message: string
+}
+
+// Add Bonus Response Interface
+export interface AddBonusResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const customerApi = createApi({
   reducerPath: "customerApi",
   baseQuery: fetchBaseQuery({
@@ -204,6 +219,7 @@ export const customerApi = createApi({
       return headers
     },
   }),
+  tagTypes: ['User'],
   endpoints: (builder) => ({
     getUsers: builder.query<
       UsersResponse,
@@ -226,12 +242,14 @@ export const customerApi = createApi({
         },
         method: "GET",
       }),
+      providesTags: ['User'],
     }),
     getUserById: builder.query<UserResponse, number>({
       query: (id) => ({
         url: API_ENDPOINTS.USERS.DETAILS(id),
         method: "GET",
       }),
+      providesTags: (result, error, id) => [{ type: 'User', id }],
     }),
     getUserTransactions: builder.query<
       TransactionsResponse,
@@ -262,7 +280,22 @@ export const customerApi = createApi({
         method: "GET",
       }),
     }),
+    // Add Bonus mutation endpoint
+    addBonus: builder.mutation<AddBonusResponse, AddBonusRequest>({
+      query: (bonusData) => ({
+        url: API_ENDPOINTS.USERS.ADD_BONUS,
+        method: "POST",
+        body: bonusData,
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 })
 
-export const { useGetUsersQuery, useGetUserByIdQuery, useGetUserTransactionsQuery, useGetUserCryptoQuery } = customerApi
+export const { 
+  useGetUsersQuery, 
+  useGetUserByIdQuery, 
+  useGetUserTransactionsQuery, 
+  useGetUserCryptoQuery,
+  useAddBonusMutation 
+} = customerApi
