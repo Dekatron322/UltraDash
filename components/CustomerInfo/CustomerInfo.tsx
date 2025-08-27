@@ -10,10 +10,10 @@ import AssetDetailModal from "components/ui/Modal/asset-detail-modal"
 import NotificationModal from "components/ui/Modal/notification-modal"
 import { motion } from "framer-motion"
 import {
+  useAddBonusMutation,
   useGetUserByIdQuery,
   useGetUserCryptoQuery,
   useGetUserTransactionsQuery,
-  useAddBonusMutation,
 } from "lib/redux/customerSlice"
 import { useNotifyUserMutation } from "lib/redux/adminSlice"
 import { useParams } from "next/navigation"
@@ -307,14 +307,15 @@ const AddBonusModal: React.FC<AddBonusModalProps> = ({ isOpen, wallet, customerN
               <div className="mb-4 text-5xl text-green-500">✓</div>
               <h3 className="mb-1 text-lg font-semibold">Bonus Added!</h3>
               <p className="text-gray-600">
-                {bonusAmount} {wallet?.currency?.ticker || 'Unknown'} bonus has been added to {customerName}'s wallet
+                {bonusAmount} {wallet?.currency?.ticker || "Unknown"} bonus has been added to {customerName}&apos;s
+                wallet
               </p>
             </div>
           ) : (
             <>
               <div className="mb-6">
                 <p className="mb-2 text-sm text-gray-600">
-                  Customer: {customerName} ({wallet?.currency?.ticker || 'Unknown'} Wallet)
+                  Customer: {customerName} ({wallet?.currency?.ticker || "Unknown"} Wallet)
                 </p>
 
                 <div className="mb-4">
