@@ -13,7 +13,7 @@ export function ProfitChart({ timeFilter = "month" }: ProfitChartProps) {
   const [dateRange, setDateRange] = useState<{ from?: string; to?: string }>({})
   const [customDateRange, setCustomDateRange] = useState<{ from: string; to: string }>({
     from: "",
-    to: ""
+    to: "",
   })
   const [useCustomDates, setUseCustomDates] = useState<boolean>(false)
 
@@ -108,12 +108,12 @@ export function ProfitChart({ timeFilter = "month" }: ProfitChartProps) {
     { value: "utility", label: "Utility" },
   ]
 
-  const handleCustomDateChange = (field: 'from' | 'to', value: string) => {
-    setCustomDateRange(prev => ({ ...prev, [field]: value }))
+  const handleCustomDateChange = (field: "from" | "to", value: string) => {
+    setCustomDateRange((prev) => ({ ...prev, [field]: value }))
   }
 
   const toggleCustomDates = () => {
-    setUseCustomDates(prev => !prev)
+    setUseCustomDates((prev) => !prev)
     if (useCustomDates) {
       // Reset custom dates when switching back to time filter
       setCustomDateRange({ from: "", to: "" })
@@ -125,12 +125,12 @@ export function ProfitChart({ timeFilter = "month" }: ProfitChartProps) {
       <div className="mb-4 space-y-3">
         {/* Transaction Type Filter */}
         <div className="flex justify-end">
-          <select 
-            value={selectedType} 
+          <select
+            value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
             className="rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            {transactionTypes.map(type => (
+            {transactionTypes.map((type) => (
               <option key={type.value} value={type.value}>
                 {type.label}
               </option>
@@ -159,7 +159,7 @@ export function ProfitChart({ timeFilter = "month" }: ProfitChartProps) {
               <input
                 type="date"
                 value={customDateRange.from}
-                onChange={(e) => handleCustomDateChange('from', e.target.value)}
+                onChange={(e) => handleCustomDateChange("from", e.target.value)}
                 className="rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -168,14 +168,14 @@ export function ProfitChart({ timeFilter = "month" }: ProfitChartProps) {
               <input
                 type="date"
                 value={customDateRange.to}
-                onChange={(e) => handleCustomDateChange('to', e.target.value)}
+                onChange={(e) => handleCustomDateChange("to", e.target.value)}
                 className="rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>
         )}
       </div>
-      <div className="h-80">
+      <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />

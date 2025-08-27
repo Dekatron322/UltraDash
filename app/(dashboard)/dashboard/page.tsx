@@ -738,14 +738,8 @@ export default function Dashboard() {
                     : "All Time"
                 }`}
               >
-                <div className="mt-4 h-80">
+                <div className="mt-4 h-96">
                   <ProfitChart timeFilter={timeFilter} />
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <ButtonModule size="sm" variant="ghost" className="flex items-center gap-2">
-                    <InsightIcon />
-                    Insights
-                  </ButtonModule>
                 </div>
               </Card>
             </div>
