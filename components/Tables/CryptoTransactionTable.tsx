@@ -3,19 +3,19 @@ import React, { useRef, useState } from "react"
 import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
 import { RxCaretSort, RxDotsVertical } from "react-icons/rx"
 import { ButtonModule } from "components/ui/Button/Button"
-import ExportIcon from "public/export-icon"
+
 import { SearchModule } from "components/ui/Search/search-module"
 import EmptyState from "public/empty-state"
 import PdfFile from "public/pdf-file"
-import DeleteModal from "components/ui/Modal/delete-modal"
+
 import Modal from "react-modal"
 import { MdClose } from "react-icons/md"
 import html2canvas from "html2canvas"
 import { jsPDF } from "jspdf"
-import Filtericon from "public/filter-icon"
+
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { useGetCryptoTransactionsQuery, CryptoTransaction } from "lib/redux/transactionSlice"
+import { useGetCryptoTransactionsQuery } from "lib/redux/transactionSlice"
 import { API_CONFIG, API_ENDPOINTS } from "lib/config/api"
 
 type SortOrder = "asc" | "desc" | null

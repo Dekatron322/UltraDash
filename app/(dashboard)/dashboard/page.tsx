@@ -15,7 +15,7 @@ import { UserGrowthChart } from "components/Dashboard/UserGrowthChart"
 import { AssetDistributionChart } from "components/Dashboard/AssetDistributionChart"
 import { AccountDistributionChart } from "components/Dashboard/AccountDistributionChart"
 import { useGetCurrenciesQuery, useGetCustomerBalanceQuery } from "lib/redux/overviewSlice"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 interface PaymentAccount {
   id: number
