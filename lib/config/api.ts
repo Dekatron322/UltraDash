@@ -63,6 +63,11 @@ export const API_ENDPOINTS = {
   SERIES: {
     ANALYTICS: "/Admin/Transactions/Series",
   },
+
+  FEES: {
+    CRYPTO_FEES: "/Admin/CryptoFees",
+    EDIT_CRYPTO_FEES: "/Admin/Crypto/Fee",
+  },
 }
 
 // Helper function to build full URL

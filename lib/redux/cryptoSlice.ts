@@ -29,6 +29,43 @@ export interface CryptoAccountResponse {
   message: string
 }
 
+export interface CryptoFee {
+  id: number
+  name: string
+  symbol: string
+  logo: string
+  isStablecoin: boolean
+  buySpread: number
+  sellSpread: number
+  isSpreadBased: boolean
+  buyCommissionPct: number
+  buyCommissionCap: number
+  sellCommissionPct: number
+  sellCommissionCap: number
+}
+
+export interface CryptoFeesResponse {
+  data: CryptoFee[]
+  isSuccess: boolean
+  message: string
+}
+
+export interface EditCryptoFeeRequest {
+  id: number
+  buySpread: number
+  sellSpread: number
+  isSpreadBased: boolean
+  buyCommissionPct: number
+  buyCommissionCap: number
+  sellCommissionPct: number
+  sellCommissionCap: number
+}
+
+export interface EditCryptoFeeResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const cryptoApi = createApi({
   reducerPath: "cryptoApi",
   baseQuery: fetchBaseQuery({
@@ -55,6 +92,7 @@ export const cryptoApi = createApi({
       return headers
     },
   }),
+  tagTypes: ["CryptoFees"],
   endpoints: (builder) => ({
     getMasterAccount: builder.query<CryptoAccountResponse, void>({
       query: () => ({
@@ -68,7 +106,23 @@ export const cryptoApi = createApi({
         method: "GET",
       }),
     }),
+    getCryptoFees: builder.query<CryptoFeesResponse, void>({
+      query: () => ({
+        url: API_ENDPOINTS.FEES.CRYPTO_FEES,
+        method: "GET",
+      }),
+      providesTags: ["CryptoFees"],
+    }),
+    editCryptoFee: builder.mutation<EditCryptoFeeResponse, EditCryptoFeeRequest>({
+      query: (feeData) => ({
+        url: API_ENDPOINTS.FEES.EDIT_CRYPTO_FEES,
+        method: "POST",
+        body: feeData,
+      }),
+      invalidatesTags: ["CryptoFees"],
+    }),
   }),
 })
 
-export const { useGetMasterAccountQuery, useGetProfitAccountQuery } = cryptoApi
+export const { useGetMasterAccountQuery, useGetProfitAccountQuery, useGetCryptoFeesQuery, useEditCryptoFeeMutation } =
+  cryptoApi
