@@ -846,10 +846,10 @@ const CustomerInfo = () => {
           </div>
 
           <div className="space-y-4 text-sm">
-            <div className="flex items-center gap-2 border-b pb-3 font-semibold">
+            {/* <div className="flex items-center gap-2 border-b pb-3 font-semibold">
               <h3 className=" text-gray-500">CUSTOMER ID:</h3>
               <p className="text-[#202B3C]">{customer.id}</p>
-            </div>
+            </div> */}
 
             <div className="flex items-center gap-2 border-b pb-3  font-semibold">
               <h3 className=" text-gray-500">EMAIL:</h3>
