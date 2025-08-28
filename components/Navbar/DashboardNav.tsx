@@ -202,8 +202,8 @@ const DashboardNav = () => {
               </button>
 
               {isUserDropdownOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                  <div className="pt-1">
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className=" pt-1">
                     <div className="border-b border-gray-100 px-4 py-3">
                       <p className="text-sm font-medium text-gray-900">
                         {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "Admin User"}
