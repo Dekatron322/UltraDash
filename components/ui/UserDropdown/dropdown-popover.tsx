@@ -89,30 +89,6 @@ const UserDropdown = () => {
             </div>
             <ul>
               <li>
-                <a href="/profile" className="text-grey-400 flex gap-2 px-4 py-2 text-sm font-medium hover:bg-gray-100">
-                  <EditProfileIcon /> Edit Profile
-                </a>
-              </li>
-              <li>
-                <a href="/pricing" className="text-grey-400 flex gap-2 px-4 py-2 text-sm font-medium hover:bg-gray-100">
-                  <PricingIcon /> Pricing
-                </a>
-              </li>
-              <li className="flex w-full justify-between px-4 py-2">
-                <a href="/support" className="text-grey-400 flex gap-2 text-sm font-medium hover:bg-gray-100">
-                  <SupportIcon /> Support
-                </a>
-                <EditIcon />
-              </li>
-              <li>
-                <a
-                  href="/settings"
-                  className="text-grey-400 flex gap-2 px-4 py-2 text-sm font-medium hover:bg-gray-100"
-                >
-                  <SettingIcon /> Settings
-                </a>
-              </li>
-              <li>
                 <button
                   onClick={() => setIsLogoutModalOpen(true)}
                   className="flex w-full justify-between gap-2 bg-[#F8F9FA] px-4 py-2 text-sm font-medium hover:bg-gray-100"

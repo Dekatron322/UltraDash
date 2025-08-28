@@ -3,27 +3,46 @@
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
-import UserDropdown from "components/ui/UserDropdown/dropdown-popover"
-import NotificationDropdown from "components/ui/UserDropdown/notification-popover"
 import { RxCross2 } from "react-icons/rx"
 import { Links } from "components/Sidebar/Links"
 import UltraIcon from "public/ultra-icon"
-import { useSelector } from "react-redux"
-import { RootState } from "lib/redux/store"
-import { ArrowDown, ArrowDown01Icon, ChevronDown } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
+import { AppDispatch, RootState } from "lib/redux/store"
+import { ChevronDown } from "lucide-react"
+import { FiUser } from "react-icons/fi"
+import LogoutModal from "components/ui/Modal/logout-modal"
+import { logout } from "lib/redux/authSlice"
+import LogoutIcon from "public/logout-icon"
 
 const DashboardNav = () => {
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [selectedTransactionType, setSelectedTransactionType] = useState("All Transactions")
   const pathname = usePathname()
   const user = useSelector((state: RootState) => state.auth.user)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const userDropdownRef = useRef<HTMLDivElement>(null)
+  const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
+  const router = useRouter()
 
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen)
+  }
+
+  const handleConfirmLogout = () => {
+    setLoading(true)
+    try {
+      dispatch(logout())
+      router.push("/signin")
+    } finally {
+      setLoading(false)
+      setIsLogoutModalOpen(false)
+    }
   }
 
   // Close dropdown when clicking outside
@@ -31,6 +50,9 @@ const DashboardNav = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
+      }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false)
       }
     }
 
@@ -158,11 +180,49 @@ const DashboardNav = () => {
             )}
           </div>
           <div className="flex gap-4">
-            <div className="flex content-center items-center justify-center gap-5">
-              <NotificationDropdown />
-            </div>
-            <div className="flex content-center items-center justify-center gap-5">
-              <UserDropdown />
+            <div className="relative flex content-center items-center justify-center gap-5" ref={userDropdownRef}>
+              <button
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-gray-100"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#003F9F] text-white">
+                  {user?.firstName ? user.firstName.charAt(0).toUpperCase() : <FiUser />}
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium text-gray-900">
+                    {user?.firstName && user?.lastName
+                      ? `${user.firstName} ${user.lastName}`
+                      : user?.email || "Admin User"}
+                  </span>
+                  <span className="text-xs text-gray-500">{user?.role || "Administrator"}</span>
+                </div>
+                <ChevronDown
+                  className={`h-4 w-4 text-gray-500 transition-transform ${isUserDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {isUserDropdownOpen && (
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className="pt-1">
+                    <div className="border-b border-gray-100 px-4 py-3">
+                      <p className="text-sm font-medium text-gray-900">
+                        {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "Admin User"}
+                      </p>
+                      <p className="text-sm text-gray-500">{user?.email}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setIsLogoutModalOpen(true)
+                        setIsUserDropdownOpen(false)
+                      }}
+                      className="flex w-full items-center gap-2 px-4 py-3  text-sm text-gray-700 transition-colors duration-300 ease-in-out hover:bg-[#FDF3F3]"
+                    >
+                      <LogoutIcon />
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -190,11 +250,17 @@ const DashboardNav = () => {
 
             <Link href="/logout" className="fixed bottom-2 mt-10 flex items-center gap-2 pb-4 text-white">
               <Image src="/Icons/Logout.svg" width={20} height={20} alt="logout" />
-              <p className="mt-1">Logout</p>
+              <p className="mt-1">Sign Out</p>
             </Link>
           </div>
         </div>
       </nav>
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onRequestClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleConfirmLogout}
+        loading={loading}
+      />
     </>
   )
 }
