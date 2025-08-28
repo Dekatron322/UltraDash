@@ -183,7 +183,7 @@ const DashboardNav = () => {
             <div className="relative flex content-center items-center justify-center gap-5" ref={userDropdownRef}>
               <button
                 onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-gray-100"
+                className="flex items-center gap-3 rounded-lg bg-[#E9f0ff] px-3 py-2 transition-colors hover:bg-gray-100"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#003F9F] text-white">
                   {user?.firstName ? user.firstName.charAt(0).toUpperCase() : <FiUser />}
