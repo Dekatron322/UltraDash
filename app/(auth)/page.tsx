@@ -74,11 +74,11 @@ const SignIn: React.FC = () => {
   const isButtonDisabled = loading || username.trim() === "" || password.trim() === ""
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f0f4ff] to-[#e6f0ff]">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen  bg-gradient-to-br from-[#f0f4ff] to-[#e6f0ff]">
+      <div className="container mx-auto px-16 py-8 max-sm:px-5">
         {/* Header */}
         <header className="mb-12 flex items-center justify-between">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
+          {/* <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
             <UltraIcon className="h-10 w-auto" />
           </motion.div>
           <motion.button
@@ -86,11 +86,17 @@ const SignIn: React.FC = () => {
             className="rounded-full bg-white px-4 py-2 text-sm font-medium text-[#003F9F] shadow-sm ring-1 ring-gray-200"
           >
             English
-          </motion.button>
+          </motion.button> */}
         </header>
 
         {/* Main Content */}
-        <main className="flex flex-col items-center justify-center">
+        <motion.main
+          className="flex flex-col items-center justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <UltraIcon className="h-10 w-auto" />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -204,14 +210,14 @@ const SignIn: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="mt-8 text-center text-sm text-gray-500"
+            className=" text-center text-sm text-gray-500"
           >
             Don&apos;t have an account?{" "}
             <Link href="#" className="font-medium text-[#003F9F] hover:text-[#2F88FC]">
               Get started
             </Link>
           </motion.div>
-        </main>
+        </motion.main>
       </div>
     </div>
   )
