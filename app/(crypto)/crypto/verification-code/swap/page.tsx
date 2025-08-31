@@ -6,7 +6,7 @@ import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock, FiMail, FiShield } 
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
-import { useCryptoTransferMutation, useRequestOtpMutation } from "lib/redux/cryptoSlice"
+import { useRequestOtpMutation, useSwapCryptoMutation } from "lib/redux/cryptoSlice"
 
 interface OtpInputProps {
   value: string
@@ -168,24 +168,24 @@ const VerificationCode: React.FC = () => {
   const [isOtpVerified, setIsOtpVerified] = useState(false)
   const [countdown, setCountdown] = useState(59)
   const [resendAttempts, setResendAttempts] = useState(0)
-  const [transferData, setTransferData] = useState<any>(null)
+  const [swapData, setSwapData] = useState<any>(null)
   const [requestingOtp, setRequestingOtp] = useState(false)
   const [otpRequested, setOtpRequested] = useState(false)
 
   const router = useRouter()
-  const [cryptoTransfer] = useCryptoTransferMutation()
+  const [swapCrypto] = useSwapCryptoMutation()
   const [requestOtp] = useRequestOtpMutation()
 
   useEffect(() => {
-    // Get transfer data from session storage
-    const storedData = sessionStorage.getItem('cryptoTransferData')
+    // Get swap data from session storage
+    const storedData = sessionStorage.getItem('swapTransactionData')
     if (storedData) {
-      setTransferData(JSON.parse(storedData))
+      setSwapData(JSON.parse(storedData))
       // Automatically request OTP when component loads
       handleRequestOtp()
     } else {
-      // Redirect back if no transfer data
-      router.push('/crypto/transfer')
+      // Redirect back if no swap data
+      router.push('/swap')
     }
   }, [router])
 
@@ -203,7 +203,7 @@ const VerificationCode: React.FC = () => {
   const handleRequestOtp = async () => {
     setRequestingOtp(true)
     try {
-      const result = await requestOtp({ purpose: 3 }).unwrap()
+      const result = await requestOtp({ purpose: 6 }).unwrap() // Using purpose 7 for swap operations
       
       if (result.isSuccess) {
         setOtpRequested(true)
@@ -233,9 +233,9 @@ const VerificationCode: React.FC = () => {
       return
     }
 
-    if (!transferData) {
-      notify("error", "Transfer Data Missing", {
-        description: "Please start the transfer process again",
+    if (!swapData) {
+      notify("error", "Swap Data Missing", {
+        description: "Please start the swap process again",
       })
       return
     }
@@ -243,34 +243,33 @@ const VerificationCode: React.FC = () => {
     setLoading(true)
 
     try {
-      // Make the actual API call
-      const transferRequest = {
-        otp,
-        currency: transferData.currency,
-        userId: transferData.userId,
-        amount: transferData.amount,
-        narration: transferData.narration
+      // Make the actual API call for swap
+      const swapRequest = {
+        fromCurrency: swapData.fromCurrency,
+        toCurrency: swapData.toCurrency,
+        amount: swapData.fromAmount,
+        otp: otp
       }
 
-      const result = await cryptoTransfer(transferRequest).unwrap()
+      const result = await swapCrypto(swapRequest).unwrap()
 
       if (result.isSuccess) {
-        notify("success", "Transfer Successful!", {
-          description: `${transferData.amount} ${transferData.currency} transferred to ${transferData.userName}`,
+        notify("success", "Swap Successful!", {
+          description: `Successfully swapped ${swapData.fromAmount} ${swapData.fromCurrency} to ${result.data.toAmount} ${swapData.toCurrency}`,
           duration: 3000,
         })
 
         // Clear the session storage
-        sessionStorage.removeItem('cryptoTransferData')
+        sessionStorage.removeItem('swapTransactionData')
         
         // Redirect to success page or back to crypto dashboard
         setTimeout(() => router.push("/crypto"), 1000)
       } else {
-        throw new Error(result.message || "Transfer failed")
+        throw new Error(result.message || "Swap failed")
       }
     } catch (error: any) {
-      setError(error.message || "Transfer failed. Please try again.")
-      notify("error", "Transfer Failed", {
+      setError(error.message || "Swap failed. Please try again.")
+      notify("error", "Swap Failed", {
         description: error.message || "Please try again",
       })
     } finally {
@@ -321,31 +320,46 @@ const VerificationCode: React.FC = () => {
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">OTP Verification</h1>
-              <p className="text-gray-500">Secure transfer confirmation</p>
+              <p className="text-gray-500">Secure swap confirmation</p>
             </div>
           </div>
 
-          {/* Transfer Summary */}
-          {transferData && (
+          {/* Swap Summary */}
+          {swapData && (
             <motion.div 
               className="mb-6 rounded-xl bg-white p-4 shadow-md"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <h3 className="mb-2 font-medium text-gray-900">Transfer Summary</h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {transferData.tokenLogo && (
-                    <img 
-                      src={transferData.tokenLogo} 
-                      alt={transferData.currency} 
-                      className="mr-2 h-6 w-6 rounded-full"
-                    />
-                  )}
-                  <span className="font-semibold">{transferData.amount} {transferData.currency}</span>
+              <h3 className="mb-2 font-medium text-gray-900">Swap Summary</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">From</span>
+                  <span className="font-semibold">{swapData.fromAmount} {swapData.fromCurrency}</span>
                 </div>
-                <span className="text-gray-600">to {transferData.userName}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">To</span>
+                  <span className="font-semibold">{swapData.toAmount} {swapData.toCurrency}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Exchange Rate</span>
+                  <span className="text-sm">{swapData.rate}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Fee</span>
+                  <span className="text-sm">{swapData.fee} {swapData.fromCurrency}</span>
+                </div>
+                {swapData.fromCurrency === "NGN" && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Network Fee</span>
+                    <span className="text-sm">360 NGN</span>
+                  </div>
+                )}
+                <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-3">
+                  <span className="font-medium text-gray-900">Total Cost</span>
+                  <span className="font-semibold">{swapData.total} {swapData.fromCurrency}</span>
+                </div>
               </div>
             </motion.div>
           )}
@@ -385,17 +399,11 @@ const VerificationCode: React.FC = () => {
           {/* Verification Form */}
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              {/* <div className="mb-4 flex items-center gap-2 text-gray-700">
-                <FiMail className="text-gray-500" />
-                <span className="text-sm">bennymulla@crossfiat.com</span>
-              </div> */}
-
               <OtpInputModule 
                 value={otp} 
                 onChange={setOtp} 
                 onVerify={handleOtpVerification} 
                 className={requestingOtp ? "opacity-50" : ""}
-                // disabled={requestingOtp}
               />
 
               <div className="mt-4 text-center">
@@ -431,7 +439,7 @@ const VerificationCode: React.FC = () => {
                     Processing...
                   </div>
                 ) : (
-                  "Confirm Transfer"
+                  "Confirm Swap"
                 )}
               </ButtonModule>
 

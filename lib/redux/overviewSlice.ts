@@ -91,6 +91,9 @@ export interface CryptoOverviewData {
   master: number
   profit: number
   total: number
+  totalBuyProfit: number
+  totalSellProfit: number
+  totalProfit: number
 }
 
 export interface CryptoOverviewResponse {

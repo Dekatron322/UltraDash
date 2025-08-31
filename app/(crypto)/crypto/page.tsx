@@ -1,4 +1,6 @@
+// app/dashboard/page.tsx
 "use client"
+
 import DashboardNav from "components/Navbar/DashboardNav"
 import AccountIcon from "public/accounts-icon"
 import { ButtonModule } from "components/ui/Button/Button"
@@ -7,7 +9,7 @@ import { RxCaretSort } from "react-icons/rx"
 import AssetDetailModal from "components/ui/Modal/asset-detail-modal"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { FiAlertCircle, FiArrowDown, FiArrowUp, FiRefreshCw, FiTrendingUp } from "react-icons/fi"
+import { FiRefreshCw, FiTrendingUp } from "react-icons/fi"
 import { useGetMasterAccountQuery, useGetProfitAccountQuery } from "lib/redux/cryptoSlice"
 import { useGetCryptoOverviewQuery } from "lib/redux/overviewSlice"
 
@@ -55,7 +57,14 @@ export default function Dashboard() {
 
   const masterAssets = masterData?.data || []
   const profitAssets = profitData?.data || []
-  const cryptoOverview = cryptoOverviewData?.data || { master: 0, profit: 0, total: 0 }
+  const cryptoOverview = cryptoOverviewData?.data || { 
+    master: 0, 
+    profit: 0, 
+    total: 0, 
+    totalBuyProfit: 0, 
+    totalSellProfit: 0, 
+    totalProfit: 0 
+  }
   const currentAssets = activeTab === "master" ? masterAssets : profitAssets
 
   // Sample data for master accounts
@@ -77,18 +86,13 @@ export default function Dashboard() {
 
   // Dashboard metrics - updated to include crypto overview data
   const dashboardMetrics = {
-    totalTransactions: 1245,
-    totalVolume: 1250000,
-    incomingTransactions: 845,
-    incomingVolume: 850000,
-    outgoingTransactions: 400,
-    outgoingVolume: 400000,
-    unresolvedTransactions: 12,
-    unresolvedVolume: 12000,
     // Crypto overview metrics
     cryptoMasterBalance: cryptoOverview.master,
     cryptoProfitBalance: cryptoOverview.profit,
     cryptoTotalBalance: cryptoOverview.total,
+    cryptoTotalBuyProfit: cryptoOverview.totalBuyProfit,
+    cryptoTotalSellProfit: cryptoOverview.totalSellProfit,
+    cryptoTotalProfit: cryptoOverview.totalProfit,
   }
 
   const handleAssetClick = (asset: CryptoAsset) => {
@@ -97,11 +101,19 @@ export default function Dashboard() {
   }
 
   const handleTransferClick = (asset: CryptoAsset) => {
+    // Disable transfer for NGN
+    if (asset.symbol.toUpperCase() === "NGN") {
+      return
+    }
     router.push(`/crypto/transfer?token=${encodeURIComponent(JSON.stringify(asset))}`)
   }
 
-  const handleSwapClick = () => {
-    router.push(`/crypto/swap`)
+  const handleSwapClick = (asset: CryptoAsset) => {
+    // Disable swap for NGN
+    if (asset.symbol.toUpperCase() === "NGN") {
+      return
+    }
+    router.push(`/crypto/swap?token=${encodeURIComponent(JSON.stringify(asset))}`)
   }
 
   const handleSettleClick = (asset: CryptoAsset) => {
@@ -136,6 +148,9 @@ export default function Dashboard() {
   const totalMasterCryptoValue = masterAssets.reduce((sum, asset) => sum + asset.convertedBalance, 0)
   const totalProfitCryptoValue = profitAssets.reduce((sum, asset) => sum + asset.convertedBalance, 0)
   const currentTotalValue = activeTab === "master" ? totalMasterCryptoValue : totalProfitCryptoValue
+
+  // Check if asset is NGN
+  const isNGN = (asset: CryptoAsset) => asset.symbol.toUpperCase() === "NGN"
 
   // Skeleton loading component
   const SkeletonRow = () => (
@@ -183,17 +198,15 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              {/* Incoming */}
-
               {/* Additional Crypto Overview Card */}
               <motion.div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm" whileHover={{ y: -2 }}>
                 <div className="mb-4 flex items-center gap-3">
                   <div className="rounded-full bg-indigo-100 p-3">
-                    <FiTrendingUp className="text-xl text-indigo-600" />
+                  <FiTrendingUp className="text-xl text-indigo-600" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900">Crypto Overview</h3>
                 </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
                   <div className="rounded-lg bg-blue-50 p-4">
                     <p className="text-sm font-medium text-blue-700">Total Crypto Balance</p>
                     <p className="text-2xl font-bold text-blue-900">
@@ -226,8 +239,26 @@ export default function Dashboard() {
                       % of total
                     </p>
                   </div>
+                  <div className="rounded-lg bg-green-50 p-4">
+                    <p className="text-sm font-medium text-green-700">Total Buy Profit</p>
+                    <p className="text-2xl font-bold text-green-900">
+                      {formatCurrency(dashboardMetrics.cryptoTotalBuyProfit)}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-red-50 p-4">
+                    <p className="text-sm font-medium text-red-700">Total Sell Profit</p>
+                    <p className="text-2xl font-bold text-red-900">
+                      {formatCurrency(dashboardMetrics.cryptoTotalSellProfit)}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-indigo-50 p-4">
+                    <p className="text-sm font-medium text-indigo-700">Total Profit</p>
+                    <p className="text-2xl font-bold text-indigo-900">
+                      {formatCurrency(dashboardMetrics.cryptoTotalProfit)}
+                    </p>
+                  </div>
                 </div>
-              </motion.div>
+                </motion.div>
             </motion.div>
 
             <motion.div
@@ -366,16 +397,22 @@ export default function Dashboard() {
                                       <ButtonModule
                                         variant="outline"
                                         size="sm"
-                                        className="border-gray-300 hover:bg-gray-50"
+                                        className={`border-gray-300 hover:bg-gray-50 ${
+                                          isNGN(asset) ? "cursor-not-allowed opacity-50" : ""
+                                        }`}
                                         onClick={() => handleTransferClick(asset)}
+                                        disabled={isNGN(asset)}
                                       >
                                         Transfer
                                       </ButtonModule>
                                       <ButtonModule
                                         variant="outline"
                                         size="sm"
-                                        className="border-gray-300 hover:bg-gray-50"
-                                        onClick={() => handleSwapClick()}
+                                        className={`border-gray-300 hover:bg-gray-50 ${
+                                          isNGN(asset) ? "cursor-not-allowed opacity-50" : ""
+                                        }`}
+                                        onClick={() => handleSwapClick(asset)}
+                                        disabled={isNGN(asset)}
                                       >
                                         Swap
                                       </ButtonModule>

@@ -1,4 +1,6 @@
+// src/app/verification-code/withdraw/page.tsx
 "use client"
+
 import React, { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
@@ -6,7 +8,8 @@ import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock, FiMail, FiShield } 
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
-import { useCryptoTransferMutation, useRequestOtpMutation } from "lib/redux/cryptoSlice"
+import { useWithdrawMutation,  } from "lib/redux/adminSlice"
+import { useRequestOtpMutation } from "lib/redux/cryptoSlice"
 
 interface OtpInputProps {
   value: string
@@ -59,7 +62,7 @@ const OtpInputModule: React.FC<OtpInputProps> = ({ value = "", onChange, onVerif
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number): void => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       setActiveInput(index - 1)
       inputRefs.current[index - 1]?.focus()
@@ -161,31 +164,34 @@ const OtpInputModule: React.FC<OtpInputProps> = ({ value = "", onChange, onVerif
   )
 }
 
-const VerificationCode: React.FC = () => {
+const WithdrawVerificationCode: React.FC = () => {
   const [otp, setOtp] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isOtpVerified, setIsOtpVerified] = useState(false)
   const [countdown, setCountdown] = useState(59)
   const [resendAttempts, setResendAttempts] = useState(0)
-  const [transferData, setTransferData] = useState<any>(null)
+  const [withdrawalData, setWithdrawalData] = useState<any>(null)
   const [requestingOtp, setRequestingOtp] = useState(false)
   const [otpRequested, setOtpRequested] = useState(false)
 
   const router = useRouter()
-  const [cryptoTransfer] = useCryptoTransferMutation()
+  const [withdraw] = useWithdrawMutation()
   const [requestOtp] = useRequestOtpMutation()
 
   useEffect(() => {
-    // Get transfer data from session storage
-    const storedData = sessionStorage.getItem('cryptoTransferData')
+    // Get withdrawal data from session storage
+    const storedData = sessionStorage.getItem("withdrawalData")
     if (storedData) {
-      setTransferData(JSON.parse(storedData))
+      setWithdrawalData(JSON.parse(storedData))
       // Automatically request OTP when component loads
       handleRequestOtp()
     } else {
-      // Redirect back if no transfer data
-      router.push('/crypto/transfer')
+      // Redirect back if no withdrawal data
+      notify("error", "Withdrawal Data Missing", {
+        description: "Please start the withdrawal process again",
+      })
+      router.push("/withdraw")
     }
   }, [router])
 
@@ -203,8 +209,8 @@ const VerificationCode: React.FC = () => {
   const handleRequestOtp = async () => {
     setRequestingOtp(true)
     try {
-      const result = await requestOtp({ purpose: 3 }).unwrap()
-      
+      const result = await requestOtp({ purpose: 5 }).unwrap()
+
       if (result.isSuccess) {
         setOtpRequested(true)
         setCountdown(59) // Reset countdown
@@ -233,9 +239,9 @@ const VerificationCode: React.FC = () => {
       return
     }
 
-    if (!transferData) {
-      notify("error", "Transfer Data Missing", {
-        description: "Please start the transfer process again",
+    if (!withdrawalData) {
+      notify("error", "Withdrawal Data Missing", {
+        description: "Please start the withdrawal process again",
       })
       return
     }
@@ -243,34 +249,38 @@ const VerificationCode: React.FC = () => {
     setLoading(true)
 
     try {
-      // Make the actual API call
-      const transferRequest = {
-        otp,
-        currency: transferData.currency,
-        userId: transferData.userId,
-        amount: transferData.amount,
-        narration: transferData.narration
+      // Prepare withdrawal data with OTP
+      const withdrawalRequest = {
+        currencyId: withdrawalData.currencyId,
+        amount: withdrawalData.amount,
+        accountName: withdrawalData.accountName,
+        accountNumber: withdrawalData.accountNumber,
+        bankCode: withdrawalData.bankCode,
+        bankName: withdrawalData.bankName,
+        narration: withdrawalData.narration,
+        otp: otp,
       }
 
-      const result = await cryptoTransfer(transferRequest).unwrap()
+      // Call the withdrawal API
+      const result = await withdraw(withdrawalRequest).unwrap()
 
       if (result.isSuccess) {
-        notify("success", "Transfer Successful!", {
-          description: `${transferData.amount} ${transferData.currency} transferred to ${transferData.userName}`,
+        notify("success", "Withdrawal Successful!", {
+          description: result.message || "Your withdrawal has been processed successfully",
           duration: 3000,
         })
 
         // Clear the session storage
-        sessionStorage.removeItem('cryptoTransferData')
-        
-        // Redirect to success page or back to crypto dashboard
-        setTimeout(() => router.push("/crypto"), 1000)
+        sessionStorage.removeItem("withdrawalData")
+
+        // Redirect to success page or back to dashboard
+        setTimeout(() => router.push("/dashboard"), 1000)
       } else {
-        throw new Error(result.message || "Transfer failed")
+        throw new Error(result.message || "Withdrawal failed")
       }
     } catch (error: any) {
-      setError(error.message || "Transfer failed. Please try again.")
-      notify("error", "Transfer Failed", {
+      setError(error.message || "Withdrawal failed. Please try again.")
+      notify("error", "Withdrawal Failed", {
         description: error.message || "Please try again",
       })
     } finally {
@@ -303,7 +313,7 @@ const VerificationCode: React.FC = () => {
     setResendAttempts((prev) => prev + 1)
     setOtp("")
     setIsOtpVerified(false)
-    
+
     // Request new OTP
     handleRequestOtp()
   }
@@ -321,31 +331,48 @@ const VerificationCode: React.FC = () => {
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">OTP Verification</h1>
-              <p className="text-gray-500">Secure transfer confirmation</p>
+              <p className="text-gray-500">Secure withdrawal confirmation</p>
             </div>
           </div>
 
-          {/* Transfer Summary */}
-          {transferData && (
-            <motion.div 
+          {/* Withdrawal Summary */}
+          {withdrawalData && (
+            <motion.div
               className="mb-6 rounded-xl bg-white p-4 shadow-md"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <h3 className="mb-2 font-medium text-gray-900">Transfer Summary</h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {transferData.tokenLogo && (
-                    <img 
-                      src={transferData.tokenLogo} 
-                      alt={transferData.currency} 
-                      className="mr-2 h-6 w-6 rounded-full"
-                    />
-                  )}
-                  <span className="font-semibold">{transferData.amount} {transferData.currency}</span>
+              <h3 className="mb-2 font-medium text-gray-900">Withdrawal Summary</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Amount:</span>
+                  <span className="font-semibold">
+                    {withdrawalData.currencySymbol}
+                    {parseFloat(withdrawalData.amount).toLocaleString("en-NG", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
                 </div>
-                <span className="text-gray-600">to {transferData.userName}</span>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Currency:</span>
+                  <span className="font-medium">
+                    {withdrawalData.currencyName} ({withdrawalData.currencyTicker})
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Bank:</span>
+                  <span className="font-medium">{withdrawalData.bankName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Account:</span>
+                  <span className="font-medium">{withdrawalData.accountNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Name:</span>
+                  <span className="font-medium">{withdrawalData.accountName}</span>
+                </div>
               </div>
             </motion.div>
           )}
@@ -372,7 +399,7 @@ const VerificationCode: React.FC = () => {
 
           {/* OTP Request Status */}
           {requestingOtp && (
-            <motion.div 
+            <motion.div
               className="mb-4 flex items-center justify-center gap-2 text-blue-600"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -385,17 +412,11 @@ const VerificationCode: React.FC = () => {
           {/* Verification Form */}
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              {/* <div className="mb-4 flex items-center gap-2 text-gray-700">
-                <FiMail className="text-gray-500" />
-                <span className="text-sm">bennymulla@crossfiat.com</span>
-              </div> */}
-
-              <OtpInputModule 
-                value={otp} 
-                onChange={setOtp} 
-                onVerify={handleOtpVerification} 
+              <OtpInputModule
+                value={otp}
+                onChange={setOtp}
+                onVerify={handleOtpVerification}
                 className={requestingOtp ? "opacity-50" : ""}
-                // disabled={requestingOtp}
               />
 
               <div className="mt-4 text-center">
@@ -431,15 +452,15 @@ const VerificationCode: React.FC = () => {
                     Processing...
                   </div>
                 ) : (
-                  "Confirm Transfer"
+                  "Confirm Withdrawal"
                 )}
               </ButtonModule>
 
-              <ButtonModule 
-                type="button" 
-                variant="outline" 
-                size="lg" 
-                className="w-full" 
+              <ButtonModule
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
                 onClick={handleGoBack}
                 disabled={requestingOtp}
               >
@@ -466,4 +487,4 @@ const VerificationCode: React.FC = () => {
   )
 }
 
-export default VerificationCode
+export default WithdrawVerificationCode

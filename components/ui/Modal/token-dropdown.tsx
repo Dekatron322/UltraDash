@@ -5,9 +5,9 @@ import { AnimatePresence, motion } from "framer-motion"
 
 interface Token {
   symbol: string
-  icon: React.ReactNode
   name: string
   color: string
+  logo?: string
 }
 
 interface TokenDropdownProps {
@@ -34,17 +34,32 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
   }, [])
 
   return (
-    <div className="relative  " ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef}>
       <motion.button
         type="button"
-        className="  z-10 flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 transition-colors hover:bg-gray-200"
+        className="z-[9999] flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 transition-colors hover:bg-gray-200"
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
       >
-        <div className={`size-6 rounded-full ${selectedToken.color} flex items-center justify-center text-white`}>
-          {selectedToken.icon}
-        </div>
+        {selectedToken.logo ? (
+          <img 
+            src={selectedToken.logo} 
+            alt={selectedToken.symbol}
+            className="h-6 w-6 rounded-full"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.onerror = null
+              target.style.display = 'none'
+            }}
+          />
+        ) : (
+          <div className={`flex h-6 w-6 items-center justify-center rounded-full ${selectedToken.color}`}>
+            <span className="text-xs font-medium text-white">
+              {selectedToken.symbol.charAt(0)}
+            </span>
+          </div>
+        )}
         <span className="font-medium">{selectedToken.symbol}</span>
         <FiChevronDown className={`text-gray-500 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </motion.button>
@@ -56,9 +71,9 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 z-50  mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
+            className="absolute right-0 z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
           >
-            <div className="py-1">
+            <div className="max-h-60 overflow-y-auto py-1">
               {tokens.map((token) => (
                 <button
                   key={token.symbol}
@@ -71,9 +86,24 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`size-6 rounded-full ${token.color} flex items-center justify-center text-white`}>
-                      {token.icon}
-                    </div>
+                    {token.logo ? (
+                      <img 
+                        src={token.logo} 
+                        alt={token.symbol}
+                        className="h-6 w-6 rounded-full"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.onerror = null
+                          target.style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <div className={`flex h-6 w-6 items-center justify-center rounded-full ${token.color}`}>
+                        <span className="text-xs font-medium text-white">
+                          {token.symbol.charAt(0)}
+                        </span>
+                      </div>
+                    )}
                     <div>
                       <p className="font-medium text-gray-900">{token.symbol}</p>
                       <p className="text-xs text-gray-500">{token.name}</p>

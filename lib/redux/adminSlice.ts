@@ -104,6 +104,52 @@ export interface NotifyUserResponse {
   message: string
 }
 
+// Bank List Interfaces
+export interface Bank {
+  bankCode: string
+  bankName: string
+  bankLongCode: string
+}
+
+export interface BankListResponse {
+  data: Bank[]
+  isSuccess: boolean
+  message: string
+}
+
+// Account Verification Interfaces
+export interface AccountVerificationRequest {
+  number: string
+  bank: string
+}
+
+export interface AccountVerificationResponse {
+  isSuccess: boolean
+  message: string
+  data: {
+    number: string
+    bank: string
+    name: string
+  }
+}
+
+// Withdrawal Interfaces
+export interface WithdrawRequest {
+  currencyId: number
+  amount: number
+  accountName: string
+  accountNumber: string
+  bankCode: string
+  bankName: string
+  narration: string
+  otp: string
+}
+
+export interface WithdrawResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const adminApi = createApi({
   reducerPath: "adminApi",
   baseQuery: fetchBaseQuery({
@@ -200,6 +246,32 @@ export const adminApi = createApi({
         body: notificationData,
       }),
     }),
+
+    // Bank List Endpoint
+    getBankList: builder.query<BankListResponse, void>({
+      query: () => ({
+        url: API_ENDPOINTS.BANKS.LIST,
+        method: "GET",
+      }),
+    }),
+
+    // Account Verification Endpoint
+    verifyAccount: builder.mutation<AccountVerificationResponse, AccountVerificationRequest>({
+      query: (verificationData) => ({
+        url: API_ENDPOINTS.BANKS.VERIFY,
+        method: "POST",
+        body: verificationData,
+      }),
+    }),
+
+    // Withdrawal Endpoint
+    withdraw: builder.mutation<WithdrawResponse, WithdrawRequest>({
+      query: (withdrawData) => ({
+        url: API_ENDPOINTS.DASHBOARD.WITHDRAW,
+        method: "POST",
+        body: withdrawData,
+      }),
+    }),
   }),
 })
 
@@ -211,4 +283,7 @@ export const {
   useGetAdminByIdQuery,
   useUpdateAdminPermissionMutation,
   useNotifyUserMutation,
+  useGetBankListQuery,
+  useVerifyAccountMutation,
+  useWithdrawMutation,
 } = adminApi

@@ -66,6 +66,115 @@ export interface EditCryptoFeeResponse {
   message: string
 }
 
+export interface CryptoTransferRequest {
+  otp: string
+  currency: string
+  userId: number
+  amount: number
+  narration: string
+}
+
+export interface CryptoTransferData {
+  reference: string
+  txid: string
+  status: string
+  fee: string
+}
+
+export interface CryptoTransferResponse {
+  isSuccess: boolean
+  message: string
+  data: CryptoTransferData
+}
+
+export interface RequestOtpRequest {
+  purpose: number
+}
+
+export interface RequestOtpResponse {
+  isSuccess: boolean
+  message: string
+}
+
+export interface QuotationRequest {
+  fromCurrency: string
+  toCurrency: string
+  fromAmount: number
+}
+
+export interface QuotationData {
+  fromCurrency: string
+  toCurrency: string
+  quotedPrice: number
+  quotedCurrency: string
+  fromAmount: number
+  toAmount: number
+  lpFee: string
+}
+
+export interface QuotationResponse {
+  isSuccess: boolean
+  message: string
+  data: QuotationData
+}
+
+export interface SwapRequest {
+  fromCurrency: string
+  toCurrency: string
+  amount: number
+  otp: string
+}
+
+export interface SwapData {
+  fromCurrency: string
+  toCurrency: string
+  quotedPrice: number
+  quotedCurrency: string
+  fromAmount: number
+  toAmount: number
+  lpFee: number
+}
+
+export interface SwapResponse {
+  isSuccess: boolean
+  message: string
+  data: SwapData
+}
+
+// Settle Request Interface
+export interface SettleRequest {
+  otp: string
+  currency: string
+  amount: number
+}
+
+// Settle Data Interface
+export interface SettleData {
+  reference: string
+  txid: string
+  status: string
+  fee: string
+}
+
+// Settle Response Interface
+export interface SettleResponse {
+  isSuccess: boolean
+  message: string
+  data: SettleData
+}
+
+// Refund Withdrawal Request Interface
+export interface RefundWithdrawalRequest {
+  reference: string
+  otp: string
+}
+
+// Refund Withdrawal Response Interface
+export interface RefundWithdrawalResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const cryptoApi = createApi({
   reducerPath: "cryptoApi",
   baseQuery: fetchBaseQuery({
@@ -121,8 +230,70 @@ export const cryptoApi = createApi({
       }),
       invalidatesTags: ["CryptoFees"],
     }),
+    cryptoTransfer: builder.mutation<CryptoTransferResponse, CryptoTransferRequest>({
+      query: (transferData) => ({
+        url: API_ENDPOINTS.CRYPTO.TRANSFER,
+        method: "POST",
+        body: transferData,
+      }),
+    }),
+    requestOtp: builder.mutation<RequestOtpResponse, RequestOtpRequest>({
+      query: (otpRequest) => ({
+        url: API_ENDPOINTS.CRYPTO.REQUEST_OTP,
+        method: "POST",
+        body: otpRequest,
+      }),
+    }),
+    getQuotation: builder.mutation<QuotationResponse, QuotationRequest>({
+      query: (quotationData) => ({
+        url: API_ENDPOINTS.CRYPTO.QUOTATION,
+        method: "POST",
+        body: {
+          ...quotationData,
+          fromCurrency: quotationData.fromCurrency.toLowerCase(),
+          toCurrency: quotationData.toCurrency.toLowerCase(),
+        },
+      }),
+    }),
+    swapCrypto: builder.mutation<SwapResponse, SwapRequest>({
+      query: (swapData) => ({
+        url: API_ENDPOINTS.CRYPTO.SWAP,
+        method: "POST",
+        body: {
+          ...swapData,
+          fromCurrency: swapData.fromCurrency.toLowerCase(),
+          toCurrency: swapData.toCurrency.toLowerCase(),
+        },
+      }),
+    }),
+    // Settle Crypto Endpoint
+    settleCrypto: builder.mutation<SettleResponse, SettleRequest>({
+      query: (settleData) => ({
+        url: API_ENDPOINTS.CRYPTO.SETTLE,
+        method: "POST",
+        body: settleData,
+      }),
+    }),
+    // Refund Withdrawal Endpoint
+    refundWithdrawal: builder.mutation<RefundWithdrawalResponse, RefundWithdrawalRequest>({
+      query: (refundData) => ({
+        url: API_ENDPOINTS.CRYPTO.REFUND,
+        method: "POST",
+        body: refundData,
+      }),
+    }),
   }),
 })
 
-export const { useGetMasterAccountQuery, useGetProfitAccountQuery, useGetCryptoFeesQuery, useEditCryptoFeeMutation } =
-  cryptoApi
+export const {
+  useGetMasterAccountQuery,
+  useGetProfitAccountQuery,
+  useGetCryptoFeesQuery,
+  useEditCryptoFeeMutation,
+  useCryptoTransferMutation,
+  useRequestOtpMutation,
+  useGetQuotationMutation,
+  useSwapCryptoMutation,
+  useSettleCryptoMutation,
+  useRefundWithdrawalMutation, // Export the new refund withdrawal mutation
+} = cryptoApi

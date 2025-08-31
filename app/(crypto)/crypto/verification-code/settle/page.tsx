@@ -1,12 +1,13 @@
 "use client"
+
 import React, { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
-import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock, FiMail, FiShield } from "react-icons/fi"
+import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock, FiShield } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
-import { useCryptoTransferMutation, useRequestOtpMutation } from "lib/redux/cryptoSlice"
+import { useSettleCryptoMutation, useRequestOtpMutation } from "lib/redux/cryptoSlice"
 
 interface OtpInputProps {
   value: string
@@ -168,24 +169,24 @@ const VerificationCode: React.FC = () => {
   const [isOtpVerified, setIsOtpVerified] = useState(false)
   const [countdown, setCountdown] = useState(59)
   const [resendAttempts, setResendAttempts] = useState(0)
-  const [transferData, setTransferData] = useState<any>(null)
+  const [settleData, setSettleData] = useState<any>(null)
   const [requestingOtp, setRequestingOtp] = useState(false)
   const [otpRequested, setOtpRequested] = useState(false)
 
   const router = useRouter()
-  const [cryptoTransfer] = useCryptoTransferMutation()
+  const [settleCrypto] = useSettleCryptoMutation()
   const [requestOtp] = useRequestOtpMutation()
 
   useEffect(() => {
-    // Get transfer data from session storage
-    const storedData = sessionStorage.getItem('cryptoTransferData')
+    // Get settle data from session storage
+    const storedData = sessionStorage.getItem("cryptoSettleData")
     if (storedData) {
-      setTransferData(JSON.parse(storedData))
+      setSettleData(JSON.parse(storedData))
       // Automatically request OTP when component loads
       handleRequestOtp()
     } else {
-      // Redirect back if no transfer data
-      router.push('/crypto/transfer')
+      // Redirect back if no settle data
+      router.push("/crypto/settle")
     }
   }, [router])
 
@@ -203,8 +204,8 @@ const VerificationCode: React.FC = () => {
   const handleRequestOtp = async () => {
     setRequestingOtp(true)
     try {
-      const result = await requestOtp({ purpose: 3 }).unwrap()
-      
+      const result = await requestOtp({ purpose: 4 }).unwrap()
+
       if (result.isSuccess) {
         setOtpRequested(true)
         setCountdown(59) // Reset countdown
@@ -233,9 +234,9 @@ const VerificationCode: React.FC = () => {
       return
     }
 
-    if (!transferData) {
-      notify("error", "Transfer Data Missing", {
-        description: "Please start the transfer process again",
+    if (!settleData) {
+      notify("error", "Settlement Data Missing", {
+        description: "Please start the settlement process again",
       })
       return
     }
@@ -244,33 +245,31 @@ const VerificationCode: React.FC = () => {
 
     try {
       // Make the actual API call
-      const transferRequest = {
+      const settleRequest = {
         otp,
-        currency: transferData.currency,
-        userId: transferData.userId,
-        amount: transferData.amount,
-        narration: transferData.narration
+        currency: settleData.currency,
+        amount: settleData.amount,
       }
 
-      const result = await cryptoTransfer(transferRequest).unwrap()
+      const result = await settleCrypto(settleRequest).unwrap()
 
       if (result.isSuccess) {
-        notify("success", "Transfer Successful!", {
-          description: `${transferData.amount} ${transferData.currency} transferred to ${transferData.userName}`,
+        notify("success", "Settlement Successful!", {
+          description: `${settleData.amount} ${settleData.currency} settled to your bank account`,
           duration: 3000,
         })
 
         // Clear the session storage
-        sessionStorage.removeItem('cryptoTransferData')
-        
+        sessionStorage.removeItem("cryptoSettleData")
+
         // Redirect to success page or back to crypto dashboard
         setTimeout(() => router.push("/crypto"), 1000)
       } else {
-        throw new Error(result.message || "Transfer failed")
+        throw new Error(result.message || "Settlement failed")
       }
     } catch (error: any) {
-      setError(error.message || "Transfer failed. Please try again.")
-      notify("error", "Transfer Failed", {
+      setError(error.message || "Settlement failed. Please try again.")
+      notify("error", "Settlement Failed", {
         description: error.message || "Please try again",
       })
     } finally {
@@ -303,7 +302,7 @@ const VerificationCode: React.FC = () => {
     setResendAttempts((prev) => prev + 1)
     setOtp("")
     setIsOtpVerified(false)
-    
+
     // Request new OTP
     handleRequestOtp()
   }
@@ -321,31 +320,38 @@ const VerificationCode: React.FC = () => {
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">OTP Verification</h1>
-              <p className="text-gray-500">Secure transfer confirmation</p>
+              <p className="text-gray-500">Secure settlement confirmation</p>
             </div>
           </div>
 
-          {/* Transfer Summary */}
-          {transferData && (
-            <motion.div 
+          {/* Settlement Summary */}
+          {settleData && (
+            <motion.div
               className="mb-6 rounded-xl bg-white p-4 shadow-md"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <h3 className="mb-2 font-medium text-gray-900">Transfer Summary</h3>
+              <h3 className="mb-2 font-medium text-gray-900">Settlement Summary</h3>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  {transferData.tokenLogo && (
-                    <img 
-                      src={transferData.tokenLogo} 
-                      alt={transferData.currency} 
-                      className="mr-2 h-6 w-6 rounded-full"
-                    />
+                  {settleData.tokenLogo && (
+                    <img src={settleData.tokenLogo} alt={settleData.currency} className="mr-2 h-6 w-6 rounded-full" />
                   )}
-                  <span className="font-semibold">{transferData.amount} {transferData.currency}</span>
+                  <span className="font-semibold">
+                    {settleData.amount} {settleData.currency}
+                  </span>
                 </div>
-                <span className="text-gray-600">to {transferData.userName}</span>
+                <span className="text-gray-600">to Bank Account</span>
+              </div>
+              <div className="mt-2 text-sm text-gray-500">
+                ≈{" "}
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "NGN",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(settleData.convertedValue)}
               </div>
             </motion.div>
           )}
@@ -372,7 +378,7 @@ const VerificationCode: React.FC = () => {
 
           {/* OTP Request Status */}
           {requestingOtp && (
-            <motion.div 
+            <motion.div
               className="mb-4 flex items-center justify-center gap-2 text-blue-600"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -385,17 +391,11 @@ const VerificationCode: React.FC = () => {
           {/* Verification Form */}
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              {/* <div className="mb-4 flex items-center gap-2 text-gray-700">
-                <FiMail className="text-gray-500" />
-                <span className="text-sm">bennymulla@crossfiat.com</span>
-              </div> */}
-
-              <OtpInputModule 
-                value={otp} 
-                onChange={setOtp} 
-                onVerify={handleOtpVerification} 
+              <OtpInputModule
+                value={otp}
+                onChange={setOtp}
+                onVerify={handleOtpVerification}
                 className={requestingOtp ? "opacity-50" : ""}
-                // disabled={requestingOtp}
               />
 
               <div className="mt-4 text-center">
@@ -431,15 +431,15 @@ const VerificationCode: React.FC = () => {
                     Processing...
                   </div>
                 ) : (
-                  "Confirm Transfer"
+                  "Confirm Settlement"
                 )}
               </ButtonModule>
 
-              <ButtonModule 
-                type="button" 
-                variant="outline" 
-                size="lg" 
-                className="w-full" 
+              <ButtonModule
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
                 onClick={handleGoBack}
                 disabled={requestingOtp}
               >

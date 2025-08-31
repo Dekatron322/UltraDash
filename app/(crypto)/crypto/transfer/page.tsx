@@ -1,11 +1,13 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
-import { FiArrowLeft, FiCheck, FiDollarSign, FiUser } from "react-icons/fi"
+import { FiArrowLeft, FiCheck, FiDollarSign, FiUser, FiX } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
+import { useGetUsersQuery } from "lib/redux/customerSlice"
+import { useCryptoTransferMutation } from "lib/redux/cryptoSlice"
 
 interface CryptoAsset {
   symbol: string
@@ -16,6 +18,7 @@ interface CryptoAsset {
   price: number
   change24h: number
   color?: string
+  logo?: string
 }
 
 const TransferToUser: React.FC = () => {
@@ -24,39 +27,112 @@ const TransferToUser: React.FC = () => {
   const [userTag, setUserTag] = useState("")
   const [amount, setAmount] = useState("")
   const [userName, setUserName] = useState("")
+  const [userData, setUserData] = useState<any>(null)
   const [verifyingUser, setVerifyingUser] = useState(false)
   const [isValidAmount, setIsValidAmount] = useState(true)
   const [selectedToken, setSelectedToken] = useState<CryptoAsset | null>(null)
   const [activeField, setActiveField] = useState<"user" | "amount" | null>(null)
+  const [debouncedTag, setDebouncedTag] = useState("")
+  const [narration, setNarration] = useState("")
 
   const router = useRouter()
-  // const searchParams = useSearchParams()
+  const searchParams = useSearchParams()
+  const [cryptoTransfer] = useCryptoTransferMutation()
 
-  // useEffect(() => {
-  //   const tokenParam = searchParams.get("token")
-  //   if (tokenParam) {
-  //     try {
-  //       const token = JSON.parse(decodeURIComponent(tokenParam))
-  //       // setSelectedToken({
-  //       //   ...token,
-  //       //   color: token.color || getTokenColor(token.symbol),
-  //       // })
-  //     } catch (e) {
-  //       console.error("Failed to parse token from URL", e)
-  //     }
-  //   }
-  // }, [searchParams])
-
-  const getTokenColor = (symbol: string) => {
-    const colors: Record<string, string> = {
-      BTC: "from-amber-500 to-orange-600",
-      ETH: "from-indigo-500 to-purple-600",
-      USDT: "from-emerald-500 to-teal-600",
-      USDC: "from-blue-500 to-cyan-600",
-      SOL: "from-green-500 to-lime-600",
-      DEFAULT: "from-gray-500 to-gray-600",
+  // Use the RTK Query hook to fetch users by tag
+  const { data: usersData, isLoading: isUsersLoading, error: usersError } = useGetUsersQuery(
+    {
+      pageNumber: 1,
+      pageSize: 1,
+      tag: debouncedTag,
+    },
+    {
+      skip: debouncedTag.length < 3, // Only run query when tag has at least 3 characters
     }
-    return colors[symbol] || colors.DEFAULT
+  )
+
+  useEffect(() => {
+    const tokenParam = searchParams.get("token")
+    if (tokenParam) {
+      try {
+        const token = JSON.parse(decodeURIComponent(tokenParam)) as {
+          symbol: string
+          name: string
+          balance?: number
+          convertedBalance?: number
+          logo?: string
+        }
+        setSelectedToken({
+          symbol: token.symbol,
+          name: token.name,
+          amount: token.balance || token.convertedBalance || 0,
+          valueUSD: token.convertedBalance || 0,
+          allocation: 0,
+          price: (token.convertedBalance || 0) / (token.balance || 1),
+          change24h: 0,
+          color: getRandomColor(),
+          logo: token.logo,
+        })
+      } catch (e) {
+        console.error("Failed to parse token from URL", e)
+      }
+    }
+  }, [searchParams])
+
+  // Debounce the user tag input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (userTag.length >= 3) {
+        setDebouncedTag(userTag)
+        setVerifyingUser(true)
+      } else {
+        setUserName("")
+        setUserData(null)
+        setDebouncedTag("")
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [userTag])
+
+  // Handle the API response for user validation
+  useEffect(() => {
+    if (usersData && usersData.data && usersData.data.length > 0) {
+      const user = usersData.data[0]
+      if (user) {
+        setUserData(user)
+        const fullName = user.firstName && user.lastName 
+          ? `${user.firstName} ${user.lastName}` 
+          : `@${user.tag || userTag}`
+        setUserName(fullName)
+        setVerifyingUser(false)
+      }
+    } else if (usersError) {
+      setUserName("")
+      setUserData(null)
+      setVerifyingUser(false)
+      console.error("Error validating user:", usersError)
+    } else if (debouncedTag && !isUsersLoading && usersData?.data?.length === 0) {
+      setUserName("User not found")
+      setUserData(null)
+      setVerifyingUser(false)
+    }
+  }, [usersData, usersError, isUsersLoading, debouncedTag, userTag])
+
+  const getRandomColor = () => {
+    const colors = [
+      "from-amber-500 to-orange-600",
+      "from-indigo-500 to-purple-600",
+      "from-emerald-500 to-teal-600",
+      "from-blue-500 to-cyan-600",
+      "from-green-500 to-lime-600",
+      "from-purple-500 to-pink-600",
+      "from-red-500 to-rose-600",
+      "from-cyan-500 to-blue-600",
+      "from-yellow-500 to-amber-600",
+      "from-teal-500 to-green-600",
+    ]
+    return colors[Math.floor(Math.random() * colors.length)]
   }
 
   const handleGoBack = () => {
@@ -67,38 +143,30 @@ const TransferToUser: React.FC = () => {
     event.preventDefault()
 
     if (!selectedToken) {
-      // notify({
-      //   type: "error",
-      //   title: "No Token Selected",
-      //   message: "Please select a token to transfer",
-      // })
+      notify("error", "No Token Selected", {
+        description: "Please select a token to transfer",
+      })
       return
     }
 
-    if (!userName || !amount) {
-      // notify({
-      //   type: "error",
-      //   title: "Incomplete Details",
-      //   message: "Please provide all required details",
-      // })
+    if (!userData || !amount) {
+      notify("error", "Incomplete Details", {
+        description: "Please provide all required details",
+      })
       return
     }
 
     if (!isValidAmount) {
-      // notify({
-      //   type: "error",
-      //   title: "Invalid Amount",
-      //   message: "Please enter a valid amount",
-      // })
+      notify("error", "Invalid Amount", {
+        description: "Please enter a valid amount",
+      })
       return
     }
 
     if (parseFloat(amount) > (selectedToken?.amount || 0)) {
-      // notify({
-      //   type: "error",
-      //   title: "Insufficient Balance",
-      //   message: `You don't have enough ${selectedToken.symbol} to complete this transfer`,
-      // })
+      notify("error", "Insufficient Balance", {
+        description: `You don't have enough ${selectedToken.symbol} to complete this transfer`,
+      })
       return
     }
 
@@ -106,60 +174,30 @@ const TransferToUser: React.FC = () => {
     setError(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // notify({
-      //   type: "success",
-      //   title: "Transfer Initiated!",
-      //   message: `${amount} ${selectedToken.symbol} to ${userName}`,
-      //   duration: 3000,
-      // })
-
-      // Redirect to verification page after delay
-      setTimeout(() => router.push("/crypto/verification-code"), 1000)
+      // Store transfer data in session storage for the next step
+      const transferData = {
+        currency: selectedToken.symbol,
+        userId: userData.id,
+        amount: parseFloat(amount),
+        narration: narration || `Transfer of ${amount} ${selectedToken.symbol} to ${userName}`,
+        userName,
+        tokenSymbol: selectedToken.symbol,
+        tokenLogo: selectedToken.logo
+      }
+      
+      sessionStorage.setItem('cryptoTransferData', JSON.stringify(transferData))
+      
+      // Redirect to verification page
+      router.push("/crypto/verification-code")
     } catch (error: any) {
       setError(error.message || "Transfer failed. Please try again.")
-      // notify({
-      //   type: "error",
-      //   title: "Transfer Failed",
-      //   message: error.message || "Please try again",
-      // })
+      notify("error", "Transfer Failed", {
+        description: error.message || "Please try again",
+      })
     } finally {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    if (userTag.length >= 3) {
-      const verifyUser = async () => {
-        setVerifyingUser(true)
-        try {
-          await new Promise((resolve) => setTimeout(resolve, 800))
-
-          const mockUsers: Record<string, string> = {
-            beni: "Young Beni Mulla",
-            john: "John Doe",
-            mary: "Mary Johnson",
-            ultra: "Ultra User",
-            crypto: "Crypto Enthusiast",
-          }
-
-          const mockUserName = mockUsers[userTag.toLowerCase()] || `@${userTag}`
-          setUserName(mockUserName)
-        } catch (error) {
-          setUserName("")
-        } finally {
-          setVerifyingUser(false)
-        }
-      }
-
-      const timer = setTimeout(verifyUser, 500)
-      return () => clearTimeout(timer)
-    } else {
-      setUserName("")
-    }
-  }, [userTag])
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -176,6 +214,13 @@ const TransferToUser: React.FC = () => {
     }
   }
 
+  const clearUserTag = () => {
+    setUserTag("")
+    setUserName("")
+    setUserData(null)
+    setDebouncedTag("")
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <DashboardNav />
@@ -188,7 +233,7 @@ const TransferToUser: React.FC = () => {
               <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Transfer {selectedToken?.symbol || "Crypto"}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Transfer <span className="uppercase">{selectedToken?.symbol || "Crypto"}</span></h1>
               <p className="text-gray-500">Send to any Ultra user instantly</p>
             </div>
           </div>
@@ -203,15 +248,27 @@ const TransferToUser: React.FC = () => {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
+                  {selectedToken.logo && (
+                    <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                      <img 
+                        src={selectedToken.logo} 
+                        alt={selectedToken.symbol} 
+                        className="h-6 w-6 rounded-full"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                    </div>
+                  )}
                   <div>
                     <h3 className="font-medium text-white">{selectedToken.name}</h3>
                     <p className="text-sm text-white/90">
-                      Balance: {selectedToken.amount.toFixed(4)} {selectedToken.symbol}
+                      Balance: {selectedToken.amount.toFixed(4)} <span className="uppercase">{selectedToken.symbol}</span>
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-white">${selectedToken.valueUSD.toLocaleString()}</p>
+                  <p className="font-medium text-white">{selectedToken.valueUSD.toLocaleString()} <span className="uppercase">{selectedToken.symbol}</span></p>
                   <p className={`text-xs ${selectedToken.change24h >= 0 ? "text-green-200" : "text-red-200"}`}>
                     {selectedToken.change24h >= 0 ? "+" : ""}
                     {selectedToken.change24h.toFixed(2)}%
@@ -247,6 +304,15 @@ const TransferToUser: React.FC = () => {
                     onBlur={() => setActiveField(null)}
                     required
                   />
+                  {userTag && (
+                    <button
+                      type="button"
+                      onClick={clearUserTag}
+                      className="ml-2 text-gray-400 hover:text-gray-600"
+                    >
+                      <FiX className="size-4" />
+                    </button>
+                  )}
                   {verifyingUser && (
                     <div className="ml-2 size-5 animate-spin">
                       <div className="size-4 rounded-full border-2 border-blue-500 border-t-transparent" />
@@ -262,18 +328,32 @@ const TransferToUser: React.FC = () => {
                       exit={{ opacity: 0 }}
                       className="mt-2 flex items-center"
                     >
-                      <div className="mr-2 flex size-4 items-center justify-center rounded-full bg-green-100">
-                        <FiCheck className="h-3 w-3 text-green-600" />
-                      </div>
-                      <span className="text-sm text-gray-700">{userName}</span>
+                      {userData ? (
+                        <>
+                          <div className="mr-2 flex size-4 items-center justify-center rounded-full bg-green-100">
+                            <FiCheck className="h-3 w-3 text-green-600" />
+                          </div>
+                          <span className="text-sm text-gray-700">{userName}</span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="mr-2 flex size-4 items-center justify-center rounded-full bg-red-100">
+                            <FiX className="h-3 w-3 text-red-600" />
+                          </div>
+                          <span className="text-sm text-red-600">{userName}</span>
+                        </>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
+              {userTag.length > 0 && userTag.length < 3 && (
+                <p className="mt-1 text-xs text-gray-500">Enter at least 3 characters</p>
+              )}
             </div>
 
             {/* Amount Field */}
-            <div className="mb-8">
+            <div className="mb-6">
               <div className="mb-2 flex items-center justify-between">
                 <label className="block text-sm font-medium text-gray-700">Amount</label>
                 {selectedToken && (
@@ -304,7 +384,7 @@ const TransferToUser: React.FC = () => {
                     required
                   />
                   {selectedToken && (
-                    <div className="ml-2 rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-700">
+                    <div className="ml-2 rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-700 uppercase">
                       {selectedToken.symbol}
                     </div>
                   )}
@@ -321,13 +401,27 @@ const TransferToUser: React.FC = () => {
               </div>
             </div>
 
+            {/* Narration Field */}
+            <div className="mb-8">
+              <label className="mb-2 block text-sm font-medium text-gray-700">Description (Optional)</label>
+              <div className="relative rounded-xl border border-gray-200 bg-gray-50 p-3 transition-all">
+                <input
+                  type="text"
+                  placeholder="Add a description for this transfer"
+                  className="w-full bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
+                  value={narration}
+                  onChange={(e) => setNarration(e.target.value)}
+                />
+              </div>
+            </div>
+
             {/* Action Buttons */}
             <div className="space-y-3">
               <ButtonModule
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={loading || !userName || !amount || !isValidAmount || !selectedToken}
+                disabled={loading || !userData || !amount || !isValidAmount || !selectedToken}
                 className="w-full"
               >
                 {loading ? (
@@ -353,7 +447,7 @@ const TransferToUser: React.FC = () => {
               animate={{ opacity: 1 }}
               className="mt-6 text-center text-sm text-gray-500"
             >
-              ≈ ${(parseFloat(amount) * selectedToken.price).toFixed(2)} USD
+              ≈ {(parseFloat(amount) * selectedToken.price).toFixed(2)}  <span className="uppercase">{selectedToken.symbol}</span>
             </motion.div>
           )}
         </motion.div>

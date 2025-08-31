@@ -66,11 +66,21 @@ const AddNewEmployee: React.FC = () => {
     canManageSystemSettings: false,
   })
   const [isSearchTypeOpen, setIsSearchTypeOpen] = useState(false)
+  const [debouncedTag, setDebouncedTag] = useState("")
   const searchTypeRef = useRef<HTMLDivElement>(null)
 
   const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
   const canManageAdmin = user?.admin?.permission?.canManageAdmin
+
+  // Debounce the search term input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTag(searchTerm)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
 
   const {
     data: usersData,
@@ -80,12 +90,13 @@ const AddNewEmployee: React.FC = () => {
     {
       pageNumber: 1,
       pageSize: 50,
-      ...(searchTerm && { [searchType]: searchTerm }),
+      ...(debouncedTag && { [searchType]: debouncedTag }),
     },
     {
-      skip: !isUserSelectionOpen, // Only fetch when the selection modal is open
+      skip: !isUserSelectionOpen || !debouncedTag || debouncedTag.length < 3, // Only fetch when modal is open and search term is valid
     }
   )
+
 
   const [createAdmin] = useCreateAdminMutation()
 

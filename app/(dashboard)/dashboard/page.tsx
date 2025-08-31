@@ -15,6 +15,9 @@ import {
   useGetTransactionOverviewQuery,
 } from "lib/redux/overviewSlice"
 import { useEffect, useState } from "react"
+import { ButtonModule } from "components/ui/Button/Button"
+import { useRouter } from "next/navigation"
+import { FiDollarSign } from "react-icons/fi"
 
 export interface CustomerBalanceResponse {
   data: {
@@ -32,6 +35,7 @@ export default function Dashboard() {
   const [customerBalance, setCustomerBalance] = useState<string>("0")
   const [selectedCurrencySymbol, setSelectedCurrencySymbol] = useState<string>("NGN")
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all")
+  const router = useRouter()
 
   // API calls
   const { data: currenciesData, isLoading: currenciesLoading } = useGetCurrenciesQuery()
@@ -430,6 +434,10 @@ export default function Dashboard() {
     </button>
   )
 
+  const handleWithdrawClick = () => {
+    router.push("/dashboard/withdraw")
+  }
+
   return (
     <section className="h-full w-full">
       <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
@@ -439,13 +447,18 @@ export default function Dashboard() {
           <div className="container mx-auto px-16 py-8 max-sm:px-3">
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Dashboard Overview</h1>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 rounded-lg bg-white p-2 shadow-sm">
+                  <span className="text-sm font-medium text-gray-500">Time Range:</span>
+                  <TimeFilterButton filter="day" label="Today" />
+                  <TimeFilterButton filter="week" label="This Week" />
+                  <TimeFilterButton filter="month" label="This Month" />
+                  <TimeFilterButton filter="all" label="All Time" />
+                </div>
 
-              <div className="flex items-center gap-2 rounded-lg bg-white p-2 shadow-sm">
-                <span className="text-sm font-medium text-gray-500">Time Range:</span>
-                <TimeFilterButton filter="day" label="Today" />
-                <TimeFilterButton filter="week" label="This Week" />
-                <TimeFilterButton filter="month" label="This Month" />
-                <TimeFilterButton filter="all" label="All Time" />
+                <ButtonModule variant="primary" size="md" onClick={handleWithdrawClick}>
+                  Withdraw
+                </ButtonModule>
               </div>
             </div>
 

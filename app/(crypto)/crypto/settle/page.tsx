@@ -1,61 +1,75 @@
 "use client"
+
 import React, { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { FiArrowLeft, FiDollarSign, FiUser } from "react-icons/fi"
+import { FiArrowLeft, FiDollarSign } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
+import { useSettleCryptoMutation, useRequestOtpMutation } from "lib/redux/cryptoSlice"
 
 interface CryptoAsset {
   symbol: string
   name: string
-  amount: number
-  valueUSD: number
-  allocation: number
-  price: number
-  change24h: number
-  color?: string
+  balance: number
+  convertedBalance: number
+  referenceCurrency: string
+  logo: string
 }
 
-const TransferToUser: React.FC = () => {
+const Settle: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [amount, setAmount] = useState("")
   const [isValidAmount, setIsValidAmount] = useState(true)
   const [selectedToken, setSelectedToken] = useState<CryptoAsset | null>(null)
-  const [recipientName, setRecipientName] = useState("")
-  const [verifyingRecipient, setVerifyingRecipient] = useState(false)
-  const [activeField, setActiveField] = useState<"amount" | "recipient" | null>(null)
+  const [activeField, setActiveField] = useState<"amount" | null>(null)
 
   const router = useRouter()
-  // const searchParams = useSearchParams()
+  const searchParams = useSearchParams()
+  const [settleCrypto] = useSettleCryptoMutation()
+  const [requestOtp] = useRequestOtpMutation()
 
-  // useEffect(() => {
-  //   const tokenParam = searchParams.get("token")
-  //   if (tokenParam) {
-  //     try {
-  //       const token = JSON.parse(decodeURIComponent(tokenParam))
-  //       // setSelectedToken({
-  //       //   ...token,
-  //       //   color: token.color || getTokenColor(token.symbol),
-  //       // })
-  //     } catch (e) {
-  //       console.error("Failed to parse token from URL", e)
-  //     }
-  //   }
-  // }, [searchParams])
+  useEffect(() => {
+    const tokenParam = searchParams.get("token")
+    if (tokenParam) {
+      try {
+        const token = JSON.parse(decodeURIComponent(tokenParam)) as CryptoAsset
+        setSelectedToken(token)
+      } catch (e) {
+        console.error("Failed to parse token from URL", e)
+      }
+    }
+  }, [searchParams])
 
   const getTokenColor = (symbol: string) => {
-    const colors: Record<string, string> = {
-      BTC: "from-amber-500 to-orange-600",
-      ETH: "from-indigo-500 to-purple-600",
-      USDT: "from-emerald-500 to-teal-600",
-      USDC: "from-blue-500 to-cyan-600",
-      SOL: "from-green-500 to-lime-600",
-      DEFAULT: "from-gray-500 to-gray-600",
+    // Array of beautiful gradient color combinations
+    const colorGradients = [
+      "from-blue-500 to-purple-600",
+      "from-green-500 to-teal-600",
+      "from-yellow-500 to-orange-600",
+      "from-pink-500 to-rose-600",
+      "from-indigo-500 to-blue-600",
+      "from-emerald-500 to-green-600",
+      "from-amber-500 to-yellow-600",
+      "from-fuchsia-500 to-purple-600",
+      "from-cyan-500 to-blue-600",
+      "from-lime-500 to-green-600",
+      "from-violet-500 to-purple-600",
+      "from-sky-500 to-blue-600",
+    ]
+
+    // Create a consistent but seemingly random color based on the symbol
+    // This ensures the same token always gets the same color
+    let hash = 0
+    for (let i = 0; i < symbol.length; i++) {
+      hash = symbol.charCodeAt(i) + ((hash << 5) - hash)
     }
-    return colors[symbol] || colors.DEFAULT
+
+    // Use the hash to select a gradient
+    const index = Math.abs(hash) % colorGradients.length
+    return colorGradients[index]
   }
 
   const handleGoBack = () => {
@@ -66,47 +80,30 @@ const TransferToUser: React.FC = () => {
     event.preventDefault()
 
     if (!selectedToken) {
-      // notify({
-      //   type: "error",
-      //   title: "No Token Selected",
-      //   message: "Please select a token to transfer",
-      // })
-      return
-    }
-
-    if (!recipientName) {
-      // notify({
-      //   type: "error",
-      //   title: "Recipient Required",
-      //   message: "Please enter a recipient name",
-      // })
+      notify("error", "Please select a token to settle", {
+        title: "No Token Selected",
+      })
       return
     }
 
     if (!amount) {
-      // notify({
-      //   type: "error",
-      //   title: "Amount Required",
-      //   message: "Please enter an amount to transfer",
-      // })
+      notify("error", "Please enter an amount to settle", {
+        title: "Amount Required",
+      })
       return
     }
 
     if (!isValidAmount) {
-      // notify({
-      //   type: "error",
-      //   title: "Invalid Amount",
-      //   message: "Please enter a valid amount",
-      // })
+      notify("error", "Please enter a valid amount", {
+        title: "Invalid Amount",
+      })
       return
     }
 
-    if (parseFloat(amount) > (selectedToken?.amount || 0)) {
-      // notify({
-      //   type: "error",
-      //   title: "Insufficient Balance",
-      //   message: `You don't have enough ${selectedToken.symbol} to complete this transfer`,
-      // })
+    if (parseFloat(amount) > (selectedToken?.balance || 0)) {
+      notify("error", `You don't have enough ${selectedToken.symbol} to complete this settlement`, {
+        title: "Insufficient Balance",
+      })
       return
     }
 
@@ -114,24 +111,31 @@ const TransferToUser: React.FC = () => {
     setError(null)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // First request OTP
+      const otpResult = await requestOtp({ purpose: 3 }).unwrap()
 
-      // notify({
-      //   type: "success",
-      //   title: "Transfer Initiated!",
-      //   message: `${amount} ${selectedToken.symbol} to ${recipientName}`,
-      //   duration: 2000,
-      // })
+      if (!otpResult.isSuccess) {
+        throw new Error(otpResult.message || "Failed to request OTP")
+      }
 
-      setTimeout(() => router.push("/crypto/verification-code"), 1000)
+      // Store settlement data in session storage for the verification page
+      const settleData = {
+        currency: selectedToken.symbol,
+        amount: parseFloat(amount),
+        tokenName: selectedToken.name,
+        tokenLogo: selectedToken.logo,
+        convertedValue: (parseFloat(amount) / selectedToken.balance) * selectedToken.convertedBalance,
+      }
+
+      sessionStorage.setItem("cryptoSettleData", JSON.stringify(settleData))
+
+      // Redirect to verification page
+      router.push("/crypto/verification-code/settle")
     } catch (error: any) {
-      setError(error.message || "Transfer failed. Please try again.")
-      // notify({
-      //   type: "error",
-      //   title: "Transfer Failed",
-      //   message: error.message || "Please try again",
-      // })
+      setError(error.message || "Settlement failed. Please try again.")
+      notify("error", error.message || "Please try again", {
+        title: "Settlement Failed",
+      })
     } finally {
       setLoading(false)
     }
@@ -147,41 +151,8 @@ const TransferToUser: React.FC = () => {
 
   const handleMaxAmount = () => {
     if (selectedToken) {
-      setAmount(selectedToken.amount.toString())
+      setAmount(selectedToken.balance.toString())
       setIsValidAmount(true)
-    }
-  }
-
-  const handleRecipientChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setRecipientName(value)
-
-    if (value.length >= 3) {
-      verifyRecipient(value)
-    } else {
-      setRecipientName("")
-    }
-  }
-
-  const verifyRecipient = async (name: string) => {
-    setVerifyingRecipient(true)
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800))
-
-      const mockUsers: Record<string, string> = {
-        john: "John Doe",
-        alice: "Alice Smith",
-        bob: "Bob Johnson",
-        emma: "Emma Wilson",
-      }
-
-      const mockUserName = mockUsers[name.toLowerCase()] || name
-      setRecipientName(mockUserName)
-    } catch (error) {
-      setRecipientName("")
-    } finally {
-      setVerifyingRecipient(false)
     }
   }
 
@@ -197,81 +168,62 @@ const TransferToUser: React.FC = () => {
               <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Transfer {selectedToken?.symbol || "Crypto"}</h1>
-              <p className="text-gray-500">Send to another user</p>
+              <h1 className="text-2xl font-bold text-gray-900">Settle {selectedToken?.symbol || "Crypto"}</h1>
+              <p className="text-gray-500">Transfer to your bank account</p>
             </div>
           </div>
 
           {/* Token Card */}
           {selectedToken && (
             <motion.div
-              className={`mb-6 rounded-xl bg-gradient-to-r p-4 ${selectedToken.color} shadow-lg`}
+              className={`mb-6 rounded-xl bg-gradient-to-r p-4 ${getTokenColor(selectedToken.symbol)} shadow-lg`}
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.1 }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  {/* <TokenIcon symbol={selectedToken.symbol} className="w-10 h-10 mr-3" /> */}
+                  <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                    <img
+                      src={selectedToken.logo}
+                      alt={selectedToken.symbol}
+                      className="h-6 w-6"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.onerror = null
+                        target.src = "https://via.placeholder.com/24"
+                      }}
+                    />
+                  </div>
                   <div>
                     <h3 className="font-medium text-white">{selectedToken.name}</h3>
                     <p className="text-sm text-white/90">
-                      Balance: {selectedToken.amount.toFixed(4)} {selectedToken.symbol}
+                      Balance: {selectedToken.balance.toFixed(4)} {selectedToken.symbol}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-white">${selectedToken.valueUSD.toLocaleString()}</p>
-                  <p className={`text-xs ${selectedToken.change24h >= 0 ? "text-green-200" : "text-red-200"}`}>
-                    {selectedToken.change24h >= 0 ? "+" : ""}
-                    {selectedToken.change24h.toFixed(2)}%
+                  <p className="font-medium text-white">
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: selectedToken.referenceCurrency || "USD",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(selectedToken.convertedBalance)}
                   </p>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* Transfer Form */}
+          {/* Settle Form */}
           <form onSubmit={handleSubmit}>
-            {/* Recipient Field */}
-            <div className="mb-6">
-              <label className="mb-2 block text-sm font-medium text-gray-700">Recipient</label>
-              <div
-                className={`relative rounded-xl border p-3 transition-all ${
-                  activeField === "recipient"
-                    ? "border-blue-500 bg-white ring-2 ring-blue-200"
-                    : "border-gray-200 bg-gray-50"
-                }`}
-                onClick={() => setActiveField("recipient")}
-              >
-                <div className="flex items-center">
-                  <FiUser className={`mr-2 text-gray-400 ${activeField === "recipient" ? "text-blue-500" : ""}`} />
-                  <input
-                    type="text"
-                    placeholder="Enter recipient name or ID"
-                    className="flex-1 bg-transparent text-gray-800 outline-none placeholder:text-gray-400"
-                    value={recipientName}
-                    onChange={handleRecipientChange}
-                    onFocus={() => setActiveField("recipient")}
-                    onBlur={() => setActiveField(null)}
-                    required
-                  />
-                  {verifyingRecipient && (
-                    <div className="ml-2 size-5 animate-spin">
-                      <div className="size-4 rounded-full border-2 border-blue-500 border-t-transparent" />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Amount Field */}
             <div className="mb-8">
               <div className="mb-2 flex items-center justify-between">
                 <label className="block text-sm font-medium text-gray-700">Amount</label>
                 {selectedToken && (
                   <button type="button" onClick={handleMaxAmount} className="text-xs text-blue-600 hover:text-blue-800">
-                    Max: {selectedToken.amount.toFixed(4)}
+                    Max: {selectedToken.balance.toFixed(4)}
                   </button>
                 )}
               </div>
@@ -321,7 +273,13 @@ const TransferToUser: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="mb-6 text-center text-sm text-gray-500"
               >
-                ≈ ${(parseFloat(amount) * selectedToken.price).toFixed(2)} USD
+                ≈{" "}
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: selectedToken.referenceCurrency || "USD",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format((parseFloat(amount) / selectedToken.balance) * selectedToken.convertedBalance)}
               </motion.div>
             )}
 
@@ -331,7 +289,7 @@ const TransferToUser: React.FC = () => {
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={loading || !recipientName || !amount || !isValidAmount || !selectedToken}
+                disabled={loading || !amount || !isValidAmount || !selectedToken}
                 className="w-full"
               >
                 {loading ? (
@@ -340,7 +298,7 @@ const TransferToUser: React.FC = () => {
                     Processing...
                   </div>
                 ) : (
-                  `Transfer ${selectedToken?.symbol || ""}`
+                  `Settle ${selectedToken?.symbol || ""}`
                 )}
               </ButtonModule>
 
@@ -355,4 +313,4 @@ const TransferToUser: React.FC = () => {
   )
 }
 
-export default TransferToUser
+export default Settle

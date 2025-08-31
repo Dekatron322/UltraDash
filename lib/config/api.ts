@@ -46,17 +46,29 @@ export const API_ENDPOINTS = {
     SETTLE: "Admin/Crypto/Refund",
   },
 
+  BANKS: {
+    LIST: "/Psb9/Banklist",
+    VERIFY: "/Psb9/AccountEnquiry",
+  },
+
   // Crypto endpoints
   CRYPTO: {
     LIST: "/Admin/Crypto",
     DETAILS: (id: string | number) => `/Admin/Crypto/${id}`,
     OVERVIEW: "/Admin/Crypto/Overview",
+    TRANSFER: "/Admin/Crypto/Transfer",
+    REQUEST_OTP: "/Admin/Request/Otp",
+    QUOTATION: "/Admin/Quotation",
+    SWAP: "/Admin/Crypto/Swap",
+    SETTLE: "/Admin/Crypto/Settle",
+    REFUND: "/Admin/Crypto/RefundWithdrawal",
   },
 
   // Dashboard endpoints
   DASHBOARD: {
     STATS: "/Admin/Dashboard/Stats",
     ANALYTICS: "/Admin/Dashboard/Analytics",
+    WITHDRAW: "/Admin/Wallet/Withdraw",
   },
 
   //Series endpoints
