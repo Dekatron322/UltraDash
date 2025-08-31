@@ -7,7 +7,7 @@ import { FiArrowLeft, FiDollarSign } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
-import { useSettleCryptoMutation, useRequestOtpMutation } from "lib/redux/cryptoSlice"
+import { useRequestOtpMutation, useSettleCryptoMutation } from "lib/redux/cryptoSlice"
 
 interface CryptoAsset {
   symbol: string

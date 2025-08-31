@@ -178,14 +178,14 @@ const VerificationCode: React.FC = () => {
 
   useEffect(() => {
     // Get transfer data from session storage
-    const storedData = sessionStorage.getItem('cryptoTransferData')
+    const storedData = sessionStorage.getItem("cryptoTransferData")
     if (storedData) {
       setTransferData(JSON.parse(storedData))
       // Automatically request OTP when component loads
       handleRequestOtp()
     } else {
       // Redirect back if no transfer data
-      router.push('/crypto/transfer')
+      router.push("/crypto/transfer")
     }
   }, [router])
 
@@ -204,7 +204,7 @@ const VerificationCode: React.FC = () => {
     setRequestingOtp(true)
     try {
       const result = await requestOtp({ purpose: 3 }).unwrap()
-      
+
       if (result.isSuccess) {
         setOtpRequested(true)
         setCountdown(59) // Reset countdown
@@ -249,7 +249,7 @@ const VerificationCode: React.FC = () => {
         currency: transferData.currency,
         userId: transferData.userId,
         amount: transferData.amount,
-        narration: transferData.narration
+        narration: transferData.narration,
       }
 
       const result = await cryptoTransfer(transferRequest).unwrap()
@@ -261,8 +261,8 @@ const VerificationCode: React.FC = () => {
         })
 
         // Clear the session storage
-        sessionStorage.removeItem('cryptoTransferData')
-        
+        sessionStorage.removeItem("cryptoTransferData")
+
         // Redirect to success page or back to crypto dashboard
         setTimeout(() => router.push("/crypto"), 1000)
       } else {
@@ -303,7 +303,7 @@ const VerificationCode: React.FC = () => {
     setResendAttempts((prev) => prev + 1)
     setOtp("")
     setIsOtpVerified(false)
-    
+
     // Request new OTP
     handleRequestOtp()
   }
@@ -327,7 +327,7 @@ const VerificationCode: React.FC = () => {
 
           {/* Transfer Summary */}
           {transferData && (
-            <motion.div 
+            <motion.div
               className="mb-6 rounded-xl bg-white p-4 shadow-md"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -337,13 +337,15 @@ const VerificationCode: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   {transferData.tokenLogo && (
-                    <img 
-                      src={transferData.tokenLogo} 
-                      alt={transferData.currency} 
+                    <img
+                      src={transferData.tokenLogo}
+                      alt={transferData.currency}
                       className="mr-2 h-6 w-6 rounded-full"
                     />
                   )}
-                  <span className="font-semibold">{transferData.amount} {transferData.currency}</span>
+                  <span className="font-semibold">
+                    {transferData.amount} {transferData.currency}
+                  </span>
                 </div>
                 <span className="text-gray-600">to {transferData.userName}</span>
               </div>
@@ -372,7 +374,7 @@ const VerificationCode: React.FC = () => {
 
           {/* OTP Request Status */}
           {requestingOtp && (
-            <motion.div 
+            <motion.div
               className="mb-4 flex items-center justify-center gap-2 text-blue-600"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -390,10 +392,10 @@ const VerificationCode: React.FC = () => {
                 <span className="text-sm">bennymulla@crossfiat.com</span>
               </div> */}
 
-              <OtpInputModule 
-                value={otp} 
-                onChange={setOtp} 
-                onVerify={handleOtpVerification} 
+              <OtpInputModule
+                value={otp}
+                onChange={setOtp}
+                onVerify={handleOtpVerification}
                 className={requestingOtp ? "opacity-50" : ""}
                 // disabled={requestingOtp}
               />
@@ -411,7 +413,7 @@ const VerificationCode: React.FC = () => {
                     disabled={requestingOtp}
                     className="text-sm font-medium text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:hover:text-gray-400"
                   >
-                    Didn't receive code? Resend
+                    Didn&apos;t receive code? Resend
                   </button>
                 )}
               </div>
@@ -435,11 +437,11 @@ const VerificationCode: React.FC = () => {
                 )}
               </ButtonModule>
 
-              <ButtonModule 
-                type="button" 
-                variant="outline" 
-                size="lg" 
-                className="w-full" 
+              <ButtonModule
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
                 onClick={handleGoBack}
                 disabled={requestingOtp}
               >

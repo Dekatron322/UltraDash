@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { FiArrowLeft, FiCheck, FiDollarSign, FiUser, FiX } from "react-icons/fi"
@@ -40,7 +40,11 @@ const TransferToUser: React.FC = () => {
   const [cryptoTransfer] = useCryptoTransferMutation()
 
   // Use the RTK Query hook to fetch users by tag
-  const { data: usersData, isLoading: isUsersLoading, error: usersError } = useGetUsersQuery(
+  const {
+    data: usersData,
+    isLoading: isUsersLoading,
+    error: usersError,
+  } = useGetUsersQuery(
     {
       pageNumber: 1,
       pageSize: 1,
@@ -101,9 +105,8 @@ const TransferToUser: React.FC = () => {
       const user = usersData.data[0]
       if (user) {
         setUserData(user)
-        const fullName = user.firstName && user.lastName 
-          ? `${user.firstName} ${user.lastName}` 
-          : `@${user.tag || userTag}`
+        const fullName =
+          user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : `@${user.tag || userTag}`
         setUserName(fullName)
         setVerifyingUser(false)
       }
@@ -182,11 +185,11 @@ const TransferToUser: React.FC = () => {
         narration: narration || `Transfer of ${amount} ${selectedToken.symbol} to ${userName}`,
         userName,
         tokenSymbol: selectedToken.symbol,
-        tokenLogo: selectedToken.logo
+        tokenLogo: selectedToken.logo,
       }
-      
-      sessionStorage.setItem('cryptoTransferData', JSON.stringify(transferData))
-      
+
+      sessionStorage.setItem("cryptoTransferData", JSON.stringify(transferData))
+
       // Redirect to verification page
       router.push("/crypto/verification-code")
     } catch (error: any) {
@@ -233,7 +236,9 @@ const TransferToUser: React.FC = () => {
               <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Transfer <span className="uppercase">{selectedToken?.symbol || "Crypto"}</span></h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Transfer <span className="uppercase">{selectedToken?.symbol || "Crypto"}</span>
+              </h1>
               <p className="text-gray-500">Send to any Ultra user instantly</p>
             </div>
           </div>
@@ -250,12 +255,12 @@ const TransferToUser: React.FC = () => {
                 <div className="flex items-center">
                   {selectedToken.logo && (
                     <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                      <img 
-                        src={selectedToken.logo} 
-                        alt={selectedToken.symbol} 
+                      <img
+                        src={selectedToken.logo}
+                        alt={selectedToken.symbol}
                         className="h-6 w-6 rounded-full"
                         onError={(e) => {
-                          e.currentTarget.style.display = 'none'
+                          e.currentTarget.style.display = "none"
                         }}
                       />
                     </div>
@@ -263,12 +268,15 @@ const TransferToUser: React.FC = () => {
                   <div>
                     <h3 className="font-medium text-white">{selectedToken.name}</h3>
                     <p className="text-sm text-white/90">
-                      Balance: {selectedToken.amount.toFixed(4)} <span className="uppercase">{selectedToken.symbol}</span>
+                      Balance: {selectedToken.amount.toFixed(4)}{" "}
+                      <span className="uppercase">{selectedToken.symbol}</span>
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium text-white">{selectedToken.valueUSD.toLocaleString()} <span className="uppercase">{selectedToken.symbol}</span></p>
+                  <p className="font-medium text-white">
+                    {selectedToken.valueUSD.toLocaleString()} <span className="uppercase">{selectedToken.symbol}</span>
+                  </p>
                   <p className={`text-xs ${selectedToken.change24h >= 0 ? "text-green-200" : "text-red-200"}`}>
                     {selectedToken.change24h >= 0 ? "+" : ""}
                     {selectedToken.change24h.toFixed(2)}%
@@ -305,11 +313,7 @@ const TransferToUser: React.FC = () => {
                     required
                   />
                   {userTag && (
-                    <button
-                      type="button"
-                      onClick={clearUserTag}
-                      className="ml-2 text-gray-400 hover:text-gray-600"
-                    >
+                    <button type="button" onClick={clearUserTag} className="ml-2 text-gray-400 hover:text-gray-600">
                       <FiX className="size-4" />
                     </button>
                   )}
@@ -384,7 +388,7 @@ const TransferToUser: React.FC = () => {
                     required
                   />
                   {selectedToken && (
-                    <div className="ml-2 rounded-md bg-gray-100 px-2 py-1 text-sm text-gray-700 uppercase">
+                    <div className="ml-2 rounded-md bg-gray-100 px-2 py-1 text-sm uppercase text-gray-700">
                       {selectedToken.symbol}
                     </div>
                   )}
@@ -447,7 +451,8 @@ const TransferToUser: React.FC = () => {
               animate={{ opacity: 1 }}
               className="mt-6 text-center text-sm text-gray-500"
             >
-              ≈ {(parseFloat(amount) * selectedToken.price).toFixed(2)}  <span className="uppercase">{selectedToken.symbol}</span>
+              ≈ {(parseFloat(amount) * selectedToken.price).toFixed(2)}{" "}
+              <span className="uppercase">{selectedToken.symbol}</span>
             </motion.div>
           )}
         </motion.div>

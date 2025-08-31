@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { FiArrowLeft, FiRefreshCw } from "react-icons/fi"
@@ -80,11 +80,11 @@ const SwapScreen: React.FC = () => {
         logo: asset.logo,
         balance: asset.balance,
         convertedBalance: asset.convertedBalance,
-        referenceCurrency: asset.referenceCurrency
+        referenceCurrency: asset.referenceCurrency,
       }))
 
       // Filter out NGN as it's not a cryptocurrency and cannot be swapped
-      const cryptoOnlyTokens = tokensFromApi.filter(token => token.symbol !== "NGN")
+      const cryptoOnlyTokens = tokensFromApi.filter((token) => token.symbol !== "NGN")
 
       setAvailableTokens(cryptoOnlyTokens)
       setIsLoadingTokens(false)
@@ -106,11 +106,11 @@ const SwapScreen: React.FC = () => {
       try {
         const token = JSON.parse(decodeURIComponent(tokenParam)) as CryptoAsset
         setSelectedToken(token)
-        
+
         // Set the buy currency to the selected token
         const tokenSymbol = token.symbol.toUpperCase()
-        const matchedToken = availableTokens.find(t => t.symbol === tokenSymbol)
-        
+        const matchedToken = availableTokens.find((t) => t.symbol === tokenSymbol)
+
         if (matchedToken) {
           setBuyCurrency(matchedToken)
         } else {
@@ -120,7 +120,7 @@ const SwapScreen: React.FC = () => {
             name: token.name,
             color: getColorForSymbol(token.symbol),
             logo: token.logo,
-            balance: token.balance
+            balance: token.balance,
           })
         }
       } catch (e) {
@@ -142,24 +142,24 @@ const SwapScreen: React.FC = () => {
 
   const getColorForSymbol = (symbol: string): string => {
     const colorMap: { [key: string]: string } = {
-      'BTC': 'bg-orange-500',
-      'ETH': 'bg-purple-500',
-      'USDT': 'bg-blue-500',
-      'USDC': 'bg-blue-400',
-      'BNB': 'bg-yellow-500',
-      'XRP': 'bg-gray-500',
-      'ADA': 'bg-gray-700',
-      'DOGE': 'bg-yellow-400',
-      'DOT': 'bg-purple-600',
-      'UNI': 'bg-pink-500',
-      'LINK': 'bg-blue-600',
-      'LTC': 'bg-gray-400',
-      'BCH': 'bg-orange-400',
-      'SOL': 'bg-purple-400',
-      'MATIC': 'bg-purple-300'
+      BTC: "bg-orange-500",
+      ETH: "bg-purple-500",
+      USDT: "bg-blue-500",
+      USDC: "bg-blue-400",
+      BNB: "bg-yellow-500",
+      XRP: "bg-gray-500",
+      ADA: "bg-gray-700",
+      DOGE: "bg-yellow-400",
+      DOT: "bg-purple-600",
+      UNI: "bg-pink-500",
+      LINK: "bg-blue-600",
+      LTC: "bg-gray-400",
+      BCH: "bg-orange-400",
+      SOL: "bg-purple-400",
+      MATIC: "bg-purple-300",
     }
-    
-    return colorMap[symbol.toUpperCase()] || 'bg-gray-500'
+
+    return colorMap[symbol.toUpperCase()] || "bg-gray-500"
   }
 
   const fetchQuotation = async () => {
@@ -168,16 +168,16 @@ const SwapScreen: React.FC = () => {
 
     setIsGettingQuotation(true)
     setCalculatingFees(true)
-    
+
     try {
       const quotationRequest = {
         fromCurrency: buyCurrency.symbol,
         toCurrency: receiveCurrency.symbol,
-        fromAmount: numAmount
+        fromAmount: numAmount,
       }
 
       const result = await getQuotation(quotationRequest).unwrap()
-      
+
       if (result.isSuccess && result.data) {
         setQuotationData(result.data)
         setExchangeRate(`1 ${result.data.fromCurrency} = ${result.data.quotedPrice} ${result.data.toCurrency}`)
@@ -188,12 +188,12 @@ const SwapScreen: React.FC = () => {
     } catch (error: any) {
       console.error("Quotation error:", error)
       setError(error.message || "Failed to get quotation. Using estimated rates.")
-      
+
       // Fallback to estimated calculation for crypto-to-crypto swaps only
       const estimatedRate = 0.05 // Default crypto-to-crypto rate
       const estimatedToAmount = numAmount * estimatedRate
       const estimatedFee = numAmount * 0.005
-      
+
       setQuotationData({
         fromCurrency: buyCurrency.symbol,
         toCurrency: receiveCurrency.symbol,
@@ -201,9 +201,9 @@ const SwapScreen: React.FC = () => {
         quotedCurrency: receiveCurrency.symbol,
         fromAmount: numAmount,
         toAmount: parseFloat(estimatedToAmount.toFixed(6)),
-        lpFee: estimatedFee.toString()
+        lpFee: estimatedFee.toString(),
       })
-      
+
       setExchangeRate(`1 ${buyCurrency.symbol} = ${estimatedRate} ${receiveCurrency.symbol}`)
       setShowFees(true)
     } finally {
@@ -238,17 +238,17 @@ const SwapScreen: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    
+
     // Prevent submission if no amount is entered
     if (!amount.trim() || !quotationData) {
       return
     }
-    
+
     setLoading(true)
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500))
-      
+
       // Navigate to confirmation page with transaction data
       const transactionData = {
         fromAmount: parseFloat(amount),
@@ -258,10 +258,10 @@ const SwapScreen: React.FC = () => {
         rate: exchangeRate,
         fee: parseFloat(quotationData.lpFee),
         total: parseFloat(amount) + parseFloat(quotationData.lpFee),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }
-      
-      sessionStorage.setItem('swapTransactionData', JSON.stringify(transactionData))
+
+      sessionStorage.setItem("swapTransactionData", JSON.stringify(transactionData))
       router.push("/crypto/verification-code/swap")
     } catch (error: any) {
       setError(error.message || "Swap failed. Please try again.")
@@ -308,22 +308,18 @@ const SwapScreen: React.FC = () => {
     if (!amount || !buyCurrency.balance) return true
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount)) return true
-    
+
     return numAmount <= (buyCurrency.balance || 0)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <DashboardNav />
       <div className="container mx-auto max-w-md px-4 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           {/* Header */}
           <div className="mb-8 flex items-center">
-            <button 
-              type="button"
-              onClick={() => router.back()} 
-              className="mr-4 rounded-full p-2 hover:bg-gray-100"
-            >
+            <button type="button" onClick={() => router.back()} className="mr-4 rounded-full p-2 hover:bg-gray-100">
               <FiArrowLeft className="size-5 text-gray-700" />
             </button>
             <div>
@@ -331,8 +327,6 @@ const SwapScreen: React.FC = () => {
               <p className="text-gray-500">Instant cryptocurrency exchange</p>
             </div>
           </div>
-
-          
 
           {/* Loading state */}
           {(isLoadingTokens || isMasterFetching) && (
@@ -349,7 +343,7 @@ const SwapScreen: React.FC = () => {
             <form onSubmit={handleSubmit}>
               {/* You Pay Section */}
               <motion.div
-                className="mb-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+                className="relative z-10 mb-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
                 whileHover={{ y: -2 }}
               >
                 <div className="mb-2 flex items-center justify-between">
@@ -367,15 +361,15 @@ const SwapScreen: React.FC = () => {
                     value={amount}
                     onChange={handleAmountChange}
                   />
-                  <TokenDropdown 
-                    selectedToken={buyCurrency} 
-                    onSelect={handleBuyCurrencyChange} 
-                    tokens={availableTokens} 
-                  />
+                  <div className="relative z-50">
+                    <TokenDropdown
+                      selectedToken={buyCurrency}
+                      onSelect={handleBuyCurrencyChange}
+                      tokens={availableTokens}
+                    />
+                  </div>
                 </div>
-                {!hasSufficientBalance() && (
-                  <p className="mt-1 text-sm text-red-500">Insufficient balance</p>
-                )}
+                {!hasSufficientBalance() && <p className="mt-1 text-sm text-red-500">Insufficient balance</p>}
 
                 {/* Percentage buttons */}
                 <div className="mt-3 flex space-x-2">
@@ -393,11 +387,11 @@ const SwapScreen: React.FC = () => {
               </motion.div>
 
               {/* Switch Button */}
-              <div className="my-2 flex justify-center">
+              <div className="relative z-0 my-2 flex justify-center">
                 <motion.button
                   type="button"
                   onClick={handleSwitch}
-                  className="rounded-full border border-gray-200 bg-white p-2 shadow-md hover:bg-gray-50"
+                  className="relative z-0 rounded-full border border-gray-200 bg-white p-2 shadow-md hover:bg-gray-50"
                   whileTap={{ scale: 0.9 }}
                 >
                   <FiRefreshCw className="size-5 text-gray-700" />
@@ -406,7 +400,7 @@ const SwapScreen: React.FC = () => {
 
               {/* You Receive Section */}
               <motion.div
-                className="mb-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+                className="relative z-0 mb-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
                 whileHover={{ y: -2 }}
               >
                 <div className="mb-2 flex items-center justify-between">
@@ -422,11 +416,13 @@ const SwapScreen: React.FC = () => {
                     value={quotationData ? quotationData.toAmount.toFixed(6) : "0.0"}
                     readOnly
                   />
-                  <TokenDropdown 
-                    selectedToken={receiveCurrency} 
-                    onSelect={handleReceiveCurrencyChange} 
-                    tokens={availableTokens} 
-                  />
+                  <div className="relative z-50">
+                    <TokenDropdown
+                      selectedToken={receiveCurrency}
+                      onSelect={handleReceiveCurrencyChange}
+                      tokens={availableTokens}
+                    />
+                  </div>
                 </div>
               </motion.div>
 
@@ -475,7 +471,7 @@ const SwapScreen: React.FC = () => {
                           <span className="text-gray-900">{exchangeRate}</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">You'll Receive</span>
+                          <span className="text-gray-600">You&apos;ll Receive</span>
                           <span className="text-gray-900">
                             {quotationData.toAmount.toFixed(6)} {quotationData.toCurrency}
                           </span>
@@ -493,7 +489,8 @@ const SwapScreen: React.FC = () => {
                         <div className="mt-3 flex justify-between border-t border-gray-200 pt-3 font-medium">
                           <span className="text-gray-700">Total Cost</span>
                           <span className="text-gray-900">
-                            {(parseFloat(amount) + parseFloat(quotationData.lpFee)).toFixed(6)} {quotationData.fromCurrency}
+                            {(parseFloat(amount) + parseFloat(quotationData.lpFee)).toFixed(6)}{" "}
+                            {quotationData.fromCurrency}
                           </span>
                         </div>
                       </div>
@@ -526,12 +523,7 @@ const SwapScreen: React.FC = () => {
           {!isLoadingTokens && availableTokens.length === 0 && (
             <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
               <p className="text-gray-600">No tokens available for swapping</p>
-              <ButtonModule
-                variant="outline"
-                size="lg"
-                className="mt-4 w-full"
-                onClick={() => router.push('/crypto')}
-              >
+              <ButtonModule variant="outline" size="lg" className="mt-4 w-full" onClick={() => router.push("/crypto")}>
                 Back to Dashboard
               </ButtonModule>
             </div>

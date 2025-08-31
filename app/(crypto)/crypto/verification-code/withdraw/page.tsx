@@ -8,7 +8,7 @@ import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiClock, FiMail, FiShield } 
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
-import { useWithdrawMutation,  } from "lib/redux/adminSlice"
+import { useWithdrawMutation } from "lib/redux/adminSlice"
 import { useRequestOtpMutation } from "lib/redux/cryptoSlice"
 
 interface OtpInputProps {
@@ -432,7 +432,7 @@ const WithdrawVerificationCode: React.FC = () => {
                     disabled={requestingOtp}
                     className="text-sm font-medium text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:hover:text-gray-400"
                   >
-                    Didn't receive code? Resend
+                    Didn&apos;t receive code? Resend
                   </button>
                 )}
               </div>

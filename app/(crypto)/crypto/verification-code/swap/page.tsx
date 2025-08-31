@@ -178,14 +178,14 @@ const VerificationCode: React.FC = () => {
 
   useEffect(() => {
     // Get swap data from session storage
-    const storedData = sessionStorage.getItem('swapTransactionData')
+    const storedData = sessionStorage.getItem("swapTransactionData")
     if (storedData) {
       setSwapData(JSON.parse(storedData))
       // Automatically request OTP when component loads
       handleRequestOtp()
     } else {
       // Redirect back if no swap data
-      router.push('/swap')
+      router.push("/swap")
     }
   }, [router])
 
@@ -204,7 +204,7 @@ const VerificationCode: React.FC = () => {
     setRequestingOtp(true)
     try {
       const result = await requestOtp({ purpose: 6 }).unwrap() // Using purpose 7 for swap operations
-      
+
       if (result.isSuccess) {
         setOtpRequested(true)
         setCountdown(59) // Reset countdown
@@ -248,7 +248,7 @@ const VerificationCode: React.FC = () => {
         fromCurrency: swapData.fromCurrency,
         toCurrency: swapData.toCurrency,
         amount: swapData.fromAmount,
-        otp: otp
+        otp: otp,
       }
 
       const result = await swapCrypto(swapRequest).unwrap()
@@ -260,8 +260,8 @@ const VerificationCode: React.FC = () => {
         })
 
         // Clear the session storage
-        sessionStorage.removeItem('swapTransactionData')
-        
+        sessionStorage.removeItem("swapTransactionData")
+
         // Redirect to success page or back to crypto dashboard
         setTimeout(() => router.push("/crypto"), 1000)
       } else {
@@ -302,7 +302,7 @@ const VerificationCode: React.FC = () => {
     setResendAttempts((prev) => prev + 1)
     setOtp("")
     setIsOtpVerified(false)
-    
+
     // Request new OTP
     handleRequestOtp()
   }
@@ -326,7 +326,7 @@ const VerificationCode: React.FC = () => {
 
           {/* Swap Summary */}
           {swapData && (
-            <motion.div 
+            <motion.div
               className="mb-6 rounded-xl bg-white p-4 shadow-md"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -336,11 +336,15 @@ const VerificationCode: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">From</span>
-                  <span className="font-semibold">{swapData.fromAmount} {swapData.fromCurrency}</span>
+                  <span className="font-semibold">
+                    {swapData.fromAmount} {swapData.fromCurrency}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">To</span>
-                  <span className="font-semibold">{swapData.toAmount} {swapData.toCurrency}</span>
+                  <span className="font-semibold">
+                    {swapData.toAmount} {swapData.toCurrency}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Exchange Rate</span>
@@ -348,7 +352,9 @@ const VerificationCode: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Fee</span>
-                  <span className="text-sm">{swapData.fee} {swapData.fromCurrency}</span>
+                  <span className="text-sm">
+                    {swapData.fee} {swapData.fromCurrency}
+                  </span>
                 </div>
                 {swapData.fromCurrency === "NGN" && (
                   <div className="flex items-center justify-between">
@@ -358,7 +364,9 @@ const VerificationCode: React.FC = () => {
                 )}
                 <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-3">
                   <span className="font-medium text-gray-900">Total Cost</span>
-                  <span className="font-semibold">{swapData.total} {swapData.fromCurrency}</span>
+                  <span className="font-semibold">
+                    {swapData.total} {swapData.fromCurrency}
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -386,7 +394,7 @@ const VerificationCode: React.FC = () => {
 
           {/* OTP Request Status */}
           {requestingOtp && (
-            <motion.div 
+            <motion.div
               className="mb-4 flex items-center justify-center gap-2 text-blue-600"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -399,10 +407,10 @@ const VerificationCode: React.FC = () => {
           {/* Verification Form */}
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
-              <OtpInputModule 
-                value={otp} 
-                onChange={setOtp} 
-                onVerify={handleOtpVerification} 
+              <OtpInputModule
+                value={otp}
+                onChange={setOtp}
+                onVerify={handleOtpVerification}
                 className={requestingOtp ? "opacity-50" : ""}
               />
 
@@ -419,7 +427,7 @@ const VerificationCode: React.FC = () => {
                     disabled={requestingOtp}
                     className="text-sm font-medium text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:hover:text-gray-400"
                   >
-                    Didn't receive code? Resend
+                    Didn&apos;t receive code? Resend
                   </button>
                 )}
               </div>
@@ -443,11 +451,11 @@ const VerificationCode: React.FC = () => {
                 )}
               </ButtonModule>
 
-              <ButtonModule 
-                type="button" 
-                variant="outline" 
-                size="lg" 
-                className="w-full" 
+              <ButtonModule
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full"
                 onClick={handleGoBack}
                 disabled={requestingOtp}
               >

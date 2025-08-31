@@ -1,15 +1,15 @@
 // src/app/withdraw/page.tsx
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
-import { FiArrowLeft, FiDollarSign, FiUser, FiX, FiCheck, FiPlus, FiCreditCard, FiRefreshCw } from "react-icons/fi"
+import { FiArrowLeft, FiCheck, FiDollarSign, FiRefreshCw, FiUser, FiX } from "react-icons/fi"
 import { ButtonModule } from "components/ui/Button/Button"
 import { notify } from "components/ui/Notification/Notification"
 import DashboardNav from "components/Navbar/DashboardNav"
 import { FormInputModule } from "components/ui/Input/Input"
-import { useGetBankListQuery, useWithdrawMutation, useVerifyAccountMutation } from "lib/redux/adminSlice"
+import { useGetBankListQuery, useVerifyAccountMutation, useWithdrawMutation } from "lib/redux/adminSlice"
 import { useGetCurrenciesQuery } from "lib/redux/overviewSlice"
 import { FaPiggyBank } from "react-icons/fa"
 
