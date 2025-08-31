@@ -2,7 +2,7 @@
 import React, { Suspense, useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
-import { FiArrowLeft, FiRefreshCw, FiCheck, FiChevronDown } from "react-icons/fi"
+import { FiArrowLeft, FiCheck, FiChevronDown, FiRefreshCw } from "react-icons/fi"
 import DashboardNav from "components/Navbar/DashboardNav"
 import { useGetMasterAccountQuery, useGetQuotationMutation } from "lib/redux/cryptoSlice"
 
