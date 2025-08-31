@@ -80,6 +80,10 @@ export const API_ENDPOINTS = {
     CRYPTO_FEES: "/Admin/CryptoFees",
     EDIT_CRYPTO_FEES: "/Admin/Crypto/Fee",
   },
+
+  LOGS: {
+    ADMIN_LOGS: "/Admin/Logs",
+  },
 }
 
 // Helper function to build full URL

@@ -181,6 +181,34 @@ export interface UserCryptoResponse {
   message: string
 }
 
+// Admin Log Interfaces
+export interface AdminLogUser {
+  id: number
+  tag: string
+  firstName: string | null
+  lastName: string | null
+  photo: string | null
+  isVerified: boolean
+}
+
+export interface AdminLog {
+  createdAt: string
+  action: string
+  user: AdminLogUser
+}
+
+export interface AdminLogsResponse {
+  data: AdminLog[]
+  totalCount: number
+  totalPages: number
+  currentPage: number
+  pageSize: number
+  hasNext: boolean
+  hasPrevious: boolean
+  isSuccess: boolean
+  message: string
+}
+
 // Add Bonus Request Interface
 export interface AddBonusRequest {
   walletId: number
@@ -233,7 +261,7 @@ export const customerApi = createApi({
       return headers
     },
   }),
-  tagTypes: ["User"],
+  tagTypes: ["User", "AdminLogs"],
   endpoints: (builder) => ({
     getUsers: builder.query<
       UsersResponse,
@@ -312,6 +340,30 @@ export const customerApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    // Get Admin Logs query endpoint
+    getAdminLogs: builder.query<
+      AdminLogsResponse,
+      {
+        pageNumber: number
+        pageSize: number
+        tag?: string
+        startDate?: string
+        endDate?: string
+      }
+    >({
+      query: ({ pageNumber, pageSize, tag, startDate, endDate }) => ({
+        url: API_ENDPOINTS.LOGS.ADMIN_LOGS,
+        params: {
+          pageNumber,
+          pageSize,
+          ...(tag && { tag }),
+          ...(startDate && { startDate }),
+          ...(endDate && { endDate }),
+        },
+        method: "GET",
+      }),
+      providesTags: ["AdminLogs"],
+    }),
   }),
 })
 
@@ -322,4 +374,5 @@ export const {
   useGetUserCryptoQuery,
   useAddBonusMutation,
   useDisableWalletMutation,
+  useGetAdminLogsQuery,
 } = customerApi

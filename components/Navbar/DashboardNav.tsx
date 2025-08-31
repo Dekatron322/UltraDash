@@ -105,6 +105,12 @@ const DashboardNav = () => {
       path: "/fees",
       show: user?.admin?.permission?.canManageSystemSettings,
     },
+
+    {
+      name: "Logs",
+      path: "/logs",
+      show: user?.role === "SuperAdmin",
+    },
   ]
 
   const transactionTypes = [
