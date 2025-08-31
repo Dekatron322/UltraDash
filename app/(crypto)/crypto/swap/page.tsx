@@ -1,13 +1,74 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
-import { FiArrowLeft, FiRefreshCw } from "react-icons/fi"
-import { ButtonModule } from "components/ui/Button/Button"
+import { FiArrowLeft, FiRefreshCw, FiCheck, FiChevronDown } from "react-icons/fi"
 import DashboardNav from "components/Navbar/DashboardNav"
-import TokenDropdown from "components/ui/Modal/token-dropdown"
 import { useGetMasterAccountQuery, useGetQuotationMutation } from "lib/redux/cryptoSlice"
 
+// Button Component
+type ButtonVariant = "primary" | "black" | "secondary" | "outline" | "ghost" | "danger" | "outlineDanger"
+type ButtonSize = "sm" | "md" | "lg"
+
+interface ButtonProps {
+  type?: "button" | "submit" | "reset"
+  onClick?: () => void
+  disabled?: boolean
+  variant?: ButtonVariant
+  size?: ButtonSize
+  className?: string
+  children: React.ReactNode
+  icon?: React.ReactNode
+  iconPosition?: "start" | "end"
+}
+
+const ButtonModule: React.FC<ButtonProps> = ({
+  type = "button",
+  onClick,
+  disabled = false,
+  variant = "primary",
+  size = "md",
+  className = "-z-50",
+  children,
+  icon,
+  iconPosition = "start",
+}) => {
+  const baseClasses =
+    "flex items-center overflow-hidden justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+
+  const variantClasses = {
+    primary: "bg-[#003F9F] text-[#ffffff] hover:bg-[#2F88FC] focus:ring-[#003F9F]",
+    black: "bg-[#131319] text-[#ffffff] hover:bg-[#000000] focus:ring-[#131319]",
+    secondary: "bg-[#E6F0FF] text-[#003F9F] hover:bg-[#C4DBFF] focus:ring-[#003F9F]",
+    outline: "border border-[#003F9F] text-[#003F9F] hover:bg-[#E6F0FF] focus:ring-[#003F9F]",
+    outlineDanger: "border border-[#D82E2E] text-[#D82E2E] hover:bg-[#FDF3F3] focus:ring-[#D82E2E]",
+    ghost: "text-[#003F9F] hover:bg-[#E6F0FF] focus:ring-[#003F9F]",
+    danger: "bg-[#D82E2E] text-white hover:bg-[#F14848] focus:ring-[#F14848]",
+  }
+
+  const sizeClasses = {
+    sm: "h-8 px-3 text-sm",
+    md: "h-10 px-4 text-base",
+    lg: "h-12 px-6 text-lg",
+  }
+
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${
+        disabled ? "cursor-not-allowed bg-[#7A9BC9]" : ""
+      } ${className}`}
+    >
+      {icon && iconPosition === "start" && <span className="mr-2 inline-flex items-center">{icon}</span>}
+      {children}
+      {icon && iconPosition === "end" && <span className="ml-2 inline-flex items-center">{icon}</span>}
+    </button>
+  )
+}
+
+// TokenDropdown Component
 interface Token {
   symbol: string
   name: string
@@ -18,6 +79,114 @@ interface Token {
   referenceCurrency?: string
 }
 
+interface TokenDropdownProps {
+  selectedToken: Token
+  onSelect: (token: Token) => void
+  tokens: Token[]
+}
+
+const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, tokens }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <motion.button
+        type="button"
+        className="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 transition-colors hover:bg-gray-200"
+        onClick={() => setIsOpen(!isOpen)}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+      >
+        {selectedToken.logo ? (
+          <img
+            src={selectedToken.logo}
+            alt={selectedToken.symbol}
+            className="h-6 w-6 rounded-full"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.onerror = null
+              target.style.display = "none"
+            }}
+          />
+        ) : (
+          <div className={`flex h-6 w-6 items-center justify-center rounded-full ${selectedToken.color}`}>
+            <span className="text-xs font-medium text-white">{selectedToken.symbol.charAt(0)}</span>
+          </div>
+        )}
+        <span className="font-medium">{selectedToken.symbol}</span>
+        <FiChevronDown className={`text-gray-500 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute right-0 z-[9999] mt-2 w-56 origin-top-right overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"
+            style={{ willChange: "transform, opacity" }}
+          >
+            <div className="max-h-60 overflow-y-auto py-1">
+              {tokens.map((token) => (
+                <button
+                  key={token.symbol}
+                  className={`flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 ${
+                    selectedToken.symbol === token.symbol ? "bg-gray-50" : ""
+                  }`}
+                  onClick={() => {
+                    onSelect(token)
+                    setIsOpen(false)
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    {token.logo ? (
+                      <img
+                        src={token.logo}
+                        alt={token.symbol}
+                        className="h-6 w-6 rounded-full"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.onerror = null
+                          target.style.display = "none"
+                        }}
+                      />
+                    ) : (
+                      <div className={`flex h-6 w-6 items-center justify-center rounded-full ${token.color}`}>
+                        <span className="text-xs font-medium text-white">{token.symbol.charAt(0)}</span>
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-900">{token.symbol}</p>
+                      <p className="text-xs text-gray-500">{token.name}</p>
+                    </div>
+                  </div>
+                  {selectedToken.symbol === token.symbol && <FiCheck className="text-blue-500" />}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// Main SwapScreen Component
 interface CryptoAsset {
   name: string
   symbol: string
@@ -47,7 +216,8 @@ interface QuotationData {
 
 const defaultToken: Token = { symbol: "", name: "", color: "" }
 
-const SwapScreen: React.FC = () => {
+// Create a component that uses useSearchParams
+const SwapContent: React.FC = () => {
   const [amount, setAmount] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -183,7 +353,6 @@ const SwapScreen: React.FC = () => {
         setExchangeRate(`1 ${result.data.fromCurrency} = ${result.data.quotedPrice} ${result.data.toCurrency}`)
         setShowFees(true)
       } else {
-        throw new Error(result.message || "Failed to get quotation")
       }
     } catch (error: any) {
       console.error("Quotation error:", error)
@@ -361,7 +530,7 @@ const SwapScreen: React.FC = () => {
                     value={amount}
                     onChange={handleAmountChange}
                   />
-                  <div className="relative z-50">
+                  <div className="relative z-50 bg-white">
                     <TokenDropdown
                       selectedToken={buyCurrency}
                       onSelect={handleBuyCurrencyChange}
@@ -505,10 +674,10 @@ const SwapScreen: React.FC = () => {
                 variant="primary"
                 size="lg"
                 disabled={loading || !amount.trim() || !hasSufficientBalance() || !quotationData}
-                className="w-full"
+                className="-z-50 w-full"
               >
                 {loading ? (
-                  <div className="flex items-center justify-center">
+                  <div className=" flex items-center justify-center">
                     <div className="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Processing...
                   </div>
@@ -531,6 +700,29 @@ const SwapScreen: React.FC = () => {
         </motion.div>
       </div>
     </div>
+  )
+}
+
+// Main component with Suspense boundary
+const SwapScreen: React.FC = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="relative min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+          <DashboardNav />
+          <div className="container mx-auto max-w-md px-4 py-8">
+            <div className="flex h-64 items-center justify-center">
+              <div className="text-center">
+                <div className="mx-auto mb-4 mr-2 size-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                <span className="text-gray-600">Loading swap interface...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <SwapContent />
+    </Suspense>
   )
 }
 

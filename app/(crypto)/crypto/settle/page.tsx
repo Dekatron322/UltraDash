@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { FiArrowLeft, FiDollarSign } from "react-icons/fi"
@@ -18,7 +18,8 @@ interface CryptoAsset {
   logo: string
 }
 
-const Settle: React.FC = () => {
+// Create a component that uses useSearchParams
+function SettleContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [amount, setAmount] = useState("")
@@ -313,4 +314,17 @@ const Settle: React.FC = () => {
   )
 }
 
-export default Settle
+// Main page component with Suspense
+export default function Settle() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <SettleContent />
+    </Suspense>
+  )
+}

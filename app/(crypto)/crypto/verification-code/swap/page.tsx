@@ -433,13 +433,13 @@ const VerificationCode: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="z-0 space-y-3">
               <ButtonModule
                 type="submit"
                 variant="primary"
                 size="lg"
                 disabled={loading || !isOtpVerified || requestingOtp}
-                className="w-full"
+                className="z-0 w-full"
               >
                 {loading ? (
                   <div className="flex items-center justify-center">

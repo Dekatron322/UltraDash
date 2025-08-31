@@ -32,7 +32,7 @@ export const ButtonModule: React.FC<ButtonProps> = ({
   iconPosition = "start",
 }) => {
   const baseClasses =
-    "flex items-center justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+    "flex z-0 items-center overflow-hidden justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
 
   const variantClasses = {
     primary: "bg-[#003F9F] text-[#ffffff] hover:bg-[#2F88FC] focus:ring-[#003F9F]",
@@ -56,7 +56,7 @@ export const ButtonModule: React.FC<ButtonProps> = ({
       disabled={disabled}
       onClick={onClick}
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${
-        disabled ? "cursor-not-allowed opacity-50" : ""
+        disabled ? "z-0 cursor-not-allowed opacity-50" : ""
       } ${className}`}
     >
       {icon && iconPosition === "start" && <span className="mr-2 inline-flex items-center">{icon}</span>}
