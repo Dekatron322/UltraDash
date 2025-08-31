@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef, useState, Suspense } from "react"
+import React, { Suspense, useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { FiArrowLeft, FiRefreshCw, FiCheck, FiChevronDown } from "react-icons/fi"
