@@ -434,9 +434,9 @@ const LogsTable: React.FC = () => {
                   <th className="whitespace-nowrap border-b p-4 text-sm">
                     <div className="flex items-center gap-2">Admin Tag</div>
                   </th>
-                  <th className="whitespace-nowrap border-b p-4 text-sm">
+                  {/* <th className="whitespace-nowrap border-b p-4 text-sm">
                     <div className="flex items-center gap-2">Verification Status</div>
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
@@ -478,7 +478,7 @@ const LogsTable: React.FC = () => {
                         <div className="max-w-md break-words">{log.action}</div>
                       </td>
                       <td className="whitespace-nowrap border-b px-4 py-2 text-sm">{log.user.tag || "N/A"}</td>
-                      <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
+                      {/* <td className="whitespace-nowrap border-b px-4 py-2 text-sm">
                         <motion.div
                           className={`flex items-center justify-center gap-1 rounded-full px-2 py-1 ${
                             log.user.isVerified ? "bg-[#EEF5F0] text-[#589E67]" : "bg-[#F7EDED] text-[#AF4B4B]"
@@ -492,7 +492,7 @@ const LogsTable: React.FC = () => {
                           ></span>
                           {log.user.isVerified ? "Verified" : "Not Verified"}
                         </motion.div>
-                      </td>
+                      </td> */}
                     </motion.tr>
                   ))}
                 </AnimatePresence>
