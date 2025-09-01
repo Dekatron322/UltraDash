@@ -97,7 +97,6 @@ const AddNewEmployee: React.FC = () => {
     }
   )
 
-
   const [createAdmin] = useCreateAdminMutation()
 
   const departments: Department[] = [
