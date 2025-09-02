@@ -3,8 +3,8 @@ type Environment = "STAGING" | "PRODUCTION"
 
 export const API_CONFIG = {
   // Environment-based base URLs
-  STAGING: "https://ultra-test-6e759a261617.herokuapp.com",
-  PRODUCTION: "https://ultra-test-6e759a261617.herokuapp.com",
+  STAGING: "https://ultrapay-test-6e759a261617.herokuapp.com",
+  PRODUCTION: "https://ultrapay-test-6e759a261617.herokuapp.com",
 
   // Current environment (change this to switch between staging/production)
   CURRENT_ENV: (process.env.NODE_ENV === "production" ? "PRODUCTION" : "STAGING") as Environment,
