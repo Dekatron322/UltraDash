@@ -61,7 +61,7 @@ export const API_ENDPOINTS = {
     QUOTATION: "/Admin/Quotation",
     SWAP: "/Admin/Crypto/Swap",
     SETTLE: "/Admin/Crypto/Settle",
-    REFUND: "/Admin/Crypto/RefundWithdrawal",
+    REFUND: "/Admin/Wallet/RefundWithdrawal",
   },
 
   // Dashboard endpoints
