@@ -155,7 +155,7 @@ api.interceptors.request.use(
       if (isTokenExpired(authState.tokens.accessExpiry)) {
         try {
           // Attempt to refresh the token
-          const response = await api.post<RefreshTokenResponse>("API_ENDPOINTS.AUTH.REFRESH_TOKEN", {
+          const response = await api.post<RefreshTokenResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {
             refreshToken: authState.tokens.refreshToken,
           })
 
@@ -207,7 +207,7 @@ api.interceptors.response.use(
       if (authState?.tokens?.refreshToken) {
         try {
           // Attempt to refresh the token
-          const response = await api.post<RefreshTokenResponse>("API_ENDPOINTS.AUTH.REFRESH_TOKEN", {
+          const response = await api.post<RefreshTokenResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {
             refreshToken: authState.tokens.refreshToken,
           })
 
