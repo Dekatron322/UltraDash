@@ -1100,14 +1100,12 @@ const CustomerInfo = () => {
               </>
             ) : (
               <div>
-                <div className="mb-6 flex justify-between">
-                  <div className="mb-6">
-                    <h3 className="mb-4 text-lg font-semibold">Wallet Balances</h3>
-
+                <div className="flex justify-between">
+                  <div className=" flex items-center">
                     {/* Keep the original crypto total if you still want it */}
                     {totalCryptoValue > 0 && (
-                      <div className="mt-4 rounded-lg bg-blue-50 p-4">
-                        <h4 className="text-md font-semibold text-blue-900">Total Crypto Value</h4>
+                      <div className="mb-4  flex gap-2 rounded-lg bg-blue-50">
+                        <h4 className="text-md font-semibold text-blue-900">Total Crypto Value:</h4>
                         <p className="text-xl font-bold text-blue-900">{formatCurrency(totalCryptoValue)}</p>
                       </div>
                     )}
