@@ -57,13 +57,13 @@ export default function Dashboard() {
 
   const masterAssets = masterData?.data || []
   const profitAssets = profitData?.data || []
-  const cryptoOverview = cryptoOverviewData?.data || { 
-    master: 0, 
-    profit: 0, 
-    total: 0, 
-    totalBuyProfit: 0, 
-    totalSellProfit: 0, 
-    totalProfit: 0 
+  const cryptoOverview = cryptoOverviewData?.data || {
+    master: 0,
+    profit: 0,
+    total: 0,
+    totalBuyProfit: 0,
+    totalSellProfit: 0,
+    totalProfit: 0,
   }
   const currentAssets = activeTab === "master" ? masterAssets : profitAssets
 
@@ -164,7 +164,7 @@ export default function Dashboard() {
   )
 
   return (
-    <section className="h-full w-full">
+    <section className="size-full">
       <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="flex w-full flex-col">
           <DashboardNav />
@@ -202,7 +202,7 @@ export default function Dashboard() {
               <motion.div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm" whileHover={{ y: -2 }}>
                 <div className="mb-4 flex items-center gap-3">
                   <div className="rounded-full bg-indigo-100 p-3">
-                  <FiTrendingUp className="text-xl text-indigo-600" />
+                    <FiTrendingUp className="text-xl text-indigo-600" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900">Crypto Overview</h3>
                 </div>
@@ -258,7 +258,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                </motion.div>
+              </motion.div>
             </motion.div>
 
             <motion.div

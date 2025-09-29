@@ -185,7 +185,7 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({ isOpen, asset, onRe
         {/* Asset Summary */}
         <div className="p-6">
           <div className="mb-6 flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#EDF0F4] text-lg font-semibold">
+            <div className="flex size-12 items-center justify-center rounded-md bg-[#EDF0F4] text-lg font-semibold">
               {asset.symbol}
             </div>
             <div>

@@ -41,7 +41,7 @@ const LoadingSkeleton = () => {
       <div className="items-center justify-between border-b py-2 md:flex md:py-4">
         <div className="h-8 w-40 rounded bg-gray-200">
           <motion.div
-            className="h-full w-full rounded bg-gray-300"
+            className="size-full rounded bg-gray-300"
             initial={{ opacity: 0.3 }}
             animate={{
               opacity: [0.3, 0.6, 0.3],
@@ -56,7 +56,7 @@ const LoadingSkeleton = () => {
         <div className="mt-3 flex gap-4 md:mt-0">
           <div className="h-10 w-48 rounded bg-gray-200">
             <motion.div
-              className="h-full w-full rounded bg-gray-300"
+              className="size-full rounded bg-gray-300"
               initial={{ opacity: 0.3 }}
               animate={{
                 opacity: [0.3, 0.6, 0.3],
@@ -71,7 +71,7 @@ const LoadingSkeleton = () => {
           </div>
           <div className="h-10 w-24 rounded bg-gray-200">
             <motion.div
-              className="h-full w-full rounded bg-gray-300"
+              className="size-full rounded bg-gray-300"
               initial={{ opacity: 0.3 }}
               animate={{
                 opacity: [0.3, 0.6, 0.3],
@@ -95,7 +95,7 @@ const LoadingSkeleton = () => {
                 <th key={i} className="whitespace-nowrap border-b p-4">
                   <div className="h-4 w-24 rounded bg-gray-200">
                     <motion.div
-                      className="h-full w-full rounded bg-gray-300"
+                      className="size-full rounded bg-gray-300"
                       initial={{ opacity: 0.3 }}
                       animate={{
                         opacity: [0.3, 0.6, 0.3],
@@ -119,7 +119,7 @@ const LoadingSkeleton = () => {
                   <td key={cellIndex} className="whitespace-nowrap border-b px-4 py-3">
                     <div className="h-4 w-full rounded bg-gray-200">
                       <motion.div
-                        className="h-full w-full rounded bg-gray-300"
+                        className="size-full rounded bg-gray-300"
                         initial={{ opacity: 0.3 }}
                         animate={{
                           opacity: [0.3, 0.6, 0.3],
@@ -143,7 +143,7 @@ const LoadingSkeleton = () => {
       <div className="flex items-center justify-between border-t py-3">
         <div className="h-4 w-48 rounded bg-gray-200">
           <motion.div
-            className="h-full w-full rounded bg-gray-300"
+            className="size-full rounded bg-gray-300"
             initial={{ opacity: 0.3 }}
             animate={{
               opacity: [0.3, 0.6, 0.3],
@@ -159,7 +159,7 @@ const LoadingSkeleton = () => {
         <div className="flex items-center gap-2">
           <div className="size-8 rounded bg-gray-200">
             <motion.div
-              className="h-full w-full rounded bg-gray-300"
+              className="size-full rounded bg-gray-300"
               initial={{ opacity: 0.3 }}
               animate={{
                 opacity: [0.3, 0.6, 0.3],
@@ -175,7 +175,7 @@ const LoadingSkeleton = () => {
           {[...Array(5)].map((_, i) => (
             <div key={i} className="size-8 rounded bg-gray-200">
               <motion.div
-                className="h-full w-full rounded bg-gray-300"
+                className="size-full rounded bg-gray-300"
                 initial={{ opacity: 0.3 }}
                 animate={{
                   opacity: [0.3, 0.6, 0.3],
@@ -191,7 +191,7 @@ const LoadingSkeleton = () => {
           ))}
           <div className="size-8 rounded bg-gray-200">
             <motion.div
-              className="h-full w-full rounded bg-gray-300"
+              className="size-full rounded bg-gray-300"
               initial={{ opacity: 0.3 }}
               animate={{
                 opacity: [0.3, 0.6, 0.3],

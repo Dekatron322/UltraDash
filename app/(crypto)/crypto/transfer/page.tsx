@@ -256,11 +256,11 @@ function TransferContent() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   {selectedToken.logo && (
-                    <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                    <div className="mr-3 flex size-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
                       <img
                         src={selectedToken.logo}
                         alt={selectedToken.symbol}
-                        className="h-6 w-6 rounded-full"
+                        className="size-6 rounded-full"
                         onError={(e) => {
                           e.currentTarget.style.display = "none"
                         }}
@@ -337,14 +337,14 @@ function TransferContent() {
                       {userData ? (
                         <>
                           <div className="mr-2 flex size-4 items-center justify-center rounded-full bg-green-100">
-                            <FiCheck className="h-3 w-3 text-green-600" />
+                            <FiCheck className="size-3 text-green-600" />
                           </div>
                           <span className="text-sm text-gray-700">{userName}</span>
                         </>
                       ) : (
                         <>
                           <div className="mr-2 flex size-4 items-center justify-center rounded-full bg-red-100">
-                            <FiX className="h-3 w-3 text-red-600" />
+                            <FiX className="size-3 text-red-600" />
                           </div>
                           <span className="text-sm text-red-600">{userName}</span>
                         </>
@@ -469,7 +469,7 @@ export default function TransferToUser() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <div className="size-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
         </div>
       }
     >

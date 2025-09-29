@@ -15,7 +15,7 @@ import Modal from "react-modal"
 import CloseIcon from "public/close-icon"
 import { FormInputModule } from "components/ui/Input/Input"
 import { useRefundWithdrawalMutation } from "lib/redux/cryptoSlice"
-import { useSuspendUserMutation, useGetUserByIdQuery } from "lib/redux/customerSlice"
+import { useGetUserByIdQuery, useSuspendUserMutation } from "lib/redux/customerSlice"
 
 interface Account {
   id: string
@@ -397,7 +397,7 @@ const CustomerDetailPage: React.FC = () => {
   const statusValue = userData?.data?.status?.value
 
   return (
-    <section className="h-full w-full">
+    <section className="size-full">
       <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="flex w-full flex-col">
           <DashboardNav />

@@ -22,7 +22,7 @@ const LoadingSkeleton = () => {
           {[...Array(8)].map((_, i) => (
             <div key={i} className="flex items-center justify-between border-b pb-3">
               <div className="h-3 w-20 animate-pulse rounded bg-gray-200"></div>
-              <div className="h-3 w-32 animate-pulse rounded bg-gray-200"></div>
+              <div className="size-32 animate-pulse rounded bg-gray-200"></div>
             </div>
           ))}
         </div>

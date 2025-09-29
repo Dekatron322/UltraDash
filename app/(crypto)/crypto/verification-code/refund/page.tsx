@@ -126,7 +126,7 @@ const OtpInputModule: React.FC<OtpInputProps> = ({ value = "", onChange, onVerif
               boxShadow: activeInput === index ? "0 0 0 3px rgba(59, 130, 246, 0.2)" : "none",
             }}
             transition={{ type: "spring", stiffness: 500 }}
-            className={`h-14 w-14 rounded-lg border-2 bg-white text-center text-2xl font-semibold text-gray-800 outline-none transition-all`}
+            className={`size-14 rounded-lg border-2 bg-white text-center text-2xl font-semibold text-gray-800 outline-none transition-all`}
           />
         ))}
       </div>

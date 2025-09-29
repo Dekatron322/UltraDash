@@ -165,7 +165,7 @@ const AddBankModal: React.FC<AddBusinessModalProps> = ({ isOpen, onRequestClose,
         >
           <div className="flex h-[120px] w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-[#CBD5E1] transition-all duration-300 ease-in-out hover:border-[#D82E2E] hover:bg-[#FDF3F3]">
             {previewUrl ? (
-              <div className="relative h-full w-full">
+              <div className="relative size-full">
                 <Image src={previewUrl} alt="Bank logo preview" layout="fill" objectFit="contain" className="p-2" />
               </div>
             ) : (

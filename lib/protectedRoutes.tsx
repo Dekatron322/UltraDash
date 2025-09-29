@@ -31,7 +31,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   if (loading || (!isAuthenticated && typeof window !== "undefined")) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-t-2 border-blue-500"></div>
+        <div className="size-12 animate-spin rounded-full border-t-2 border-blue-500"></div>
       </div>
     )
   }

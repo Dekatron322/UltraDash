@@ -122,7 +122,7 @@ export default function AllTransactions() {
 
   if (isLoading) {
     return (
-      <section className="h-full w-full ">
+      <section className="size-full ">
         <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
           <div className="flex w-full flex-col">
             <DashboardNav />
@@ -142,7 +142,7 @@ export default function AllTransactions() {
 
   if (error) {
     return (
-      <section className="h-full w-full ">
+      <section className="size-full ">
         <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
           <div className="flex w-full flex-col">
             <DashboardNav />
@@ -163,7 +163,7 @@ export default function AllTransactions() {
   }
 
   return (
-    <section className="h-full w-full ">
+    <section className="size-full ">
       <div className="flex min-h-screen w-full bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="flex w-full flex-col">
           <DashboardNav />

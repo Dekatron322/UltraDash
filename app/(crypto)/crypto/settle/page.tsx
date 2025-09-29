@@ -184,11 +184,11 @@ function SettleContent() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                  <div className="mr-3 flex size-10 items-center justify-center rounded-full bg-white/20">
                     <img
                       src={selectedToken.logo}
                       alt={selectedToken.symbol}
-                      className="h-6 w-6"
+                      className="size-6"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.onerror = null
@@ -320,7 +320,7 @@ export default function Settle() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
-          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+          <div className="size-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
         </div>
       }
     >

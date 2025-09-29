@@ -501,7 +501,7 @@ const CustomerOrders = () => {
               <p className="px-2 pb-1 pt-2 text-sm">Message</p>
               <div className="search-bg mb-3 items-center  justify-between  rounded-md focus:bg-[#FBFAFC] max-sm:mb-2 ">
                 <textarea
-                  className="h-[120px] w-full rounded-md border-0 bg-transparent  p-2 px-2 text-sm outline-none focus:outline-none"
+                  className="h-[120px] w-full rounded-md border-0 bg-transparent  p-2 text-sm outline-none focus:outline-none"
                   placeholder="Enter Your Message Here"
                 ></textarea>
               </div>

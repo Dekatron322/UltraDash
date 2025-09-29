@@ -115,7 +115,7 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
           <img
             src={selectedToken.logo}
             alt={selectedToken.symbol}
-            className="h-6 w-6 rounded-full"
+            className="size-6 rounded-full"
             onError={(e) => {
               const target = e.target as HTMLImageElement
               target.onerror = null
@@ -123,7 +123,7 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
             }}
           />
         ) : (
-          <div className={`flex h-6 w-6 items-center justify-center rounded-full ${selectedToken.color}`}>
+          <div className={`flex size-6 items-center justify-center rounded-full ${selectedToken.color}`}>
             <span className="text-xs font-medium text-white">{selectedToken.symbol.charAt(0)}</span>
           </div>
         )}
@@ -158,7 +158,7 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
                       <img
                         src={token.logo}
                         alt={token.symbol}
-                        className="h-6 w-6 rounded-full"
+                        className="size-6 rounded-full"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
                           target.onerror = null
@@ -166,7 +166,7 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ selectedToken, onSelect, 
                         }}
                       />
                     ) : (
-                      <div className={`flex h-6 w-6 items-center justify-center rounded-full ${token.color}`}>
+                      <div className={`flex size-6 items-center justify-center rounded-full ${token.color}`}>
                         <span className="text-xs font-medium text-white">{token.symbol.charAt(0)}</span>
                       </div>
                     )}

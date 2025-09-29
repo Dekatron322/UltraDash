@@ -284,7 +284,7 @@ const AddNewEmployee: React.FC = () => {
               <div className="rounded-xl border border-green-200 bg-green-50 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                    <div className="flex size-12 items-center justify-center rounded-full bg-green-100">
                       {selectedUser.firstName ? selectedUser.firstName.charAt(0).toUpperCase() : "U"}
                     </div>
                     <div>
@@ -386,7 +386,7 @@ const AddNewEmployee: React.FC = () => {
                           {Array.from({ length: 3 }).map((_, index) => (
                             <div key={index} className="flex items-center justify-between rounded border p-3">
                               <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200"></div>
+                                <div className="size-10 animate-pulse rounded-full bg-gray-200"></div>
                                 <div>
                                   <div className="mb-2 h-4 w-32 animate-pulse rounded bg-gray-200"></div>
                                   <div className="h-3 w-24 animate-pulse rounded bg-gray-200"></div>
@@ -410,7 +410,7 @@ const AddNewEmployee: React.FC = () => {
                               className="flex items-center justify-between rounded border p-3 hover:bg-gray-50"
                             >
                               <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                                <div className="flex size-10 items-center justify-center rounded-full bg-blue-100">
                                   {user.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
                                 </div>
                                 <div>
