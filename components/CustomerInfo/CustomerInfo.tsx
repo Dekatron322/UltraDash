@@ -872,7 +872,7 @@ const CustomerInfo = () => {
                 className={`gap-2 rounded-full p-1 px-2 text-center ${
                   customer.status?.value === 4
                     ? "bg-[#d82e2e]"
-                    : customer.status?.value === 2
+                    : customer.status?.value === 1
                     ? "bg-[#589e67]"
                     : "bg-[#E6A441]"
                 }`}
