@@ -235,6 +235,19 @@ export interface DisableWalletResponse {
   message: string
 }
 
+// Suspend User Request Interface
+export interface SuspendUserRequest {
+  userId: number
+  suspend: boolean
+  reason: string
+}
+
+// Suspend User Response Interface
+export interface SuspendUserResponse {
+  isSuccess: boolean
+  message: string
+}
+
 export const customerApi = createApi({
   reducerPath: "customerApi",
   baseQuery: fetchBaseQuery({
@@ -340,6 +353,15 @@ export const customerApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    // Suspend User mutation endpoint
+    suspendUser: builder.mutation<SuspendUserResponse, SuspendUserRequest>({
+      query: (suspendData) => ({
+        url: API_ENDPOINTS.USERS.SUSPEND,
+        method: "POST",
+        body: suspendData,
+      }),
+      invalidatesTags: ["User"],
+    }),
     // Get Admin Logs query endpoint
     getAdminLogs: builder.query<
       AdminLogsResponse,
@@ -374,5 +396,6 @@ export const {
   useGetUserCryptoQuery,
   useAddBonusMutation,
   useDisableWalletMutation,
+  useSuspendUserMutation,
   useGetAdminLogsQuery,
 } = customerApi

@@ -866,14 +866,29 @@ const CustomerInfo = () => {
               <p className="text-[#202B3C]">{customer.tag || "N/A"}</p>
             </div>
 
-            <div className="flex items-center justify-between gap-2 border-b pb-3  font-semibold">
-              <h3 className=" font-semibold text-gray-500">2FA Verification:</h3>
+            <div className="flex items-center justify-between gap-2 border-b pb-3 font-semibold">
+              <h3 className="font-semibold text-gray-500">Account Status:</h3>
+              <div
+                className={`gap-2 rounded-full p-1 px-2 text-center ${
+                  customer.status?.value === 4
+                    ? "bg-[#d82e2e]"
+                    : customer.status?.value === 2
+                    ? "bg-[#589e67]"
+                    : "bg-[#E6A441]"
+                }`}
+              >
+                <span className="text-white">{customer.status?.label || "Unknown"}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 border-b pb-3 font-semibold">
+              <h3 className="font-semibold text-gray-500">2FA Verification:</h3>
               <div
                 className={`gap-2 rounded-full p-1 px-2 text-center ${
                   customer.isTwoFactorEnabled ? "bg-[#589e67]" : "bg-[#d82e2e]"
                 }`}
               >
-                <span className=" text-white">{customer.isTwoFactorEnabled ? "Enabled" : "Disabled"}</span>
+                <span className="text-white">{customer.isTwoFactorEnabled ? "Enabled" : "Disabled"}</span>
               </div>
             </div>
 

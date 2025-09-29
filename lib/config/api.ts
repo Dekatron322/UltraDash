@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
     DETAILS: (id: string | number) => `/Admin/Users/${id}`,
     ADD_BONUS: "/Admin/Wallet/Bonus",
     DISABLE: "/Admin/Wallet/Disable",
+    SUSPEND: "/Admin/User/Suspend",
   },
 
   // Transaction endpoints
