@@ -1,4 +1,3 @@
-// src/app/withdraw/page.tsx
 "use client"
 
 import React, { useEffect, useState } from "react"
@@ -62,6 +61,8 @@ interface AccountVerificationResponse {
   }
 }
 
+const MAX_TRANSACTION_AMOUNT = 5000000 // 5,000,000 maximum per transaction
+
 const WithdrawPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [verifyingAccount, setVerifyingAccount] = useState(false)
@@ -103,33 +104,17 @@ const WithdrawPage: React.FC = () => {
   // Account verification mutation
   const [verifyAccount, { isLoading: isVerifyingAccount }] = useVerifyAccountMutation()
 
-  // Mock user data with currency-specific balances
-  const userDetails: UserDetails = {
-    id: "user-001",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+2348012345678",
-    balances: [
-      { currencyId: 1, balance: 15000000.0, currencySymbol: "₦", currencyName: "Nigerian Naira" },
-      { currencyId: 2, balance: 1500.5, currencySymbol: "$", currencyName: "US Dollar" },
-      { currencyId: 3, balance: 0.025, currencySymbol: "₿", currencyName: "Bitcoin" },
-      { currencyId: 4, balance: 0.85, currencySymbol: "Ξ", currencyName: "Ethereum" },
-    ],
-  }
-
-  // Get current balance for selected currency
+  // Get current balance for selected currency - This should come from your actual API
   const getCurrentBalance = (): number => {
-    if (!selectedCurrency) return 0
-    const currencyBalance = userDetails.balances.find((b) => b.currencyId === selectedCurrency.id)
-    return currencyBalance?.balance || 0
+    // In a real application, you would fetch this from your user balance API
+    // For now, returning a placeholder value
+    return 0
   }
 
   // Get current currency symbol for display
   const getCurrentCurrencySymbol = (): string => {
     if (!selectedCurrency) return "₦"
-    const currencyBalance = userDetails.balances.find((b) => b.currencyId === selectedCurrency.id)
-    return currencyBalance?.currencySymbol || selectedCurrency.symbol
+    return selectedCurrency.symbol
   }
 
   // Filter banks based on search term
@@ -248,17 +233,11 @@ const WithdrawPage: React.FC = () => {
     }
 
     const withdrawalAmount = parseFloat(amount)
-    const currentBalance = getCurrentBalance()
-    if (withdrawalAmount > currentBalance) {
-      notify("error", "Insufficient Balance", {
-        description: `You don't have enough funds to complete this withdrawal. Available: ${getCurrentCurrencySymbol()}${currentBalance.toLocaleString()}`,
-      })
-      return
-    }
 
-    if (withdrawalAmount < 1) {
-      notify("error", "Minimum Amount", {
-        description: `Minimum withdrawal amount is ${getCurrentCurrencySymbol()}1.00`,
+    // Check if amount exceeds maximum transaction limit
+    if (withdrawalAmount > MAX_TRANSACTION_AMOUNT) {
+      notify("error", "Amount Exceeds Limit", {
+        description: `Maximum withdrawal amount is ${getCurrentCurrencySymbol()}${MAX_TRANSACTION_AMOUNT.toLocaleString()}`,
       })
       return
     }
@@ -288,13 +267,19 @@ const WithdrawPage: React.FC = () => {
     // Allow only numbers and decimal point
     if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value)
-      setIsValidAmount(!!value && !isNaN(parseFloat(value)) && parseFloat(value) > 0)
+
+      const numericValue = parseFloat(value)
+      const isValid = !!value && !isNaN(numericValue) && numericValue > 0
+      const isWithinLimit = numericValue <= MAX_TRANSACTION_AMOUNT
+
+      setIsValidAmount(isValid && isWithinLimit)
     }
   }
 
   const handleMaxAmount = () => {
     const currentBalance = getCurrentBalance()
-    setAmount(currentBalance.toString())
+    const maxAmount = Math.min(currentBalance, MAX_TRANSACTION_AMOUNT)
+    setAmount(maxAmount.toString())
     setIsValidAmount(true)
   }
 
@@ -351,30 +336,21 @@ const WithdrawPage: React.FC = () => {
             </div>
           </div>
 
-          {/* User Balance Card */}
-          {/* <motion.div
-            className="mb-6 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-600 p-4 text-white shadow-lg"
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.1 }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm opacity-80">
-                  Available Balance {selectedCurrency ? `(${selectedCurrency.name})` : ""}
-                </p>
-                <h2 className="text-2xl font-bold">
-                  {getCurrentCurrencySymbol()}{getCurrentBalance().toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </h2>
-                {!selectedCurrency && (
-                  <p className="text-xs opacity-70 mt-1">Select a currency to view balance</p>
-                )}
+          {/* Maximum Transaction Limit Notice */}
+          <div className="mb-6 rounded-lg bg-blue-50 p-4">
+            <div className="flex items-start">
+              <div className="mr-3 mt-0.5">
+                <FiCheck className="text-blue-600" />
               </div>
-              <div className="rounded-full bg-white/20 p-3">
-                <FiCreditCard className="size-6" />
+              <div>
+                <h3 className="text-sm font-medium text-blue-800">Transaction Limit</h3>
+                <p className="mt-1 text-xs text-blue-700">
+                  Maximum withdrawal amount: {getCurrentCurrencySymbol()}
+                  {MAX_TRANSACTION_AMOUNT.toLocaleString()} per transaction
+                </p>
               </div>
             </div>
-          </motion.div> */}
+          </div>
 
           {/* Withdrawal Form */}
           <form onSubmit={handleSubmit}>
@@ -688,13 +664,13 @@ const WithdrawPage: React.FC = () => {
 
             {/* Amount Field */}
             <div className="mb-6">
-              <div className="mb-2 flex items-center justify-between">
+              {/* <div className="mb-2 flex items-center justify-between">
                 <label className="block text-sm font-medium text-gray-700">Amount</label>
                 <button type="button" onClick={handleMaxAmount} className="text-xs text-blue-600 hover:text-blue-800">
                   Max: {getCurrentCurrencySymbol()}
-                  {getCurrentBalance().toLocaleString()}
+                  {Math.min(getCurrentBalance(), MAX_TRANSACTION_AMOUNT).toLocaleString()}
                 </button>
-              </div>
+              </div> */}
               <div
                 className={`relative rounded-xl border p-3 transition-all ${
                   activeField === "amount"
@@ -717,13 +693,15 @@ const WithdrawPage: React.FC = () => {
                     required
                   />
                 </div>
-                {!isValidAmount && (
+                {!isValidAmount && amount && (
                   <motion.p
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     className="mt-1 text-xs text-red-500"
                   >
-                    Please enter a valid amount
+                    {parseFloat(amount) > MAX_TRANSACTION_AMOUNT
+                      ? `Amount exceeds maximum limit of ${getCurrentCurrencySymbol()}${MAX_TRANSACTION_AMOUNT.toLocaleString()}`
+                      : "Please enter a valid amount"}
                   </motion.p>
                 )}
               </div>
