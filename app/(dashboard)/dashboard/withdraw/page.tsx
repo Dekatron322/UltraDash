@@ -111,7 +111,7 @@ const WithdrawPage: React.FC = () => {
     email: "john.doe@example.com",
     phone: "+2348012345678",
     balances: [
-      { currencyId: 1, balance: 250000.75, currencySymbol: "₦", currencyName: "Nigerian Naira" },
+      { currencyId: 1, balance: 15000000.0, currencySymbol: "₦", currencyName: "Nigerian Naira" },
       { currencyId: 2, balance: 1500.5, currencySymbol: "$", currencyName: "US Dollar" },
       { currencyId: 3, balance: 0.025, currencySymbol: "₿", currencyName: "Bitcoin" },
       { currencyId: 4, balance: 0.85, currencySymbol: "Ξ", currencyName: "Ethereum" },
