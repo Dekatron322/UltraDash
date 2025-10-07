@@ -109,7 +109,7 @@ const DashboardNav = () => {
     {
       name: "Logs",
       path: "/logs",
-      show: user?.admin?.permission?.canManageSystemSettings,
+      show: user?.admin?.isSuperAdmin === true,
     },
   ]
 

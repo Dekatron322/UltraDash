@@ -36,6 +36,7 @@ interface Permission {
 interface Admin {
   id: number
   isActive: boolean
+  isSuperAdmin: boolean
   permission: Permission
 }
 
