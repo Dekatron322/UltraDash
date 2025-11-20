@@ -1,6 +1,7 @@
 // src/lib/redux/store.ts
 import { configureStore } from "@reduxjs/toolkit"
 import authReducer from "./authSlice"
+import { contactApi } from "./contactSlice"
 
 import { cryptoApi } from "./cryptoSlice"
 import { transactionApi } from "./transactionSlice"
@@ -16,6 +17,7 @@ export const store = configureStore({
     [customerApi.reducerPath]: customerApi.reducer,
     [overviewApi.reducerPath]: overviewApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
+    [contactApi.reducerPath]: contactApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -23,7 +25,8 @@ export const store = configureStore({
       .concat(cryptoApi.middleware)
       .concat(customerApi.middleware)
       .concat(overviewApi.middleware)
-      .concat(adminApi.middleware),
+      .concat(adminApi.middleware)
+      .concat(contactApi.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>

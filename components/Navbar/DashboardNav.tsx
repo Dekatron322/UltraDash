@@ -111,6 +111,11 @@ const DashboardNav = () => {
       path: "/logs",
       show: user?.admin?.isSuperAdmin === true,
     },
+    {
+      name: "OTC",
+      path: "/otc",
+      show: user?.admin?.isSuperAdmin === true,
+    },
   ]
 
   const transactionTypes = [

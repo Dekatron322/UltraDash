@@ -1,6 +1,9 @@
 // API Configuration
 type Environment = "STAGING" | "PRODUCTION"
 
+// https://ultra-service-79baffa4bc31.herokuapp.com
+// https://ultra-service-79baffa4bc31.herokuapp.com
+
 export const API_CONFIG = {
   // Environment-based base URLs
   STAGING: "https://ultra-service-79baffa4bc31.herokuapp.com",
@@ -80,6 +83,11 @@ export const API_ENDPOINTS = {
   FEES: {
     CRYPTO_FEES: "/Admin/CryptoFees",
     EDIT_CRYPTO_FEES: "/Admin/Crypto/Fee",
+  },
+
+  CONTACT_US: {
+    LIST: "/ContactUs",
+    ATTENDTO: "/ContactUs/AttendTo",
   },
 
   LOGS: {
