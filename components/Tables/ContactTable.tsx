@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { RxCaretSort } from "react-icons/rx"
 import { MdOutlineArrowBackIosNew, MdOutlineArrowForwardIos, MdOutlineCheckBoxOutlineBlank } from "react-icons/md"
-import { useGetContactListQuery, useAttendToContactMutation } from "lib/redux/contactSlice"
+import { useAttendToContactMutation, useGetContactListQuery } from "lib/redux/contactSlice"
 import { AnimatePresence, motion } from "framer-motion"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"

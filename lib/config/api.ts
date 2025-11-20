@@ -2,7 +2,7 @@
 type Environment = "STAGING" | "PRODUCTION"
 
 // https://ultra-service-79baffa4bc31.herokuapp.com
-// https://ultra-service-79baffa4bc31.herokuapp.com
+// https://ultrapay-002-site1.qtempurl.com
 
 export const API_CONFIG = {
   // Environment-based base URLs
